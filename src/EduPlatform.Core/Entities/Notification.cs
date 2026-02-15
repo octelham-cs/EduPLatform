@@ -11,25 +11,24 @@ namespace EduPlatform.Core.Entities
         public int Id { get; set; }
 
         [Required]
-        public string UserId { get; set; } // المستلم
+        public string UserId { get; set; } = string.Empty;
 
-        [Required]
         public NotificationType Type { get; set; }
 
         [Required]
-        [MaxLength(200)]
-        public string Title { get; set; }
+        [StringLength(200)]
+        public string Title { get; set; } = string.Empty;
 
-        [MaxLength(500)]
-        public string Message { get; set; }
+        [StringLength(1000)]
+        public string? Message { get; set; }
 
-        public string Url { get; set; } // رابط عند الضغط
-
+        public string? Link { get; set; }
         public bool IsRead { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        [ForeignKey("UserId")]
-        public virtual ApplicationUser User { get; set; }
+        // Navigation Property
+        [ForeignKey(nameof(UserId))]
+        public ApplicationUser User { get; set; } = null!;
+        public string Url { get; set; }
     }
 }

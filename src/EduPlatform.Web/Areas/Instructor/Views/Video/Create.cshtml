@@ -1,0 +1,153 @@
+﻿<!-- src/EduPlatform.Web/Areas/Instructor/Views/Video/Create.cshtml -->
+@model EduPlatform.Web.ViewModels.Instructor.AddVideoViewModel
+@{
+    ViewData["Title"] = "إضافة فيديو جديد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-video me-2"></i>
+                        إضافة فيديو جديد
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label asp-for="ChapterId" class="form-label fw-bold">
+                                <i class="fas fa-folder text-warning me-1"></i>
+                                اختر الفصل
+                            </label>
+                            <select asp-for="ChapterId" class="form-select form-select-lg" required>
+                                <option value="">-- اختر الفصل --</option>
+                                @if (ViewBag.Chapters != null)
+                                {
+                                    @foreach (var chapter in ViewBag.Chapters)
+                                    {
+                                        <option value="@chapter.Value">@chapter.Text</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ChapterId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">
+                                <i class="fas fa-heading text-primary me-1"></i>
+                                عنوان الفيديو
+                            </label>
+                            <input asp-for="Title" class="form-control form-control-lg"
+                                   placeholder="مثال: مقدمة في النحو" required />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold">
+                                <i class="fas fa-align-left text-primary me-1"></i>
+                                وصف الفيديو (اختياري)
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="3"
+                                      placeholder="وصف مختصر لمحتوى الفيديو..."></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="YouTubeUrl" class="form-label fw-bold">
+                                <i class="fab fa-youtube text-danger me-1"></i>
+                                رابط YouTube
+                            </label>
+                            <input asp-for="YouTubeUrl" class="form-control form-control-lg"
+                                   placeholder="https://www.youtube.com/watch?v=..." required
+                                   id="youtubeUrl" />
+                            <span asp-validation-for="YouTubeUrl" class="text-danger small"></span>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                سيتم جلب الصورة المصغرة تلقائياً
+                            </small>
+                        </div>
+
+                        <!-- معاينة الصورة -->
+                        <div class="mb-4" id="thumbnailPreview" style="display: none;">
+                            <label class="form-label fw-bold">معاينة الصورة:</label>
+                            <div>
+                                <img id="thumbnailImg" src="" class="rounded shadow-sm"
+                                     style="max-width: 320px; display: none;" />
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Order" class="form-label fw-bold">
+                                    <i class="fas fa-sort text-info me-1"></i>
+                                    ترتيب الفيديو
+                                </label>
+                                <input asp-for="Order" class="form-control" type="number" min="1" value="1" />
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="form-check form-switch fs-5">
+                                    <input asp-for="IsHidden" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsHidden" class="form-check-label">
+                                        <i class="fas fa-eye-slash text-warning me-1"></i>
+                                        إخفاء الفيديو
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-right me-2"></i>
+                                رجوع
+                            </a>
+
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-save me-2"></i>
+                                حفظ الفيديو
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // استخراج ومعاينة الصورة المصغرة
+            $('#youtubeUrl').on('input', function() {
+                var url = $(this).val();
+                var videoId = extractVideoId(url);
+
+                if (videoId) {
+                    var thumbnail = 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
+                    $('#thumbnailImg').attr('src', thumbnail).show();
+                    $('#thumbnailPreview').show();
+                } else {
+                    $('#thumbnailImg').hide();
+                    $('#thumbnailPreview').hide();
+                }
+            });
+
+            function extractVideoId(url) {
+                if (!url) return '';
+
+                var match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/]+)/);
+                return match ? match[1] : '';
+            }
+        });
+    </script>
+}

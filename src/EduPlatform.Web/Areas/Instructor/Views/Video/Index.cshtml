@@ -1,0 +1,240 @@
+﻿@using EduPlatform.Core.Entities
+@model List<Course>
+
+@{
+    ViewData["Title"] = "إدارة الفيديوهات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // تحويل ViewBag إلى متغيرات محددة النوع
+    var courses = ViewBag.Courses as List<Course> ?? new List<Course>();
+    var selectedCourse = ViewBag.SelectedCourse as Course;
+    var selectedCourseId = ViewBag.SelectedCourseId as int?;
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0 fade-in">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0">
+                                <i class="fas fa-video text-primary me-2"></i>
+                                إدارة الفيديوهات
+                            </h4>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>
+                                إضافة فيديو جديد
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- اختيار الكورس -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">اختر الكورس:</label>
+                            <select class="form-select" id="courseSelect">
+                                <option value="">-- كل الكورسات --</option>
+                                @if (courses.Any())
+                                {
+                                    @foreach (var course in courses)
+                                    {
+                                        var videoCount = course.Chapters?.Sum(c => c.Videos?.Count ?? 0) ?? 0;
+                                        <option value="@course.Id" selected="@(selectedCourseId == course.Id)">
+                                            @course.Title (@videoCount فيديو)
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    @if (selectedCourse == null)
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-video fa-5x text-muted opacity-25"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">اختر كورس لعرض الفيديوهات</h4>
+                            <p class="text-muted">أو أضف فيديو جديد مباشرة</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-4">
+                            <h5 class="fw-bold">
+                                <i class="fas fa-book text-primary me-2"></i>
+                                @selectedCourse.Title
+                            </h5>
+                            <p class="text-muted mb-0">@selectedCourse.Description</p>
+                        </div>
+
+                        @if (selectedCourse.Chapters == null || !selectedCourse.Chapters.Any())
+                        {
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                لا توجد فصول في هذا الكورس. أضف فصولاً أولاً من صفحة الكورسات.
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var chapter in selectedCourse.Chapters.OrderBy(c => c.Order))
+                            {
+                                <div class="card mb-4">
+                                    <div class="card-header bg-light">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0 fw-bold">
+                                                <i class="fas fa-folder text-warning me-2"></i>
+                                                @chapter.Title
+                                            </h6>
+                                            <span class="badge bg-secondary">
+                                                @(chapter.Videos?.Count ?? 0) فيديو
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body p-0">
+                                        @if (chapter.Videos == null || !chapter.Videos.Any())
+                                        {
+                                            <div class="text-center py-4 text-muted">
+                                                <i class="fas fa-video-slash me-2"></i>
+                                                لا توجد فيديوهات
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="table-responsive">
+                                                <table class="table table-hover mb-0">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 80px">#</th>
+                                                            <th style="width: 120px">الصورة</th>
+                                                            <th>العنوان</th>
+                                                            <th style="width: 80px">الترتيب</th>
+                                                            <th style="width: 100px">الحالة</th>
+                                                            <th style="width: 150px">الإجراءات</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var video in chapter.Videos.OrderBy(v => v.Order))
+                                                        {
+                                                            <tr id="video-@video.Id">
+                                                                <td class="text-muted">@video.Order</td>
+                                                                <td>
+                                                                    @if (!string.IsNullOrEmpty(video.ThumbnailUrl))
+                                                                    {
+                                                                        <img src="@video.ThumbnailUrl"
+                                                                             class="rounded"
+                                                                             style="width: 100px; height: 56px; object-fit: cover;"
+                                                                             alt="@video.Title" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center"
+                                                                             style="width: 100px; height: 56px;">
+                                                                            <i class="fas fa-video text-white"></i>
+                                                                        </div>
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    <span class="fw-semibold">@video.Title</span>
+                                                                    @if (!string.IsNullOrEmpty(video.Description))
+                                                                    {
+                                                                        <br />
+                                                                        <small class="text-muted">
+                                                                            @(video.Description.Length > 50 ? video.Description.Substring(0, 50) + "..." : video.Description)
+                                                                        </small>
+                                                                    }
+                                                                </td>
+                                                                <td>@video.Order</td>
+                                                                <td>
+                                                                    @if (video.IsHidden)
+                                                                    {
+                                                                        <span class="badge bg-warning text-dark">
+                                                                            <i class="fas fa-eye-slash me-1"></i> مخفي
+                                                                        </span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="badge bg-success">
+                                                                            <i class="fas fa-eye me-1"></i> ظاهر
+                                                                        </span>
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    <div class="btn-group">
+                                                                        <button type="button" class="btn btn-sm btn-outline-warning toggle-visibility"
+                                                                                data-id="@video.Id" title="إخفاء/إظهار">
+                                                                            <i class="fas fa-eye@(video.IsHidden ? "" : "-slash")"></i>
+                                                                        </button>
+                                                                        <a asp-action="Edit" asp-route-id="@video.Id"
+                                                                           class="btn btn-sm btn-outline-primary" title="تعديل">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </a>
+                                                                        <button type="button" class="btn btn-sm btn-outline-danger delete-video"
+                                                                                data-id="@video.Id" title="حذف">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // تغيير الكورس
+            $('#courseSelect').change(function() {
+                var courseId = $(this).val();
+                if (courseId) {
+                    window.location.href = '/Instructor/Video?courseId=' + courseId;
+                } else {
+                    window.location.href = '/Instructor/Video';
+                }
+            });
+
+            // إخفاء/إظهار الفيديو
+            $('.toggle-visibility').click(function() {
+                var btn = $(this);
+                var id = btn.data('id');
+
+                $.post('/Instructor/Video/ToggleVisibility/' + id, function(res) {
+                    if (res.success) {
+                        location.reload();
+                    }
+                });
+            });
+
+            // حذف الفيديو
+            $('.delete-video').click(function() {
+                var id = $(this).data('id');
+
+                if (confirm('هل أنت متأكد من حذف هذا الفيديو؟')) {
+                    $.post('/Instructor/Video/Delete/' + id, {
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    }, function() {
+                        location.reload();
+                    });
+                }
+            });
+        });
+    </script>
+}

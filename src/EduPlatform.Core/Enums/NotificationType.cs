@@ -2,10 +2,13 @@
 {
     public enum NotificationType
     {
-        System = 0,           // عام
-        CodeActivated = 1,    // تفعيل كود
-        NewVideo = 2,         // فيديو جديد
-        SubscriptionExpiry = 3, // قرب انتهاء اشتراك
-        QuizResult = 4        // نتيجة اختبار
+        SubscriptionExpiring = 1,
+        SubscriptionExpired = 2,
+        NewVideo = 3,
+        Announcement = 4,
+        QuizResult = 5,
+        CodeActivated = 6,
+        InstructorApproved = 7,
+        TicketReply = 8
     }
 }

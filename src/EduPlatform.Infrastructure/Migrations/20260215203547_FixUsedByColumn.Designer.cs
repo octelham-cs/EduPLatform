@@ -4,6 +4,7 @@ using EduPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260215203547_FixUsedByColumn")]
+    partial class FixUsedByColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -436,12 +439,10 @@ namespace EduPlatform.Infrastructure.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Link")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Message")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -478,6 +479,7 @@ namespace EduPlatform.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("CorrectAnswerJson")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -494,8 +496,7 @@ namespace EduPlatform.Infrastructure.Migrations
 
                     b.Property<string>("QuestionText")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
@@ -535,6 +536,7 @@ namespace EduPlatform.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("QuestionsJson")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TimeLimit")
@@ -555,8 +557,6 @@ namespace EduPlatform.Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("VideoId");
-
                     b.ToTable("Quizzes");
                 });
 
@@ -569,6 +569,7 @@ namespace EduPlatform.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AnswersJson")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("FinishedAt")
@@ -1032,19 +1033,13 @@ namespace EduPlatform.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EduPlatform.Core.Entities.Video", "Video")
-                        .WithMany()
-                        .HasForeignKey("VideoId");
-
                     b.Navigation("Course");
-
-                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("EduPlatform.Core.Entities.QuizAttempt", b =>
                 {
                     b.HasOne("EduPlatform.Core.Entities.Quiz", "Quiz")
-                        .WithMany("QuizAttempts")
+                        .WithMany()
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1174,11 +1169,6 @@ namespace EduPlatform.Infrastructure.Migrations
             modelBuilder.Entity("EduPlatform.Core.Entities.Course", b =>
                 {
                     b.Navigation("Chapters");
-                });
-
-            modelBuilder.Entity("EduPlatform.Core.Entities.Quiz", b =>
-                {
-                    b.Navigation("QuizAttempts");
                 });
 
             modelBuilder.Entity("EduPlatform.Core.Entities.Student", b =>

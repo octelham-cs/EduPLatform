@@ -1,120 +1,235 @@
-﻿@model IEnumerable<EduPlatform.Core.Entities.EnrollmentCode>
-
+﻿<!-- src/EduPlatform.Web/Areas/Instructor/Views/Code/Index.cshtml -->
+@model List<EduPlatform.Web.ViewModels.Instructor.GeneratedCodeViewModel>
 @{
-    ViewData["Title"] = "أكوادي";
+    ViewData["Title"] = "أكواد الاشتراك";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>أكواد الاشتراك</h2>
-        <div>
-            <a asp-action="Generate" class="btn btn-success">
-                ➕ توليد أكواد جديدة
-            </a>
-            <a asp-action="Export" class="btn btn-outline-primary">
-                📥 تصدير CSV
-            </a>
-        </div>
-    </div>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0">
+                                <i class="fas fa-qrcode text-primary me-2"></i>
+                                أكواد الاشتراك
+                            </h4>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a asp-action="Generate" class="btn btn-primary me-2">
+                                <i class="fas fa-plus me-1"></i>
+                                توليد أكواد جديدة
+                            </a>
+                            <a asp-action="ExportCsv" class="btn btn-success">
+                                <i class="fas fa-file-csv me-1"></i>
+                                تصدير CSV
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
 
-    <!-- فلتر -->
-    <div class="card mb-3">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label">الكورس</label>
-                    <select name="courseId" class="form-select">
-                        <option value="">كل الكورسات</option>
-@foreach (var course in (ViewBag.Courses as IEnumerable<SelectListItem>) ?? new List<SelectListItem>())                        {
-                            <option value="@course.Value">@course.Text</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">الحالة</label>
-                    <select name="status" class="form-select">
-                        <option value="">كل الحالات</option>
-                        <option value="Available">متاح</option>
-                        <option value="Used">مستخدم</option>
-                        <option value="Expired">منتهي</option>
-                    </select>
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary">فلتر</button>
-                </div>
-            </form>
-        </div>
-    </div>
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-qrcode fa-5x text-muted opacity-25"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">لا توجد أكواد حتى الآن</h4>
+                            <p class="text-muted mb-4">ابدأ بتوليد أكواد اشتراك لطلابك</p>
+                            <a asp-action="Generate" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus me-2"></i>
+                                توليد أكواد جديدة
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- إحصائيات سريعة -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-primary bg-opacity-10 border-0">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-qrcode fa-2x text-primary mb-2"></i>
+                                        <h5 class="mb-0">@Model.Count</h5>
+                                        <small class="text-muted">إجمالي الأكواد</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-success bg-opacity-10 border-0">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                        <h5 class="mb-0">@Model.Count(c => c.Status == "متاح")</h5>
+                                        <small class="text-muted">متاحة</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-info bg-opacity-10 border-0">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-check fa-2x text-info mb-2"></i>
+                                        <h5 class="mb-0">@Model.Count(c => c.Status == "مستخدم")</h5>
+                                        <small class="text-muted">مستخدمة</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-secondary bg-opacity-10 border-0">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-clock fa-2x text-secondary mb-2"></i>
+                                        <h5 class="mb-0">@Model.Count(c => c.Status == "منتهي")</h5>
+                                        <small class="text-muted">منتهية</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-    <div class="card">
-        <div class="card-body">
-            @if (Model.Any())
-            {
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>الكود</th>
-                            <th>الكورس</th>
-                            <th>السعر</th>
-                            <th>الترم</th>
-                            <th>الحالة</th>
-                            <th>تاريخ الانتهاء</th>
-                            <th>المستخدم</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var code in Model)
-                        {
-                            <tr>
-                                <td>
-                                    <code class="bg-light p-1 rounded">@code.Code</code>
-                                </td>
-                                <td>@code.Course.Title</td>
-                                <td>@code.Price جنيه</td>
-                                <td>@code.AcademicTerm.Name</td>
-                                <td>
-                                    @switch (code.Status)
+                        <!-- جدول الأكواد -->
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px">#</th>
+                                        <th>الكود</th>
+                                        <th>الكورس</th>
+                                        <th>السعر</th>
+                                        <th>الحالة</th>
+                                        <th>تاريخ الإنشاء</th>
+                                        <th>فترة الصلاحية</th>
+                                        <th>الطالب</th>
+                                        <th style="width: 100px">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var (code, index) in Model.Select((c, i) => (c, i + 1)))
                                     {
-                                        case EduPlatform.Core.Enums.CodeStatus.Available:
-                                            <span class="badge bg-success">متاح</span>
-                                            break;
-                                        case EduPlatform.Core.Enums.CodeStatus.Used:
-                                            <span class="badge bg-primary">مستخدم</span>
-                                            break;
-                                        case EduPlatform.Core.Enums.CodeStatus.Expired:
-                                            <span class="badge bg-danger">منتهي</span>
-                                            break;
+                                        <tr>
+                                            <td class="text-muted">@index</td>
+                                            <td>
+                                                <code class="bg-light px-3 py-2 rounded d-inline-block fs-6">@code.Code</code>
+                                            </td>
+                                            <td>
+                                                <span class="fw-semibold">@code.CourseName</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-success fw-bold">@code.Price.ToString("N2")</span>
+                                                <small class="text-muted">ج.م</small>
+                                            </td>
+                                            <td>
+                                                @if (code.Status == "متاح")
+                                                {
+                                                    <span class="badge bg-success-subtle text-success px-3 py-2">
+                                                        <i class="fas fa-check me-1"></i> متاح
+                                                    </span>
+                                                }
+                                                else if (code.Status == "مستخدم")
+                                                {
+                                                    <span class="badge bg-info-subtle text-info px-3 py-2">
+                                                        <i class="fas fa-user-check me-1"></i> مستخدم
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2">
+                                                        <i class="fas fa-clock me-1"></i> منتهي
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small>@code.CreatedAt.ToString("yyyy-MM-dd")</small>
+                                            </td>
+                                            <td>
+                                                <small>
+                                                    <i class="fas fa-calendar-alt text-muted me-1"></i>
+                                                    @code.StartDate.ToString("dd/MM/yyyy")
+                                                    <i class="fas fa-arrow-left text-muted mx-1"></i>
+                                                    @code.EndDate.ToString("dd/MM/yyyy")
+                                                </small>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(code.StudentName))
+                                                {
+                                                    <span class="badge bg-primary-subtle text-primary">
+                                                        <i class="fas fa-user me-1"></i>
+                                                        @code.StudentName
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary copy-btn"
+                                                            data-code="@code.Code" title="نسخ الكود">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                    <a asp-action="Details" asp-route-id="@code.Id"
+                                                       class="btn btn-sm btn-outline-info" title="التفاصيل">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
                                     }
-                                </td>
-                                <td>@code.EndDate.ToString("yyyy/MM/dd")</td>
-                                <td>
-                                    @if (code.UsedByStudent != null)
-                                    {
-                                        <span>@code.UsedByStudent.User.FullName</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">-</span>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <div class="alert alert-info text-center">
-                    <h5>لا توجد أكواد</h5>
-                    <p>لم تقم بتوليد أي أكواد بعد</p>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
                 </div>
-            }
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // نسخ الكود
+            $('.copy-btn').click(function() {
+                var btn = $(this);
+                var code = btn.data('code');
+
+                navigator.clipboard.writeText(code).then(function() {
+                    // تغيير الأيقونة مؤقتاً
+                    var icon = btn.find('i');
+                    icon.removeClass('fa-copy').addClass('fa-check text-success');
+
+                    setTimeout(function() {
+                        icon.removeClass('fa-check text-success').addClass('fa-copy');
+                    }, 1500);
+
+                    // إظهار Toast
+                    showToast('success', 'تم نسخ الكود: ' + code);
+                }).catch(function() {
+                    showToast('error', 'فشل في نسخ الكود');
+                });
+            });
+
+            function showToast(type, message) {
+                var toast = $('<div class="toast align-items-center text-bg-' + (type === 'success' ? 'success' : 'danger') + ' border-0" role="alert">' +
+                    '<div class="d-flex">' +
+                    '<div class="toast-body">' + message + '</div>' +
+                    '<button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>' +
+                    '</div></div>');
+
+                $('.toast-container').append(toast);
+                var bsToast = new bootstrap.Toast(toast[0]);
+                bsToast.show();
+            }
+        });
+    </script>
+}

@@ -1,36 +1,41 @@
-﻿using System.Collections.Generic;
+﻿// src/EduPlatform.Web/ViewModels/Instructor/AddQuestionViewModel.cs
+
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using EduPlatform.Core.Enums;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EduPlatform.Web.ViewModels.Instructor
 {
-    public class QuestionViewModel
+    public class AddQuestionViewModel
     {
         public int Id { get; set; }
 
         [Required(ErrorMessage = "نص السؤال مطلوب")]
-        public string QuestionText { get; set; }
+        [Display(Name = "نص السؤال")]
+        public string QuestionText { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "نوع السؤال مطلوب")]
-        public QuestionType Type { get; set; }
+        [Required(ErrorMessage = "يجب اختيار نوع السؤال")]
+        [Display(Name = "نوع السؤال")]
+        public string QuestionType { get; set; } = "MultipleChoice";
 
-        [Required(ErrorMessage = "المادة مطلوبة")]
+        [Display(Name = "المادة")]
         public int SubjectId { get; set; }
 
+        [Display(Name = "الفصل")]
         public int? ChapterId { get; set; }
 
-        [Range(1, 5, ErrorMessage = "مستوى الصعوبة من 1 إلى 5")]
-        public int DifficultyLevel { get; set; } = 1;
+        [Range(1, 5, ErrorMessage = "مستوى الصعوبة بين 1 و 5")]
+        [Display(Name = "مستوى الصعوبة")]
+        public int DifficultyLevel { get; set; } = 3;
 
-        // للاستخدام في الـ View
+        // للاختيارات
+        [Display(Name = "الاختيارات")]
         public List<string> Options { get; set; } = new List<string> { "", "", "", "" };
 
-        [Required(ErrorMessage = "الإجابة الصحيحة مطلوبة")]
-        public string CorrectAnswer { get; set; }
+        [Display(Name = "الإجابة الصحيحة")]
+        public int CorrectAnswerIndex { get; set; }
 
-        // القوائم المنسدلة
-        public List<SelectListItem>? Subjects { get; set; }
-        public List<SelectListItem>? Chapters { get; set; }
+        [Display(Name = "الإجابة الصحيحة (للصح/خطأ)")]
+        public bool CorrectAnswerBool { get; set; }
     }
 }

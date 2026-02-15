@@ -1,92 +1,225 @@
-﻿@model EduPlatform.Web.ViewModels.Instructor.GenerateCodeViewModel
-
+﻿<!-- src/EduPlatform.Web/Areas/Instructor/Views/Code/Generate.cshtml -->
+@model EduPlatform.Web.ViewModels.Instructor.GenerateCodeViewModel
 @{
-    ViewData["Title"] = "توليد أكواد";
+    ViewData["Title"] = "توليد أكواد الاشتراك";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <h2>توليد أكواد اشتراك جديدة</h2>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-qrcode me-2"></i>
+                        توليد أكواد الاشتراك
+                    </h4>
+                </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <form asp-action="Generate" method="post">
-                        <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="card-body p-4">
+                    <!-- رسائل النجاح والخطأ -->
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="fas fa-check-circle me-2 fs-5"></i>
+                            <span>@TempData["Success"]</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2 fs-5"></i>
+                            <span>@TempData["Error"]</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Generate" method="post" id="generateCodeForm">
+                        @Html.AntiForgeryToken()
 
                         <!-- اختيار الكورس -->
-                        <div class="mb-3">
-                            <label asp-for="CourseId" class="form-label"></label>
-                            <select asp-for="CourseId" class="form-select">
-                                <option value="">-- اختر الكورس --</option>
-                                @foreach (var course in ViewBag.Courses)
-                                {
-                                    <option value="@course.Id">@course.Title (@course.Subject.Name)</option>
-                                }
-                            </select>
-                            <span asp-validation-for="CourseId" class="text-danger"></span>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-book text-primary me-1"></i>
+                                    اختر الكورس
+                                </label>
+                                <select asp-for="CourseId" class="form-select form-select-lg" id="courseSelect" required>
+                                    <option value="">-- اختر الكورس --</option>
+                                    @if (ViewBag.Courses != null)
+                                    {
+                                        @foreach (var course in ViewBag.Courses)
+                                        {
+                                            <option value="@course.Value" data-price="@course.Price">@course.Text</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="CourseId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-graduation-cap text-primary me-1"></i>
+                                    الترم الدراسي
+                                </label>
+                                <select asp-for="AcademicTermId" class="form-select form-select-lg" required>
+                                    <option value="">-- اختر الترم --</option>
+                                    @if (ViewBag.AcademicTerms != null)
+                                    {
+                                        @foreach (var term in ViewBag.AcademicTerms)
+                                        {
+                                            <option value="@term.Value"
+                                                    data-start="@term.StartDate?.ToString("yyyy-MM-dd")"
+                                                    data-end="@term.EndDate?.ToString("yyyy-MM-dd")">
+                                                @term.Text
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="AcademicTermId" class="text-danger small"></span>
+                            </div>
                         </div>
 
                         <!-- السعر -->
-                        <div class="mb-3">
-                            <label asp-for="Price" class="form-label"></label>
-                            <input asp-for="Price" class="form-control" type="number" step="0.01" />
-                            <span asp-validation-for="Price" class="text-danger"></span>
-                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-money-bill-wave text-success me-1"></i>
+                                    سعر الاشتراك (جنيه)
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <input asp-for="Price" class="form-control" type="number"
+                                           min="0" step="0.01" id="priceInput" required />
+                                    <span class="input-group-text bg-light">ج.م</span>
+                                </div>
+                                <span asp-validation-for="Price" class="text-danger small"></span>
+                            </div>
 
-                        <!-- نسبة الخصم -->
-                        <div class="mb-3">
-                            <label asp-for="DiscountPercentage" class="form-label"></label>
-                            <input asp-for="DiscountPercentage" class="form-control" type="number" />
-                            <small class="text-muted">اتركه فارغ إذا لا يوجد خصم</small>
-                        </div>
-
-                        <!-- الترم الدراسي -->
-                        <div class="mb-3">
-                            <label asp-for="AcademicTermId" class="form-label"></label>
-                            <select asp-for="AcademicTermId" class="form-select">
-                                <option value="">-- اختر الترم --</option>
-                                @foreach (var term in ViewBag.AcademicTerms)
-                                {
-                                    <option value="@term.Id">@term.Name</option>
-                                }
-                            </select>
-                            <span asp-validation-for="AcademicTermId" class="text-danger"></span>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-tags text-warning me-1"></i>
+                                    نسبة الخصم (اختياري)
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <input asp-for="DiscountPercentage" class="form-control"
+                                           type="number" min="0" max="100"
+                                           placeholder="مثال: 20" id="discountInput" />
+                                    <span class="input-group-text bg-light">%</span>
+                                </div>
+                                <small class="text-muted">اتركه فارغاً إذا لم يكن هناك خصم</small>
+                            </div>
                         </div>
 
                         <!-- عدد الأكواد -->
-                        <div class="mb-3">
-                            <label asp-for="Quantity" class="form-label"></label>
-                            <input asp-for="Quantity" class="form-control" type="number" />
-                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-hashtag text-info me-1"></i>
+                                    عدد الأكواد المطلوبة
+                                </label>
+                                <div class="input-group input-group-lg">
+                                    <button type="button" class="btn btn-outline-secondary" id="decreaseQty">-</button>
+                                    <input asp-for="Quantity" class="form-control text-center"
+                                           type="number" min="1" max="1000" value="1" id="quantityInput" />
+                                    <button type="button" class="btn btn-outline-secondary" id="increaseQty">+</button>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    أدخل 1 لتوليد كود واحد، أو أكثر لتوليد مجموعة أكواد دفعة واحدة
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- فترة الاشتراك -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar-check text-success me-1"></i>
+                                    بداية الاشتراك
+                                </label>
+                                <input asp-for="StartDate" class="form-control form-control-lg"
+                                       type="date" id="startDateInput" required />
+                                <span asp-validation-for="StartDate" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar-times text-danger me-1"></i>
+                                    نهاية الاشتراك
+                                </label>
+                                <input asp-for="EndDate" class="form-control form-control-lg"
+                                       type="date" id="endDateInput" required />
+                                <span asp-validation-for="EndDate" class="text-danger small"></span>
+                            </div>
                         </div>
 
                         <!-- ملاحظات -->
-                        <div class="mb-3">
-                            <label asp-for="Notes" class="form-label"></label>
-                            <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-sticky-note text-secondary me-1"></i>
+                                    ملاحظات (اختياري)
+                                </label>
+                                <textarea asp-for="Notes" class="form-control" rows="2"
+                                          placeholder="أي ملاحظات خاصة بالأكواد..."></textarea>
+                            </div>
                         </div>
 
-                        <!-- أزرار -->
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-success">توليد الأكواد</button>
-                            <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                        <!-- ملخص السعر -->
+                        <div class="card bg-light border-0 mb-4">
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fas fa-calculator me-2"></i>
+                                    ملخص الأسعار
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <table class="table table-sm mb-0">
+                                            <tr>
+                                                <td>السعر الأساسي:</td>
+                                                <td class="fw-bold" id="basePrice">0.00 ج.م</td>
+                                            </tr>
+                                            <tr>
+                                                <td>الخصم:</td>
+                                                <td class="text-danger fw-bold" id="discountAmount">- 0.00 ج.م</td>
+                                            </tr>
+                                            <tr class="table-success">
+                                                <td class="fw-bold">السعر النهائي:</td>
+                                                <td class="fw-bold text-success" id="finalPrice">0.00 ج.م</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <table class="table table-sm mb-0">
+                                            <tr>
+                                                <td>عدد الأكواد:</td>
+                                                <td class="fw-bold" id="totalCodes">1</td>
+                                            </tr>
+                                            <tr class="table-primary">
+                                                <td class="fw-bold">إجمالي القيمة:</td>
+                                                <td class="fw-bold text-primary" id="totalValue">0.00 ج.م</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- أزرار التحكم -->
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-right me-2"></i>
+                                رجوع للقائمة
+                            </a>
+
+                            <button type="submit" class="btn btn-primary btn-lg px-5" id="submitBtn">
+                                <i class="fas fa-magic me-2"></i>
+                                توليد الأكواد
+                            </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card bg-light">
-                <div class="card-body">
-                    <h5>📋 ملاحظات</h5>
-                    <ul>
-                        <li>الكود يُستخدم مرة واحدة فقط</li>
-                        <li>صلاحية الكود تنتهي مع نهاية الترم</li>
-                        <li>الطالب يدخل الكود للاشتراك في الكورس</li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -94,5 +227,90 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // تعيين التواريخ الافتراضية
+            var today = new Date();
+            var nextMonth = new Date();
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+
+            if (!$('#startDateInput').val()) {
+                $('#startDateInput').val(today.toISOString().split('T')[0]);
+            }
+            if (!$('#endDateInput').val()) {
+                $('#endDateInput').val(nextMonth.toISOString().split('T')[0]);
+            }
+
+            // أزرار زيادة/نقصان الكمية
+            $('#increaseQty').click(function() {
+                var current = parseInt($('#quantityInput').val()) || 1;
+                if (current < 1000) {
+                    $('#quantityInput').val(current + 1);
+                    updateSummary();
+                }
+            });
+
+            $('#decreaseQty').click(function() {
+                var current = parseInt($('#quantityInput').val()) || 1;
+                if (current > 1) {
+                    $('#quantityInput').val(current - 1);
+                    updateSummary();
+                }
+            });
+
+            // تحديث الملخص
+            function updateSummary() {
+                var price = parseFloat($('#priceInput').val()) || 0;
+                var discount = parseFloat($('#discountInput').val()) || 0;
+                var quantity = parseInt($('#quantityInput').val()) || 1;
+
+                var discountAmount = price * (discount / 100);
+                var finalPrice = price - discountAmount;
+                var totalValue = finalPrice * quantity;
+
+                $('#basePrice').text(price.toFixed(2) + ' ج.م');
+                $('#discountAmount').text('- ' + discountAmount.toFixed(2) + ' ج.م');
+                $('#finalPrice').text(finalPrice.toFixed(2) + ' ج.م');
+                $('#totalCodes').text(quantity);
+                $('#totalValue').text(totalValue.toFixed(2) + ' ج.م');
+            }
+
+            // ربط الأحداث
+            $('#priceInput, #discountInput, #quantityInput').on('input change', updateSummary);
+
+            // عند اختيار الترم - تعبئة التواريخ تلقائياً
+            $('select[name="AcademicTermId"]').change(function() {
+                var selected = $(this).find(':selected');
+                var start = selected.data('start');
+                var end = selected.data('end');
+
+                if (start) $('#startDateInput').val(start);
+                if (end) $('#endDateInput').val(end);
+            });
+
+            // تحديث السعر من الكورس المختار
+            $('#courseSelect').change(function() {
+                var selected = $(this).find(':selected');
+                var price = selected.data('price');
+                if (price) {
+                    $('#priceInput').val(price);
+                    updateSummary();
+                }
+            });
+
+            // تحديث أولي
+            updateSummary();
+
+            // تأثير التحميل عند الإرسال
+            $('#generateCodeForm').submit(function() {
+                var btn = $('#submitBtn');
+                btn.prop('disabled', true);
+                btn.html('<i class="fas fa-spinner fa-spin me-2"></i> جاري التوليد...');
+            });
+        });
+    </script>
 }

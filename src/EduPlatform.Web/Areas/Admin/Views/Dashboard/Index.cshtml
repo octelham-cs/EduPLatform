@@ -1,106 +1,219 @@
-﻿@model IEnumerable<EduPlatform.Core.Entities.Instructor>
-
+﻿<!-- src/EduPlatform.Web/Areas/Admin/Views/Dashboard/Index.cshtml -->
+@model EduPlatform.Web.ViewModels.Admin.AdminDashboardViewModel
 @{
-    ViewData["Title"] = "لوحة التحكم";
+    ViewData["Title"] = "لوحة تحكم الأدمن";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid mt-4">
-    <h2 class="mb-4">لوحة تحكم المسؤول</h2>
-
-    <div class="mb-4">
-        <a asp-action="AssignInstructor" class="btn btn-success">
-            ➕ تعيين مدرس جديد
-        </a>
-        <a asp-action="Instructors" class="btn btn-primary">
-            📋 إدارة المدرسين
-        </a>
-        <a asp-action="Students" class="btn btn-info">
-            🎓 إدارة الطلاب
-        </a>
-    </div>
-
-    <!-- بطاقات الإحصائيات -->
+<div class="container-fluid py-4 fade-in">
+    <!-- العنوان -->
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h3>@ViewBag.TotalInstructors</h3>
-                    <p class="mb-0">إجمالي المدرسين</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body text-center">
-                    <h3>@ViewBag.PendingInstructors</h3>
-                    <p class="mb-0">طلبات معلقة</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h3>@ViewBag.TotalStudents</h3>
-                    <p class="mb-0">إجمالي الطلاب</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h3>@ViewBag.TotalCourses</h3>
-                    <p class="mb-0">إجمالي الكورسات</p>
+        <div class="col-12">
+            <div class="card bg-dark text-white border-0">
+                <div class="card-body py-4">
+                    <h3 class="mb-2">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        لوحة تحكم الأدمن
+                    </h3>
+                    <p class="mb-0 opacity-75">إدارة شاملة للمنصة والمستخدمين</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- قائمة المدرسين المعلقين -->
-    <div class="card">
-        <div class="card-header bg-warning">
-            <h5 class="mb-0">المدرسين في انتظار الموافقة</h5>
+    <!-- الإحصائيات -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">طلبات المدرسين المعلقة</h6>
+                            <h2 class="mb-0 fw-bold text-warning">@Model.PendingInstructors</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-user-clock text-warning fa-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            @if (Model.Any())
-            {
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>الاسم</th>
-                            <th>البريد الإلكتروني</th>
-                            <th>رقم الهاتف</th>
-                            <th>تاريخ التسجيل</th>
-                            <th>الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var instructor in Model)
-                        {
-                            <tr>
-                                <td>@instructor.User.FullName</td>
-                                <td>@instructor.User.Email</td>
-                                <td>@instructor.User.PhoneNumber</td>
-                                <td>@instructor.RegisteredAt.ToString("yyyy/MM/dd")</td>
-                                <td>
-                                    <form asp-action="ApproveInstructor" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="@instructor.Id" />
-                                        <button type="submit" class="btn btn-success btn-sm">موافقة</button>
-                                    </form>
-                                    <form asp-action="RejectInstructor" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="@instructor.Id" />
-                                        <button type="submit" class="btn btn-danger btn-sm">رفض</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <p class="text-center text-muted">لا توجد طلبات معلقة</p>
-            }
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">إجمالي المدرسين</h6>
+                            <h2 class="mb-0 fw-bold">@Model.TotalInstructors</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-chalkboard-teacher text-primary fa-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">إجمالي الطلاب</h6>
+                            <h2 class="mb-0 fw-bold">@Model.TotalStudents</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-user-graduate text-success fa-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">إجمالي الكورسات</h6>
+                            <h2 class="mb-0 fw-bold">@Model.TotalCourses</h2>
+                        </div>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-book text-info fa-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- المدرسين المعلقين -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-clock text-warning me-2"></i>
+                        طلبات الانضمام المعلقة
+                    </h5>
+                    <span class="badge bg-warning text-dark">@Model.PendingInstructors طلب</span>
+                </div>
+                <div class="card-body">
+                    @if (!Model.PendingInstructorsList.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-4x text-success opacity-25 mb-3"></i>
+                            <h5 class="text-muted">لا توجد طلبات معلقة</h5>
+                            <p class="text-muted small">جميع الطلبات تمت معالجتها</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>الاسم</th>
+                                        <th>البريد الإلكتروني</th>
+                                        <th>تاريخ التسجيل</th>
+                                        <th style="width: 180px" class="text-center">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var instructor in Model.PendingInstructorsList)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                        <i class="fas fa-user text-primary"></i>
+                                                    </div>
+                                                    <span class="fw-semibold">@instructor.Name</span>
+                                                </div>
+                                            </td>
+                                            <td>@instructor.Email</td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    @instructor.RegisteredAt.ToString("dd/MM/yyyy HH:mm")
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <form asp-action="ApproveInstructor" method="post"
+                                                          asp-route-id="@instructor.Id" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-success">
+                                                            <i class="fas fa-check me-1"></i>
+                                                            موافقة
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="RejectInstructor" method="post"
+                                                          asp-route-id="@instructor.Id" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-times me-1"></i>
+                                                            رفض
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- إحصائيات إضافية -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie text-info me-2"></i>
+                        إحصائيات المنصة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-video text-danger me-2"></i>
+                                إجمالي الفيديوهات
+                            </span>
+                            <span class="badge bg-danger rounded-pill">@Model.TotalVideos</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-qrcode text-warning me-2"></i>
+                                إجمالي الأكواد
+                            </span>
+                            <span class="badge bg-warning text-dark rounded-pill">@Model.TotalCodes</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                المدرسين المعتمدين
+                            </span>
+                            <span class="badge bg-success rounded-pill">@Model.ApprovedInstructors</span>
+                        </li>
+                    </ul>
+
+                    <hr class="my-3" />
+
+                    <a asp-action="AssignInstructor" class="btn btn-primary w-100">
+                        <i class="fas fa-user-plus me-2"></i>
+                        تعيين مدرس جديد
+                    </a>
+                    <a asp-action="Instructors" class="btn btn-outline-primary w-100 mt-2">
+                        <i class="fas fa-list me-2"></i>
+                        عرض جميع المدرسين
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

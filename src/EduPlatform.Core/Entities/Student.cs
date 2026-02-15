@@ -1,32 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduPlatform.Core.Entities
 {
     public class Student
     {
+        [Key]
         public int Id { get; set; }
 
-        // ربط بـ ApplicationUser
+        [Required]
         public string UserId { get; set; } = string.Empty;
 
-        // المستوى الدراسي
         public int GradeLevelId { get; set; }
-
-        // الشعبة (اختياري)
         public int? BranchId { get; set; }
 
-        // تاريخ التسجيل
         public DateTime RegisteredAt { get; set; } = DateTime.Now;
 
         // Navigation Properties
+        [ForeignKey(nameof(UserId))]
         public ApplicationUser User { get; set; } = null!;
+
+        [ForeignKey(nameof(GradeLevelId))]
         public GradeLevel GradeLevel { get; set; } = null!;
+
+        [ForeignKey(nameof(BranchId))]
         public Branch? Branch { get; set; }
 
-        // الاشتراكات
+        // Collections
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
-
-        // تقدم الفيديوهات
-        public ICollection<VideoProgress> VideoProgresses { get; set; } = new List<VideoProgress>();
+        public ICollection<EnrollmentCode> EnrollmentCodes { get; set; } = new List<EnrollmentCode>();
     }
 }

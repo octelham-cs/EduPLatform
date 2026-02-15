@@ -1,60 +1,131 @@
-﻿@using EduPlatform.Core.Enums
-@model IEnumerable<EduPlatform.Core.Entities.Question>
+﻿<!-- src/EduPlatform.Web/Areas/Instructor/Views/QuestionBank/Index.cshtml -->
+@model List<EduPlatform.Core.Entities.Question>
 @{
     ViewData["Title"] = "بنك الأسئلة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 style="color: #003366;">📚 بنك الأسئلة</h2>
-        <a asp-action="Create" class="btn btn-primary" style="background-color: #003366;">
-            <i class="fas fa-plus"></i> إضافة سؤال جديد
-        </a>
-    </div>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0 fade-in">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0">
+                                <i class="fas fa-question-circle text-primary me-2"></i>
+                                بنك الأسئلة
+                            </h4>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>
+                                إضافة سؤال جديد
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-question-circle fa-5x text-muted opacity-25"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">لا توجد أسئلة في البنك</h4>
+                            <p class="text-muted mb-4">ابدأ بإضافة أسئلة للاختبارات</p>
+                            <a asp-action="Create" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus me-2"></i>
+                                إضافة سؤال جديد
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- فلاتر البحث -->
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-2">
+                                <input type="text" class="form-control" id="searchInput" placeholder="بحث في الأسئلة...">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <select class="form-select" id="subjectFilter">
+                                    <option value="">كل المواد</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <select class="form-select" id="typeFilter">
+                                    <option value="">كل الأنواع</option>
+                                </select>
+                            </div>
+                        </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>السؤال</th>
-                    <th>المادة</th>
-                    <th>النوع</th>
-                    <th>الصعوبة</th>
-                    <th>تاريخ الإضافة</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.QuestionText</td>
-                        <td>@item.Subject?.Name</td>
-                        <td>
-                            @if (item.Type == QuestionType.MultipleChoice)
-                            {
-                                <span class="badge bg-info text-dark">اختيار من متعدد</span>
-                            }
-                            else
-                            {
-
-                                <span class="badge bg-secondary">صح وخطأ</span>
-                            }
-                        </td>
-                        <td>
-                            @for (int i = 0; i < item.DifficultyLevel; i++)
-                            {
-                                <span>⭐</span>
-                            }
-                        </td>
-                        <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 60px">#</th>
+                                        <th>السؤال</th>
+                                        <th style="width: 120px">النوع</th>
+                                        <th style="width: 150px">المادة</th>
+                                        <th style="width: 120px">الصعوبة</th>
+                                        <th style="width: 100px">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var (question, index) in Model.Select((q, i) => (q, i + 1)))
+                                    {
+                                        <tr>
+                                            <td class="text-muted">@index</td>
+                                            <td>
+                                                <span class="fw-medium">@(question.QuestionText?.Length > 60 ? question.QuestionText.Substring(0, 60) + "..." : question.QuestionText)</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary-subtle text-primary">
+                                                    @question.Type
+                                                </span>
+                                            </td>
+                                            <td>@question.Subject?.Name</td>
+                                            <td>
+                                                <div class="d-flex gap-1">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="fas fa-star @(i <= question.DifficultyLevel ? "text-warning" : "text-muted opacity-25")"></i>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a asp-action="Edit" asp-route-id="@question.Id"
+                                                       class="btn btn-sm btn-outline-primary" title="تعديل">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@question.Id"
+                                                       class="btn btn-sm btn-outline-danger" title="حذف">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // البحث والفلترة
+        $('#searchInput').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('table tbody tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    </script>
+}

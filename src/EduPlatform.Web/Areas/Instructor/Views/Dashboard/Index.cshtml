@@ -1,107 +1,276 @@
-﻿@model EduPlatform.Core.Entities.Instructor
-
+﻿<!-- src/EduPlatform.Web/Areas/Instructor/Views/Dashboard/Index.cshtml -->
+@model EduPlatform.Web.ViewModels.Instructor.InstructorDashboardViewModel
 @{
-    ViewData["Title"] = "لوحة تحكم المدرس";
+    ViewData["Title"] = "لوحة التحكم";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid mt-4">
-    <h2 class="mb-4">لوحة تحكم المدرس</h2>
+<div class="container-fluid py-4 fade-in">
+    <!-- الترحيب -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-gradient-primary text-white border-0">
+                <div class="card-body py-4">
+                    <h3 class="mb-2">
+                        <i class="fas fa-hand-wave me-2"></i>
+                        أهلاً بك في لوحة التحكم!
+                    </h3>
+                    <p class="mb-0 opacity-75">إدارة كورساتك وطلابك بكل سهولة</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    @if (Model.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
-    {
-        <div class="alert alert-warning">
-            <h5>حسابك في انتظار الموافقة</h5>
-            <p class="mb-0">يرجى الانتظار حتى يوافق المسؤول على حسابك. سيتم إعلامك عند الموافقة.</p>
-        </div>
-    }
-    else if (Model.Status == EduPlatform.Core.Enums.InstructorStatus.Rejected)
-    {
-        <div class="alert alert-danger">
-            <h5>تم رفض حسابك</h5>
-            <p class="mb-0">للأسف، تم رفض طلب التسجيل الخاص بك. يمكنك التواصل مع الدعم الفني للمزيد من المعلومات.</p>
-        </div>
-    }
-    else if (Model.Status == EduPlatform.Core.Enums.InstructorStatus.Approved)
-    {
-        <!-- بطاقات الإحصائيات -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card bg-primary text-white">
-                    <div class="card-body text-center">
-                        <h3>@ViewBag.TotalCourses</h3>
-                        <p class="mb-0">إجمالي الكورسات</p>
+    <!-- الإحصائيات -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">الكورسات</h6>
+                            <h2 class="mb-0 fw-bold">@Model.TotalCourses</h2>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-book text-primary fa-xl"></i>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-success text-white">
-                    <div class="card-body text-center">
-                        <h3>@ViewBag.TotalStudents</h3>
-                        <p class="mb-0">إجمالي الطلاب</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-info text-white">
-                    <div class="card-body text-center">
-                        <h3>0</h3>
-                        <p class="mb-0">الأكواد المباعة</p>
-                    </div>
+                <div class="card-footer bg-transparent border-0 pb-3">
+                    <a asp-area="Instructor" asp-controller="Course" asp-action="Index"
+                       class="text-primary text-decoration-none small">
+                        عرض الكل <i class="fas fa-arrow-left ms-1"></i>
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- قائمة الكورسات -->
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">كورساتي</h5>
-                <a href="#" class="btn btn-primary btn-sm">إضافة كورس جديد</a>
-            </div>
-            <div class="card-body">
-                @if (ViewBag.Courses != null && ViewBag.Courses.Count > 0)
-                {
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>عنوان الكورس</th>
-                                <th>المادة</th>
-                                <th>السعر</th>
-                                <th>الحالة</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var course in ViewBag.Courses)
-                            {
-                                <tr>
-                                    <td>@course.Title</td>
-                                    <td>@course.Subject.Name</td>
-                                    <td>@course.Price جنيه</td>
-                                    <td>
-                                        @if (course.IsActive)
-                                        {
-                                            <span class="badge bg-success">نشط</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">غير نشط</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-info btn-sm">عرض</a>
-                                        <a href="#" class="btn btn-warning btn-sm">تعديل</a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <p class="text-center text-muted">لم تقم بإنشاء أي كورسات بعد</p>
-                }
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">الفيديوهات</h6>
+                            <h2 class="mb-0 fw-bold">@Model.TotalVideos</h2>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-video text-danger fa-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-3">
+                    <a asp-area="Instructor" asp-controller="Video" asp-action="Index"
+                       class="text-danger text-decoration-none small">
+                        إدارة الفيديوهات <i class="fas fa-arrow-left ms-1"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    }
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">الطلاب</h6>
+                            <h2 class="mb-0 fw-bold">@Model.TotalStudents</h2>
+                        </div>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-users text-success fa-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-3">
+                    <a asp-area="Instructor" asp-controller="Student" asp-action="Index"
+                       class="text-success text-decoration-none small">
+                        عرض الطلاب <i class="fas fa-arrow-left ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-1">الأكواد المتاحة</h6>
+                            <h2 class="mb-0 fw-bold">@Model.AvailableCodes</h2>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-qrcode text-warning fa-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pb-3">
+                    <a asp-area="Instructor" asp-controller="Code" asp-action="Generate"
+                       class="text-warning text-decoration-none small">
+                        توليد أكواد <i class="fas fa-arrow-left ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- أحدث الطلاب -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-plus text-success me-2"></i>
+                        أحدث الطلاب المشتركين
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.RecentStudents.Any())
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-users fa-2x mb-3 opacity-25"></i>
+                            <p class="mb-0">لا يوجد طلاب مشتركين حتى الآن</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    @foreach (var student in Model.RecentStudents)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                        <i class="fas fa-user text-primary"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0 fw-semibold">@student.Name</h6>
+                                                        <small class="text-muted">@student.Course</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-end">
+                                                <small class="text-muted">
+                                                    @student.EnrolledAt.ToString("dd/MM/yyyy")
+                                                </small>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- أحدث الأكواد -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-qrcode text-warning me-2"></i>
+                        أحدث الأكواد
+                    </h5>
+                    <a asp-area="Instructor" asp-controller="Code" asp-action="Index"
+                       class="btn btn-sm btn-outline-primary">
+                        عرض الكل
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (!Model.RecentCodes.Any())
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-qrcode fa-2x mb-3 opacity-25"></i>
+                            <p class="mb-0">لم تقم بتوليد أي أكواد بعد</p>
+                            <a asp-area="Instructor" asp-controller="Code" asp-action="Generate"
+                               class="btn btn-primary btn-sm mt-2">
+                                <i class="fas fa-plus me-1"></i> توليد أكواد
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    @foreach (var code in Model.RecentCodes)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <code class="bg-light px-3 py-2 rounded">@code.Code</code>
+                                            </td>
+                                            <td>
+                                                @if (code.Status == "متاح")
+                                                {
+                                                    <span class="badge bg-success-subtle text-success">متاح</span>
+                                                }
+                                                else if (code.Status == "مستخدم")
+                                                {
+                                                    <span class="badge bg-info-subtle text-info">مستخدم</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary-subtle text-secondary">منتهي</span>
+                                                }
+                                            </td>
+                                            <td class="text-end">
+                                                <small class="text-muted">@code.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- إجراءات سريعة -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt text-warning me-2"></i>
+                        إجراءات سريعة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a asp-area="Instructor" asp-controller="Course" asp-action="Create"
+                               class="btn btn-outline-primary w-100 py-3">
+                                <i class="fas fa-plus-circle fa-lg mb-2 d-block"></i>
+                                إضافة كورس جديد
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-area="Instructor" asp-controller="Video" asp-action="Create"
+                               class="btn btn-outline-danger w-100 py-3">
+                                <i class="fas fa-video fa-lg mb-2 d-block"></i>
+                                إضافة فيديو جديد
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-area="Instructor" asp-controller="Code" asp-action="Generate"
+                               class="btn btn-outline-success w-100 py-3">
+                                <i class="fas fa-qrcode fa-lg mb-2 d-block"></i>
+                                توليد أكواد
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a asp-area="Instructor" asp-controller="QuestionBank" asp-action="Create"
+                               class="btn btn-outline-info w-100 py-3">
+                                <i class="fas fa-question-circle fa-lg mb-2 d-block"></i>
+                                إضافة سؤال جديد
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

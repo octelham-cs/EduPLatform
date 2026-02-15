@@ -10,34 +10,28 @@ namespace EduPlatform.Core.Entities
         [Key]
         public int Id { get; set; }
 
-        [Required]
         public int CourseId { get; set; }
-
-        public int? VideoId { get; set; } // اختياري (للاختبارات البعد فيديو)
-
-        [Required]
-        [MaxLength(200)]
-        public string Title { get; set; }
+        public int? VideoId { get; set; }
 
         [Required]
-        public QuizType Type { get; set; }
+        [StringLength(200)]
+        public string Title { get; set; } = string.Empty;
 
-        [Required]
-        public int TimeLimit { get; set; } // بالدقائق
+        public QuizType Type { get; set; } = QuizType.Progress;
+        public int TimeLimit { get; set; } = 30; // بالدقائق
+        public int PassingScore { get; set; } = 60; // نسبة مئوية
+        public int MaxAttempts { get; set; } = 0; // 0 = unlimited
 
-        [Required]
-        public int PassingScore { get; set; } // نسبة النجاح (مثلاً 60)
+        public string? QuestionsJson { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public int MaxAttempts { get; set; } = 0; // 0 = غير محدود
+        // Navigation Properties
+        [ForeignKey(nameof(CourseId))]
+        public Course Course { get; set; } = null!;
 
-        // هنحفظ قائمة أرقام الأسئلة هنا (JSON)
-        [Required]
-        public string QuestionsJson { get; set; }
+        [ForeignKey(nameof(VideoId))]
+        public Video? Video { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // Navigation
-        [ForeignKey("CourseId")]
-        public virtual Course Course { get; set; }
+        public ICollection<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();
     }
 }

@@ -1,11 +1,19 @@
-﻿using EduPlatform.Core.Entities;
+﻿// src/EduPlatform.Web/Areas/Instructor/Controllers/CodeController.cs
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using EduPlatform.Core.Entities;
 using EduPlatform.Core.Enums;
 using EduPlatform.Infrastructure.Data;
 using EduPlatform.Web.ViewModels.Instructor;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace EduPlatform.Web.Areas.Instructor.Controllers
 {
@@ -16,133 +24,160 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CodeController(
-            ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+        public CodeController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
-        // ========================================
-        // GET: Instructor/Code
-        // ========================================
+        // GET: /Instructor/Code
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var instructor = await _context.Instructors
                 .FirstOrDefaultAsync(i => i.UserId == user.Id);
 
             if (instructor == null)
             {
-                return NotFound();
+                TempData["Error"] = "لم يتم العثور على حساب المدرس";
+                return RedirectToAction("Index", "Dashboard");
             }
 
             var codes = await _context.EnrollmentCodes
-                .Include(c => c.Course)
-                .Include(c => c.AcademicTerm)
-                .Include(c => c.UsedByStudent)
-                    .ThenInclude(s => s.User)
-                .Where(c => c.InstructorId == instructor.Id)
-                .OrderByDescending(c => c.CreatedAt)
+                .Include(e => e.Course)
+                .Include(e => e.AcademicTerm)
+                .Include(e => e.Student)
+                    .ThenInclude(s => s!.User)
+                .Where(e => e.InstructorId == instructor.Id)
+                .OrderByDescending(e => e.CreatedAt)
                 .ToListAsync();
 
-            return View(codes);
+            var viewModel = codes.Select(c => new GeneratedCodeViewModel
+            {
+                Id = c.Id,
+                Code = c.Code,
+                CourseName = c.Course?.Title ?? "غير محدد",
+                Price = c.Price,
+                Status = c.Status switch
+                {
+                    CodeStatus.Available => "متاح",
+                    CodeStatus.Used => "مستخدم",
+                    CodeStatus.Expired => "منتهي",
+                    _ => "غير معروف"
+                },
+                CreatedAt = c.CreatedAt,
+                StartDate = c.StartDate,
+                EndDate = c.EndDate,
+                StudentName = c.Student?.User?.FullName,
+                UsedAt = c.UsedAt
+            }).ToList();
+
+            return View(viewModel);
         }
 
-        // ========================================
-        // GET: Instructor/Code/Generate
-        // ========================================
-        [HttpGet]
+        // GET: /Instructor/Code/Generate
         public async Task<IActionResult> Generate()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var instructor = await _context.Instructors
                 .FirstOrDefaultAsync(i => i.UserId == user.Id);
 
             if (instructor == null)
             {
-                return NotFound();
+                TempData["Error"] = "لم يتم العثور على حساب المدرس";
+                return RedirectToAction("Index", "Dashboard");
             }
 
-            // جلب كورسات المدرس
-            ViewBag.Courses = await _context.Courses
-                .Include(c => c.Subject)
+            // تحميل الكورسات
+            var courses = await _context.Courses
                 .Where(c => c.InstructorId == instructor.Id && c.IsActive)
+                .Select(c => new { c.Id, c.Title, c.Price })
                 .ToListAsync();
 
-            // جلب الأترمة الدراسية
-            ViewBag.AcademicTerms = await _context.AcademicTerms
+            ViewBag.Courses = new SelectList(courses, "Id", "Title");
+            ViewBag.CoursePrices = courses.ToDictionary(c => c.Id, c => c.Price);
+
+            // تحميل الأترمة الدراسية
+            var terms = await _context.AcademicTerms
                 .Where(t => t.IsActive)
-                .OrderByDescending(t => t.Year)
+                .OrderByDescending(t => t.StartDate)
+                .Select(t => new { t.Id, t.Name, t.StartDate, t.EndDate })
                 .ToListAsync();
 
-            return View();
+            ViewBag.AcademicTerms = new SelectList(terms, "Id", "Name");
+
+            // تعيين التواريخ الافتراضية
+            var today = DateTime.Today;
+            var nextMonth = today.AddMonths(1);
+
+            var model = new GenerateCodeViewModel
+            {
+                StartDate = today,
+                EndDate = nextMonth
+            };
+
+            return View(model);
         }
 
-        // ========================================
-        // POST: Instructor/Code/Generate
-        // ========================================
+        // POST: /Instructor/Code/Generate
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Generate(GenerateCodeViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                await LoadDropdowns();
+                return View(model);
+            }
+
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var instructor = await _context.Instructors
                 .FirstOrDefaultAsync(i => i.UserId == user.Id);
 
             if (instructor == null)
             {
-                return NotFound();
+                TempData["Error"] = "لم يتم العثور على حساب المدرس";
+                return RedirectToAction("Index", "Dashboard");
             }
 
-            if (!ModelState.IsValid)
+            // التحقق من التواريخ
+            if (model.EndDate <= model.StartDate)
             {
-                ViewBag.Courses = await _context.Courses
-                    .Include(c => c.Subject)
-                    .Where(c => c.InstructorId == instructor.Id && c.IsActive)
-                    .ToListAsync();
-
-                ViewBag.AcademicTerms = await _context.AcademicTerms
-                    .Where(t => t.IsActive)
-                    .ToListAsync();
-
+                ModelState.AddModelError("", "تاريخ النهاية يجب أن يكون بعد تاريخ البداية");
+                await LoadDropdowns();
                 return View(model);
             }
 
-            // جلب الترم الدراسي
-            var term = await _context.AcademicTerms.FindAsync(model.AcademicTermId);
-            if (term == null)
-            {
-                ModelState.AddModelError("AcademicTermId", "الترم الدراسي غير موجود");
-                return View(model);
-            }
-
-            // حساب السعر بعد الخصم
-            var finalPrice = model.Price;
-            if (model.DiscountPercentage.HasValue && model.DiscountPercentage > 0)
-            {
-                finalPrice = model.Price - (model.Price * model.DiscountPercentage.Value / 100);
-            }
-
-            // توليد الأكواد
             var codes = new List<EnrollmentCode>();
+
             for (int i = 0; i < model.Quantity; i++)
             {
                 var code = new EnrollmentCode
                 {
-                    Code = GenerateRandomCode(),
+                    Code = await GenerateUniqueCode(),
                     InstructorId = instructor.Id,
                     CourseId = model.CourseId,
                     AcademicTermId = model.AcademicTermId,
-                    Price = finalPrice,
-                    DiscountPercentage = model.DiscountPercentage,
-                    Status = CodeStatus.Available,
+                    Price = model.Price,
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate,
                     CreatedAt = DateTime.Now,
-                    StartDate = term.StartDate,
-                    EndDate = term.EndDate,
-                    Notes = model.Notes
+                    Status = CodeStatus.Available
                 };
+
+                // تطبيق الخصم
+                if (model.DiscountPercentage.HasValue && model.DiscountPercentage > 0)
+                {
+                    var discountAmount = model.Price * (model.DiscountPercentage.Value / 100m);
+                    code.Price = model.Price - discountAmount;
+                }
+
                 codes.Add(code);
             }
 
@@ -153,47 +188,29 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ========================================
-        // GET: Instructor/Code/Export
-        // ========================================
-        public async Task<IActionResult> Export(int? courseId, string? status)
+        // GET: /Instructor/Code/ExportCsv
+        public async Task<IActionResult> ExportCsv()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var instructor = await _context.Instructors
                 .FirstOrDefaultAsync(i => i.UserId == user.Id);
 
-            if (instructor == null)
-            {
-                return NotFound();
-            }
+            if (instructor == null) return NotFound();
 
-            var query = _context.EnrollmentCodes
-                .Include(c => c.Course)
-                .Include(c => c.AcademicTerm)
-                .Where(c => c.InstructorId == instructor.Id);
+            var codes = await _context.EnrollmentCodes
+                .Include(e => e.Course)
+                .Where(e => e.InstructorId == instructor.Id)
+                .OrderByDescending(e => e.CreatedAt)
+                .ToListAsync();
 
-            if (courseId.HasValue)
-            {
-                query = query.Where(c => c.CourseId == courseId);
-            }
-
-            if (!string.IsNullOrEmpty(status))
-            {
-                if (Enum.TryParse<CodeStatus>(status, out var codeStatus))
-                {
-                    query = query.Where(c => c.Status == codeStatus);
-                }
-            }
-
-            var codes = await query.OrderByDescending(c => c.CreatedAt).ToListAsync();
-
-            // إنشاء CSV بسيط
-            var csv = new System.Text.StringBuilder();
-            csv.AppendLine("الكود,الكورس,السعر,الحالة,تاريخ الإنشاء,تاريخ الانتهاء");
+            var csv = new StringBuilder();
+            csv.AppendLine("الكود,الكورس,السعر,الحالة,تاريخ الإنشاء,تاريخ البداية,تاريخ النهاية,الطالب");
 
             foreach (var code in codes)
             {
-                var statusText = code.Status switch
+                var status = code.Status switch
                 {
                     CodeStatus.Available => "متاح",
                     CodeStatus.Used => "مستخدم",
@@ -201,27 +218,97 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
                     _ => "غير معروف"
                 };
 
-                csv.AppendLine($"{code.Code},{code.Course.Title},{code.Price},{statusText},{code.CreatedAt:yyyy/MM/dd},{code.EndDate:yyyy/MM/dd}");
+                csv.AppendLine($"\"{code.Code}\",\"{code.Course?.Title ?? "غير محدد"}\",{code.Price},\"{status}\",{code.CreatedAt:yyyy-MM-dd},{code.StartDate:yyyy-MM-dd},{code.EndDate:yyyy-MM-dd},\"{code.Student?.User?.FullName ?? ""}\"");
             }
 
-            return File(System.Text.Encoding.UTF8.GetBytes(csv.ToString()), "text/csv", "codes.csv");
+            var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+            var fileName = $"codes_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+
+            return File(bytes, "text/csv; charset=utf-8", fileName);
         }
 
-        // ========================================
-        // Helper: توليد كود عشوائي
-        // ========================================
-        private string GenerateRandomCode()
+        // GET: /Instructor/Code/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var instructor = await _context.Instructors
+                .FirstOrDefaultAsync(i => i.UserId == user.Id);
+
+            var code = await _context.EnrollmentCodes
+                .Include(e => e.Course)
+                .Include(e => e.AcademicTerm)
+                .Include(e => e.Student)
+                    .ThenInclude(s => s!.User)
+                .FirstOrDefaultAsync(e => e.Id == id && e.InstructorId == instructor!.Id);
+
+            if (code == null) return NotFound();
+
+            var viewModel = new GeneratedCodeViewModel
+            {
+                Id = code.Id,
+                Code = code.Code,
+                CourseName = code.Course?.Title ?? "غير محدد",
+                Price = code.Price,
+                Status = code.Status switch
+                {
+                    CodeStatus.Available => "متاح",
+                    CodeStatus.Used => "مستخدم",
+                    CodeStatus.Expired => "منتهي",
+                    _ => "غير معروف"
+                },
+                CreatedAt = code.CreatedAt,
+                StartDate = code.StartDate,
+                EndDate = code.EndDate,
+                StudentName = code.Student?.User?.FullName,
+                UsedAt = code.UsedAt
+            };
+
+            return View(viewModel);
+        }
+
+        private async Task LoadDropdowns()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return;
+
+            var instructor = await _context.Instructors
+                .FirstOrDefaultAsync(i => i.UserId == user.Id);
+
+            var courses = await _context.Courses
+                .Where(c => c.InstructorId == instructor!.Id && c.IsActive)
+                .Select(c => new { c.Id, c.Title, c.Price })
+                .ToListAsync();
+
+            ViewBag.Courses = new SelectList(courses, "Id", "Title");
+
+            var terms = await _context.AcademicTerms
+                .Where(t => t.IsActive)
+                .OrderByDescending(t => t.StartDate)
+                .Select(t => new { t.Id, t.Name, t.StartDate, t.EndDate })
+                .ToListAsync();
+
+            ViewBag.AcademicTerms = new SelectList(terms, "Id", "Name");
+        }
+
+        private async Task<string> GenerateUniqueCode()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             var random = new Random();
+            string code;
+            bool exists;
 
-            // تنسيق: EDU-XXXX-XXXX
-            var part1 = new string(Enumerable.Repeat(chars, 4)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-            var part2 = new string(Enumerable.Repeat(chars, 4)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+            do
+            {
+                code = "EDU-" + new string(Enumerable.Repeat(chars, 8)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+                exists = await _context.EnrollmentCodes.AnyAsync(e => e.Code == code);
+            } while (exists);
 
-            return $"EDU-{part1}-{part2}";
+            return code;
         }
     }
 }

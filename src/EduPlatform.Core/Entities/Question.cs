@@ -13,7 +13,6 @@ namespace EduPlatform.Core.Entities
         [Required]
         public int InstructorId { get; set; }
 
-        [Required]
         public int SubjectId { get; set; }
 
         public int? ChapterId { get; set; }
@@ -22,24 +21,25 @@ namespace EduPlatform.Core.Entities
         public QuestionType Type { get; set; }
 
         [Required]
-        public string QuestionText { get; set; }
+        [StringLength(2000)]
+        public string QuestionText { get; set; } = string.Empty;
 
-        // حفظ الاختيارات بصيغة JSON
         public string? OptionsJson { get; set; }
+        public string? CorrectAnswerJson { get; set; }
 
-        // حفظ الإجابة الصحيحة
-        [Required]
-        public string CorrectAnswerJson { get; set; }
+        [Range(1, 5)]
+        public int DifficultyLevel { get; set; } = 3;
 
-        public int DifficultyLevel { get; set; } = 1; // 1 إلى 5
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation Properties
-        [ForeignKey("InstructorId")]
-        public virtual Instructor Instructor { get; set; }
+        [ForeignKey(nameof(InstructorId))]
+        public Instructor Instructor { get; set; } = null!;
 
-        [ForeignKey("SubjectId")]
-        public virtual Subject Subject { get; set; }
+        [ForeignKey(nameof(SubjectId))]
+        public Subject Subject { get; set; } = null!;
+
+        [ForeignKey(nameof(ChapterId))]
+        public Chapter? Chapter { get; set; }
     }
 }

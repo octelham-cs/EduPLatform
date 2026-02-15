@@ -37,56 +37,26 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-
-
 builder.Services.AddScoped<EduPlatform.Core.Interfaces.IEnrollmentService, EduPlatform.Infrastructure.Services.EnrollmentService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-
 builder.Services.AddSignalR();
 
 builder.Services.AddScoped<EduPlatform.Core.Interfaces.INotificationService, NotificationService>();
+
 var app = builder.Build();
-
-
-// ===========================================
-// 5. تهيئة قاعدة البيانات (Seeding)
-// ===========================================
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
-        await DbInitializer.InitializeAsync(context, userManager, roleManager);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
-    }
-}
-
-
-
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
 
 // ترتيب مهم: Authentication قبل Authorization
 app.UseAuthentication();
@@ -104,6 +74,27 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
 app.MapHub<EduPlatform.Web.Hubs.NotificationHub>("/notificationHub");
+
+// ===========================================
+// 5. تهيئة قاعدة البيانات (Seeding) - مرة واحدة فقط
+// ===========================================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        await EduPlatform.Infrastructure.Data.DbInitializer.Initialize(context, userManager, roleManager);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
+
 app.Run();

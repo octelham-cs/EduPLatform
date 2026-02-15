@@ -1,11 +1,16 @@
-﻿using EduPlatform.Core.Entities;
-using EduPlatform.Core.Enums;
+﻿// src/EduPlatform.Web/Areas/Instructor/Controllers/CourseController.cs
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using EduPlatform.Core.Entities;
 using EduPlatform.Infrastructure.Data;
 using EduPlatform.Web.ViewModels.Instructor;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace EduPlatform.Web.Areas.Instructor.Controllers
 {
@@ -16,30 +21,30 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public CourseController(
-            ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+        public CourseController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
-        // ========================================
-        // GET: Instructor/Course
-        // ========================================
+        // GET: /Instructor/Course
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var instructor = await _context.Instructors
                 .FirstOrDefaultAsync(i => i.UserId == user.Id);
 
-            if (instructor == null || instructor.Status != InstructorStatus.Approved)
+            if (instructor == null)
             {
+                TempData["Error"] = "لم يتم العثور على حساب المدرس";
                 return RedirectToAction("Index", "Dashboard");
             }
 
             var courses = await _context.Courses
                 .Include(c => c.Subject)
+                .Include(c => c.Chapters)
                 .Where(c => c.InstructorId == instructor.Id)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
@@ -47,53 +52,34 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
             return View(courses);
         }
 
-        // ========================================
-        // GET: Instructor/Course/Create
-        // ========================================
+        // GET: /Instructor/Course/Create
         public async Task<IActionResult> Create()
         {
-            var user = await _userManager.GetUserAsync(User);
-            var instructor = await _context.Instructors
-                .FirstOrDefaultAsync(i => i.UserId == user.Id);
-
-            if (instructor == null || instructor.Status != InstructorStatus.Approved)
-            {
-                return RedirectToAction("Index", "Dashboard");
-            }
-
-            // جلب المواد المتاحة
-            ViewBag.Subjects = await _context.Subjects
-                .Include(s => s.GradeLevelId)
-                .Where(s => s.IsActive)
-                .OrderBy(s => s.GradeLevelId)
-                .ToListAsync();
-
-            return View();
+            await LoadSubjectsDropdown();
+            return View(new AddCourseViewModel());
         }
 
-        // ========================================
-        // POST: Instructor/Course/Create
-        // ========================================
+        // POST: /Instructor/Course/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddCourseViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                await LoadSubjectsDropdown();
+                return View(model);
+            }
+
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var instructor = await _context.Instructors
                 .FirstOrDefaultAsync(i => i.UserId == user.Id);
 
-            if (instructor == null || instructor.Status != InstructorStatus.Approved)
+            if (instructor == null)
             {
+                TempData["Error"] = "لم يتم العثور على حساب المدرس";
                 return RedirectToAction("Index", "Dashboard");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Subjects = await _context.Subjects
-                    .Include(s => s.GradeLevelId)
-                    .Where(s => s.IsActive)
-                    .ToListAsync();
-                return View(model);
             }
 
             var course = new Course
@@ -110,16 +96,18 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
             _context.Courses.Add(course);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "تم إنشاء الكورس بنجاح";
+            TempData["Success"] = "تم إضافة الكورس بنجاح!";
             return RedirectToAction(nameof(Index));
         }
 
-        // ========================================
-        // GET: Instructor/Course/Details/5
-        // ========================================
-        public async Task<IActionResult> Details(int id)
+        // GET: /Instructor/Course/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
+            if (id == null) return NotFound();
+
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var instructor = await _context.Instructors
                 .FirstOrDefaultAsync(i => i.UserId == user.Id);
 
@@ -129,131 +117,80 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
                     .ThenInclude(ch => ch.Videos)
                 .FirstOrDefaultAsync(c => c.Id == id && c.InstructorId == instructor!.Id);
 
-            if (course == null)
-            {
-                return NotFound();
-            }
+            if (course == null) return NotFound();
 
             return View(course);
         }
 
-        // ========================================
-        // POST: Instructor/Course/AddChapter
-        // ========================================
+        // GET: /Instructor/Course/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var instructor = await _context.Instructors
+                .FirstOrDefaultAsync(i => i.UserId == user.Id);
+
+            var course = await _context.Courses
+                .FirstOrDefaultAsync(c => c.Id == id && c.InstructorId == instructor!.Id);
+
+            if (course == null) return NotFound();
+
+            var viewModel = new AddCourseViewModel
+            {
+                SubjectId = course.SubjectId,
+                Title = course.Title,
+                Description = course.Description,
+                Price = course.Price
+            };
+
+            await LoadSubjectsDropdown();
+            return View(viewModel);
+        }
+
+        // POST: /Instructor/Course/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddChapter(AddChapterViewModel model)
+        public async Task<IActionResult> Edit(int id, AddCourseViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "حدث خطأ في البيانات";
-                return RedirectToAction(nameof(Details), new { id = model.CourseId });
+                await LoadSubjectsDropdown();
+                return View(model);
             }
 
-            var chapter = new Chapter
-            {
-                CourseId = model.CourseId,
-                Title = model.Title,
-                Description = model.Description,
-                Order = model.Order,
-                IsActive = true
-            };
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
 
-            _context.Chapters.Add(chapter);
+            var instructor = await _context.Instructors
+                .FirstOrDefaultAsync(i => i.UserId == user.Id);
+
+            var course = await _context.Courses
+                .FirstOrDefaultAsync(c => c.Id == id && c.InstructorId == instructor!.Id);
+
+            if (course == null) return NotFound();
+
+            course.SubjectId = model.SubjectId;
+            course.Title = model.Title;
+            course.Description = model.Description;
+            course.Price = model.Price;
+
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "تم إضافة الفصل بنجاح";
-            return RedirectToAction(nameof(Details), new { id = model.CourseId });
+            TempData["Success"] = "تم تحديث الكورس بنجاح!";
+            return RedirectToAction(nameof(Index));
         }
 
-        // ========================================
-        // POST: Instructor/Course/AddVideo
-        // ========================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddVideo(AddVideoViewModel model)
+        private async Task LoadSubjectsDropdown()
         {
-            if (!ModelState.IsValid)
-            {
-                TempData["Error"] = "حدث خطأ في البيانات";
-                return RedirectToAction(nameof(Details), new { id = model.CourseId });
-            }
+            var subjects = await _context.Subjects
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.Name)
+                .ToListAsync();
 
-            // استخراج معرف يوتيوب من الرابط
-            var youtubeId = ExtractYouTubeId(model.YouTubeUrl);
-
-            var video = new Video
-            {
-                ChapterId = model.ChapterId,
-                Title = model.Title,
-                Description = model.Description,
-                YouTubeUrl = model.YouTubeUrl,
-                YouTubeVideoId = youtubeId,
-                ThumbnailUrl = GetThumbnailUrl(youtubeId),
-                Order = model.Order,
-                CreatedAt = DateTime.Now
-            };
-
-            _context.Videos.Add(video);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "تم إضافة الفيديو بنجاح";
-            return RedirectToAction(nameof(Details), new { id = model.CourseId });
-        }
-
-        // ========================================
-        // POST: Instructor/Course/HideVideo/5
-        // ========================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> HideVideo(int id, int courseId)
-        {
-            var video = await _context.Videos.FindAsync(id);
-            if (video != null)
-            {
-                video.IsHidden = !video.IsHidden;
-                await _context.SaveChangesAsync();
-                TempData["Success"] = video.IsHidden ? "تم إخفاء الفيديو" : "تم إظهار الفيديو";
-            }
-            return RedirectToAction(nameof(Details), new { id = courseId });
-        }
-
-        // ========================================
-        // Helper: استخراج معرف يوتيوب
-        // ========================================
-        private string? ExtractYouTubeId(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-                return null;
-
-            // أنماط مختلفة لروابط يوتيوب
-            var patterns = new[]
-            {
-                @"(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/]+)",
-                @"youtube\.com\/v\/([^&\?\/]+)"
-            };
-
-            foreach (var pattern in patterns)
-            {
-                var match = System.Text.RegularExpressions.Regex.Match(url, pattern);
-                if (match.Success)
-                {
-                    return match.Groups[1].Value;
-                }
-            }
-
-            return null;
-        }
-
-        // ========================================
-        // Helper: الحصول على صورة مصغرة
-        // ========================================
-        private string? GetThumbnailUrl(string? youtubeId)
-        {
-            if (string.IsNullOrEmpty(youtubeId))
-                return null;
-
-            return $"https://img.youtube.com/vi/{youtubeId}/mqdefault.jpg";
+            ViewBag.Subjects = new SelectList(subjects, "Id", "Name");
         }
     }
 }

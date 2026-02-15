@@ -1,7 +1,6 @@
-﻿<!-- src/EduPlatform.Web/Areas/Instructor/Views/QuestionBank/Create.cshtml -->
-@model EduPlatform.Web.ViewModels.Instructor.AddQuestionViewModel
+﻿@model EduPlatform.Web.ViewModels.Instructor.AddQuestionViewModel
 @{
-    ViewData["Title"] = "إضافة سؤال جديد";
+    ViewData["Title"] = "تعديل السؤال";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -9,16 +8,17 @@
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="card shadow border-0">
-                <div class="card-header bg-gradient-primary text-white py-3">
+                <div class="card-header bg-gradient-warning text-dark py-3">
                     <h4 class="mb-0">
-                        <i class="fas fa-question-circle me-2"></i>
-                        إضافة سؤال جديد
+                        <i class="fas fa-edit me-2"></i>
+                        تعديل السؤال
                     </h4>
                 </div>
 
                 <div class="card-body p-4">
-                    <form asp-action="Create" method="post" id="questionForm">
+                    <form asp-action="Edit" method="post" id="questionForm">
                         @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
 
                         <div class="row">
                             <div class="col-lg-8">
@@ -28,9 +28,9 @@
                                         نوع السؤال
                                     </label>
                                     <select asp-for="QuestionType" class="form-select form-select-lg" id="questionType" required>
-                                        <option value="MultipleChoice">اختيار من متعدد</option>
-                                        <option value="TrueFalse">صح / خطأ</option>
-                                        <option value="MultipleSelect">اختيارات متعددة</option>
+                                        <option value="MultipleChoice" selected="@(Model.QuestionType == "MultipleChoice")">اختيار من متعدد</option>
+                                        <option value="TrueFalse" selected="@(Model.QuestionType == "TrueFalse")">صح / خطأ</option>
+                                        <option value="MultipleSelect" selected="@(Model.QuestionType == "MultipleSelect")">اختيارات متعددة</option>
                                     </select>
                                 </div>
 
@@ -39,52 +39,46 @@
                                         <i class="fas fa-pen text-primary me-1"></i>
                                         نص السؤال
                                     </label>
-                                    <textarea asp-for="QuestionText" class="form-control" rows="3"
-                                              placeholder="اكتب السؤال هنا..." required></textarea>
+                                    <textarea asp-for="QuestionText" class="form-control" rows="3" required></textarea>
                                     <span asp-validation-for="QuestionText" class="text-danger small"></span>
                                 </div>
 
                                 <!-- اختيارات للاختيار من متعدد -->
-                                <div id="multipleChoiceSection">
+                                <div id="multipleChoiceSection" style="display: @((Model.QuestionType == "MultipleChoice" || Model.QuestionType == "MultipleSelect") ? "block" : "none");">
                                     <label class="form-label fw-bold">
                                         <i class="fas fa-list-ul text-info me-1"></i>
                                         الاختيارات
                                     </label>
 
-                                    @for (int i = 0; i < 4; i++)
+                                    @for (int i = 0; i < Model.Options.Count && i < 4; i++)
                                     {
                                         <div class="input-group mb-2">
                                             <div class="input-group-text">
                                                 <input type="radio" name="CorrectAnswerIndex" value="@i"
-                                                       class="form-check-input" @(i == 0 ? "checked" : "") />
+                                                       class="form-check-input" checked="@(i == 0)" />
                                             </div>
                                             <input type="text" name="Options[@i]" class="form-control"
-                                                   placeholder="الاختيار @(i + 1)" />
+                                                   value="@Model.Options[i]" placeholder="الاختيار @(i + 1)" />
                                             <span class="input-group-text bg-light">صحيح</span>
                                         </div>
                                     }
-
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        اختر الإجابة الصحيحة بتحديد الدائرة بجانب الاختيار
-                                    </small>
                                 </div>
 
                                 <!-- صح / خطأ -->
-                                <div id="trueFalseSection" style="display: none;">
+                                <div id="trueFalseSection" style="display: @(Model.QuestionType == "TrueFalse" ? "block" : "none");">
                                     <label class="form-label fw-bold">
                                         <i class="fas fa-check-circle text-success me-1"></i>
                                         الإجابة الصحيحة
                                     </label>
                                     <div class="btn-group w-100" role="group">
                                         <input type="radio" class="btn-check" name="CorrectAnswerBool"
-                                               id="trueAnswer" value="true" checked />
+                                               id="trueAnswer" value="true" checked="@Model.CorrectAnswerBool" />
                                         <label class="btn btn-outline-success btn-lg" for="trueAnswer">
                                             <i class="fas fa-check me-2"></i> صح
                                         </label>
 
                                         <input type="radio" class="btn-check" name="CorrectAnswerBool"
-                                               id="falseAnswer" value="false" />
+                                               id="falseAnswer" value="false" checked="@(!Model.CorrectAnswerBool)" />
                                         <label class="btn btn-outline-danger btn-lg" for="falseAnswer">
                                             <i class="fas fa-times me-2"></i> خطأ
                                         </label>
@@ -108,21 +102,25 @@
                                                 {
                                                     @foreach (var subject in ViewBag.Subjects)
                                                     {
-                                                        <option value="@subject.Value">@subject.Text</option>
+                                                        <option value="@subject.Value" selected="@(subject.Value.ToString() == Model.SubjectId.ToString())">
+                                                            @subject.Text
+                                                        </option>
                                                     }
                                                 }
                                             </select>
                                         </div>
 
                                         <div class="mb-3">
-                                            <label asp-for="ChapterId" class="form-label">الفصل (اختياري)</label>
+                                            <label asp-for="ChapterId" class="form-label">الفصل</label>
                                             <select asp-for="ChapterId" class="form-select">
                                                 <option value="">-- بدون --</option>
                                                 @if (ViewBag.Chapters != null)
                                                 {
                                                     @foreach (var chapter in ViewBag.Chapters)
                                                     {
-                                                        <option value="@chapter.Value">@chapter.Text</option>
+                                                        <option value="@chapter.Value" selected="@(chapter.Value.ToString() == Model.ChapterId?.ToString())">
+                                                            @chapter.Text
+                                                        </option>
                                                     }
                                                 }
                                             </select>
@@ -133,13 +131,13 @@
                                             <div class="d-flex gap-1">
                                                 @for (int i = 1; i <= 5; i++)
                                                 {
-                                                    <button type="button" class="btn btn-outline-warning difficulty-btn"
+                                                    <button type="button" class="btn @(i <= Model.DifficultyLevel ? "btn-warning" : "btn-outline-warning") difficulty-btn"
                                                             data-value="@i">
                                                         <i class="fas fa-star"></i>
                                                     </button>
                                                 }
                                             </div>
-                                            <input asp-for="DifficultyLevel" type="hidden" value="3" />
+                                            <input asp-for="DifficultyLevel" type="hidden" value="@Model.DifficultyLevel" />
                                         </div>
                                     </div>
                                 </div>
@@ -154,9 +152,9 @@
                                 رجوع
                             </a>
 
-                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <button type="submit" class="btn btn-warning btn-lg px-5">
                                 <i class="fas fa-save me-2"></i>
-                                حفظ السؤال
+                                حفظ التعديلات
                             </button>
                         </div>
                     </form>
@@ -176,7 +174,6 @@
             // تغيير نوع السؤال
             $('#questionType').change(function() {
                 var type = $(this).val();
-
                 if (type === 'MultipleChoice' || type === 'MultipleSelect') {
                     $('#multipleChoiceSection').show();
                     $('#trueFalseSection').hide();
@@ -190,7 +187,6 @@
             $('.difficulty-btn').click(function() {
                 var value = $(this).data('value');
                 $('#DifficultyLevel').val(value);
-
                 $('.difficulty-btn').each(function(i) {
                     if (i < value) {
                         $(this).removeClass('btn-outline-warning').addClass('btn-warning');
@@ -198,13 +194,6 @@
                         $(this).removeClass('btn-warning').addClass('btn-outline-warning');
                     }
                 });
-            });
-
-            // تعيين المستوى الافتراضي
-            $('.difficulty-btn').each(function(i) {
-                if (i < 3) {
-                    $(this).removeClass('btn-outline-warning').addClass('btn-warning');
-                }
             });
         });
     </script>

@@ -75,7 +75,7 @@ namespace EduPlatform.Infrastructure.Services
             // 6. تحديث حالة الكود إلى "مستخدم"
             enrollmentCode.Status = CodeStatus.Used;
             enrollmentCode.UsedAt = DateTime.UtcNow;
-            enrollmentCode.UsedByStudentId = student.Id;
+            enrollmentCode.UsedBy = student.Id;
 
             // حفظ التغييرات
             _context.Enrollments.Add(enrollment);

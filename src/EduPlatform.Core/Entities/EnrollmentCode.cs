@@ -1,55 +1,47 @@
-﻿using EduPlatform.Core.Enums;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using EduPlatform.Core.Enums;
 
 namespace EduPlatform.Core.Entities
 {
-    // كود الاشتراك
     public class EnrollmentCode
     {
+        [Key]
         public int Id { get; set; }
 
-        // الكود (مثال: EDU-AR1-3A9F)
+        [Required]
+        [StringLength(50)]
         public string Code { get; set; } = string.Empty;
 
-        // المدرس
         public int InstructorId { get; set; }
-
-        // الكورس
         public int CourseId { get; set; }
-
-        // الترم الدراسي
         public int AcademicTermId { get; set; }
 
-        // السعر
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
-        // نسبة الخصم
-        public int? DiscountPercentage { get; set; }
-
-        // حالة الكود
         public CodeStatus Status { get; set; } = CodeStatus.Available;
 
-        // تاريخ الإنشاء
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        // تاريخ البداية
         public DateTime StartDate { get; set; }
-
-        // تاريخ النهاية
         public DateTime EndDate { get; set; }
-
-        // تاريخ الاستخدام
         public DateTime? UsedAt { get; set; }
 
-        // الطالب المستخدم (لو مستخدم)
-        public int? UsedByStudentId { get; set; }
+        // ✅ Foreign Key للطالب (اللي استخدم الكود)
+        public int? UsedBy { get; set; }
 
-        // ملاحظات
-        public string? Notes { get; set; }
-
-        // Navigation Properties
+        // ✅ Navigation Properties
+        [ForeignKey(nameof(InstructorId))]
         public Instructor Instructor { get; set; } = null!;
+
+        [ForeignKey(nameof(CourseId))]
         public Course Course { get; set; } = null!;
+
+        [ForeignKey(nameof(AcademicTermId))]
         public AcademicTerm AcademicTerm { get; set; } = null!;
-        public Student? UsedByStudent { get; set; }
+
+        [ForeignKey(nameof(UsedBy))]
+        public Student? Student { get; set; }
     }
 }

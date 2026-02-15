@@ -1,73 +1,170 @@
-﻿@model IEnumerable<EduPlatform.Core.Entities.Instructor>
-
+﻿@model List<EduPlatform.Core.Entities.Instructor>
 @{
     ViewData["Title"] = "إدارة المدرسين";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid mt-4">
-    <h2 class="mb-4">إدارة المدرسين</h2>
+<div class="container-fluid py-4 fade-in">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0">
+                                <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                                إدارة المدرسين
+                            </h4>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a asp-action="AssignInstructor" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-1"></i>
+                                تعيين مدرس جديد
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
+                <div class="card-body">
+                    <!-- فلترة -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-2">
+                            <select class="form-select" id="statusFilter">
+                                <option value="">كل الحالات</option>
+                                <option value="Pending">معلق</option>
+                                <option value="Approved">معتمد</option>
+                                <option value="Rejected">مرفوض</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <input type="text" class="form-control" id="searchInput" placeholder="بحث بالاسم أو الإيميل...">
+                        </div>
+                    </div>
 
-    <div class="card">
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>الاسم</th>
-                        <th>البريد الإلكتروني</th>
-                        <th>رقم الهاتف</th>
-                        <th>الحالة</th>
-                        <th>تاريخ التسجيل</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var instructor in Model)
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px">#</th>
+                                    <th>المدرس</th>
+                                    <th>البريد الإلكتروني</th>
+                                    <th>رقم الهاتف</th>
+                                    <th>الحالة</th>
+                                    <th>تاريخ التسجيل</th>
+                                    <th style="width: 150px">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (instructor, index) in Model.Select((i, idx) => (i, idx + 1)))
+                                {
+                                    <tr data-status="@instructor.Status">
+                                        <td class="text-muted">@index</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-semibold">@instructor.User?.FullName</h6>
+                                                    @if (!string.IsNullOrEmpty(instructor.Bio))
+                                                    {
+                                                        <small class="text-muted">@(instructor.Bio.Length > 30 ? instructor.Bio.Substring(0, 30) + "..." : instructor.Bio)</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@instructor.User?.Email</td>
+                                        <td>@instructor.User?.PhoneNumber</td>
+                                        <td>
+                                            @switch (instructor.Status)
+                                            {
+                                                case EduPlatform.Core.Enums.InstructorStatus.Pending:
+                                                    <span class="badge bg-warning text-dark px-3 py-2">
+                                                        <i class="fas fa-clock me-1"></i> معلق
+                                                    </span>
+                                                    break;
+                                                case EduPlatform.Core.Enums.InstructorStatus.Approved:
+                                                    <span class="badge bg-success px-3 py-2">
+                                                        <i class="fas fa-check me-1"></i> معتمد
+                                                    </span>
+                                                    break;
+                                                case EduPlatform.Core.Enums.InstructorStatus.Rejected:
+                                                    <span class="badge bg-danger px-3 py-2">
+                                                        <i class="fas fa-times me-1"></i> مرفوض
+                                                    </span>
+                                                    break;
+                                                default:
+                                                    <span class="badge bg-secondary px-3 py-2">غير معروف</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>
+                                            <small>@instructor.RegisteredAt.ToString("dd/MM/yyyy")</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
+                                                {
+                                                    <form asp-action="ApproveInstructor" method="post" asp-route-id="@instructor.Id" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-success" title="موافقة">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form asp-action="RejectInstructor" method="post" asp-route-id="@instructor.Id" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="رفض">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                <a asp-action="InstructorDetails" asp-route-id="@instructor.Id"
+                                                   class="btn btn-sm btn-outline-info" title="التفاصيل">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (!Model.Any())
                     {
-                        <tr>
-                            <td>@instructor.User.FullName</td>
-                            <td>@instructor.User.Email</td>
-                            <td>@instructor.User.PhoneNumber</td>
-                            <td>
-                                @switch (instructor.Status)
-                                {
-                                    case EduPlatform.Core.Enums.InstructorStatus.Pending:
-                                        <span class="badge bg-warning">معلق</span>
-                                        break;
-                                    case EduPlatform.Core.Enums.InstructorStatus.Approved:
-                                        <span class="badge bg-success">موافق عليه</span>
-                                        break;
-                                    case EduPlatform.Core.Enums.InstructorStatus.Rejected:
-                                        <span class="badge bg-danger">مرفوض</span>
-                                        break;
-                                    case EduPlatform.Core.Enums.InstructorStatus.Suspended:
-                                        <span class="badge bg-secondary">محظور</span>
-                                        break;
-                                }
-                            </td>
-                            <td>@instructor.RegisteredAt.ToString("yyyy/MM/dd")</td>
-                            <td>
-                                @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
-                                {
-                                    <form asp-action="ApproveInstructor" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="@instructor.Id" />
-                                        <button type="submit" class="btn btn-success btn-sm">موافقة</button>
-                                    </form>
-                                    <form asp-action="RejectInstructor" method="post" class="d-inline">
-                                        <input type="hidden" name="id" value="@instructor.Id" />
-                                        <button type="submit" class="btn btn-danger btn-sm">رفض</button>
-                                    </form>
-                                }
-                            </td>
-                        </tr>
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-4x text-muted opacity-25 mb-3"></i>
+                            <h5 class="text-muted">لا يوجد مدرسين</h5>
+                        </div>
                     }
-                </tbody>
-            </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // فلترة الحالة
+            $('#statusFilter').change(function() {
+                var status = $(this).val();
+                $('tbody tr').each(function() {
+                    if (!status || $(this).data('status') == status) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
+            // البحث
+            $('#searchInput').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $('tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+}

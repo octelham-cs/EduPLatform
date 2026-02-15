@@ -9,6 +9,8 @@ namespace EduPlatform.Infrastructure.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+
+
         }
 
         // DbSets - جداول قاعدة البيانات
@@ -34,6 +36,12 @@ namespace EduPlatform.Infrastructure.Data
             base.OnModelCreating(builder);
 
             // هنا هنضيف Configurations لاحقاً
+
+            builder.Entity<EnrollmentCode>()
+        .HasOne(e => e.Student)
+        .WithMany(s => s.EnrollmentCodes)
+        .HasForeignKey(e => e.UsedBy)
+        .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
