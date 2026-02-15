@@ -1,0 +1,73 @@
+﻿@model IEnumerable<EduPlatform.Core.Entities.Instructor>
+
+@{
+    ViewData["Title"] = "إدارة المدرسين";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">إدارة المدرسين</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>رقم الهاتف</th>
+                        <th>الحالة</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var instructor in Model)
+                    {
+                        <tr>
+                            <td>@instructor.User.FullName</td>
+                            <td>@instructor.User.Email</td>
+                            <td>@instructor.User.PhoneNumber</td>
+                            <td>
+                                @switch (instructor.Status)
+                                {
+                                    case EduPlatform.Core.Enums.InstructorStatus.Pending:
+                                        <span class="badge bg-warning">معلق</span>
+                                        break;
+                                    case EduPlatform.Core.Enums.InstructorStatus.Approved:
+                                        <span class="badge bg-success">موافق عليه</span>
+                                        break;
+                                    case EduPlatform.Core.Enums.InstructorStatus.Rejected:
+                                        <span class="badge bg-danger">مرفوض</span>
+                                        break;
+                                    case EduPlatform.Core.Enums.InstructorStatus.Suspended:
+                                        <span class="badge bg-secondary">محظور</span>
+                                        break;
+                                }
+                            </td>
+                            <td>@instructor.RegisteredAt.ToString("yyyy/MM/dd")</td>
+                            <td>
+                                @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
+                                {
+                                    <form asp-action="ApproveInstructor" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@instructor.Id" />
+                                        <button type="submit" class="btn btn-success btn-sm">موافقة</button>
+                                    </form>
+                                    <form asp-action="RejectInstructor" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@instructor.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">رفض</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

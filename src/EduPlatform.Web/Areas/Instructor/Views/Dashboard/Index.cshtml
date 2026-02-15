@@ -1,0 +1,107 @@
+﻿@model EduPlatform.Core.Entities.Instructor
+
+@{
+    ViewData["Title"] = "لوحة تحكم المدرس";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">لوحة تحكم المدرس</h2>
+
+    @if (Model.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
+    {
+        <div class="alert alert-warning">
+            <h5>حسابك في انتظار الموافقة</h5>
+            <p class="mb-0">يرجى الانتظار حتى يوافق المسؤول على حسابك. سيتم إعلامك عند الموافقة.</p>
+        </div>
+    }
+    else if (Model.Status == EduPlatform.Core.Enums.InstructorStatus.Rejected)
+    {
+        <div class="alert alert-danger">
+            <h5>تم رفض حسابك</h5>
+            <p class="mb-0">للأسف، تم رفض طلب التسجيل الخاص بك. يمكنك التواصل مع الدعم الفني للمزيد من المعلومات.</p>
+        </div>
+    }
+    else if (Model.Status == EduPlatform.Core.Enums.InstructorStatus.Approved)
+    {
+        <!-- بطاقات الإحصائيات -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h3>@ViewBag.TotalCourses</h3>
+                        <p class="mb-0">إجمالي الكورسات</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3>@ViewBag.TotalStudents</h3>
+                        <p class="mb-0">إجمالي الطلاب</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3>0</h3>
+                        <p class="mb-0">الأكواد المباعة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- قائمة الكورسات -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">كورساتي</h5>
+                <a href="#" class="btn btn-primary btn-sm">إضافة كورس جديد</a>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Courses != null && ViewBag.Courses.Count > 0)
+                {
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>عنوان الكورس</th>
+                                <th>المادة</th>
+                                <th>السعر</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var course in ViewBag.Courses)
+                            {
+                                <tr>
+                                    <td>@course.Title</td>
+                                    <td>@course.Subject.Name</td>
+                                    <td>@course.Price جنيه</td>
+                                    <td>
+                                        @if (course.IsActive)
+                                        {
+                                            <span class="badge bg-success">نشط</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">غير نشط</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-info btn-sm">عرض</a>
+                                        <a href="#" class="btn btn-warning btn-sm">تعديل</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-center text-muted">لم تقم بإنشاء أي كورسات بعد</p>
+                }
+            </div>
+        </div>
+    }
+</div>

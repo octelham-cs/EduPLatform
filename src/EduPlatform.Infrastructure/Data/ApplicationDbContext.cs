@@ -16,6 +16,10 @@ namespace EduPlatform.Infrastructure.Data
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Chapter> Chapters { get; set; }
+        public DbSet<AcademicTerm> AcademicTerms { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

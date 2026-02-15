@@ -1,0 +1,94 @@
+﻿@model IEnumerable<EduPlatform.Core.Entities.Instructor>
+
+@{
+    ViewData["Title"] = "لوحة التحكم";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">لوحة تحكم المسؤول</h2>
+
+    <!-- بطاقات الإحصائيات -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>@ViewBag.TotalInstructors</h3>
+                    <p class="mb-0">إجمالي المدرسين</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h3>@ViewBag.PendingInstructors</h3>
+                    <p class="mb-0">طلبات معلقة</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3>@ViewBag.TotalStudents</h3>
+                    <p class="mb-0">إجمالي الطلاب</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3>@ViewBag.TotalCourses</h3>
+                    <p class="mb-0">إجمالي الكورسات</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- قائمة المدرسين المعلقين -->
+    <div class="card">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">المدرسين في انتظار الموافقة</h5>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>رقم الهاتف</th>
+                            <th>تاريخ التسجيل</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var instructor in Model)
+                        {
+                            <tr>
+                                <td>@instructor.User.FullName</td>
+                                <td>@instructor.User.Email</td>
+                                <td>@instructor.User.PhoneNumber</td>
+                                <td>@instructor.RegisteredAt.ToString("yyyy/MM/dd")</td>
+                                <td>
+                                    <form asp-action="ApproveInstructor" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@instructor.Id" />
+                                        <button type="submit" class="btn btn-success btn-sm">موافقة</button>
+                                    </form>
+                                    <form asp-action="RejectInstructor" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@instructor.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">رفض</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-center text-muted">لا توجد طلبات معلقة</p>
+            }
+        </div>
+    </div>
+</div>
