@@ -35,7 +35,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 
 
-
+builder.Services.AddScoped<EduPlatform.Core.Interfaces.IEnrollmentService, EduPlatform.Infrastructure.Services.EnrollmentService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

@@ -1,0 +1,726 @@
+Folder PATH listing for volume Ilham
+Volume serial number is C0000100 28E1:8C6D
+E:.
+│   .gitignore
+│   EduPlatform.sln
+│   README.md
+│   structure.txt
+│   
+├───.github
+│   └───workflows
+└───src
+    ├───EduPlatform.Core
+    │   │   EduPlatform.Core.csproj
+    │   │   
+    │   ├───bin
+    │   │   ├───Debug
+    │   │   │   └───net9.0
+    │   │   │           EduPlatform.Core.deps.json
+    │   │   │           EduPlatform.Core.dll
+    │   │   │           EduPlatform.Core.pdb
+    │   │   │           
+    │   │   └───Release
+    │   │       └───net9.0
+    │   ├───Entities
+    │   │       AcademicTerm.cs
+    │   │       ApplicationUser.cs
+    │   │       AttachedFile.cs
+    │   │       Branch.cs
+    │   │       Chapter.cs
+    │   │       Course.cs
+    │   │       Enrollment.cs
+    │   │       EnrollmentCode.cs
+    │   │       GradeLevel.cs
+    │   │       Instructor.cs
+    │   │       Student.cs
+    │   │       Subject.cs
+    │   │       Video.cs
+    │   │       VideoProgress.cs
+    │   │       
+    │   ├───Enums
+    │   │       CodeStatus.cs
+    │   │       FileType.cs
+    │   │       InstructorStatus.cs
+    │   │       UserRole.cs
+    │   │       
+    │   ├───Interfaces
+    │   └───obj
+    │       │   EduPlatform.Core.csproj.nuget.dgspec.json
+    │       │   EduPlatform.Core.csproj.nuget.g.props
+    │       │   EduPlatform.Core.csproj.nuget.g.targets
+    │       │   project.assets.json
+    │       │   project.nuget.cache
+    │       │   
+    │       ├───Debug
+    │       │   └───net9.0
+    │       │       │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+    │       │       │   EduPlatform.Core.AssemblyInfo.cs
+    │       │       │   EduPlatform.Core.AssemblyInfoInputs.cache
+    │       │       │   EduPlatform.Core.assets.cache
+    │       │       │   EduPlatform.Core.csproj.AssemblyReference.cache
+    │       │       │   EduPlatform.Core.csproj.CoreCompileInputs.cache
+    │       │       │   EduPlatform.Core.csproj.FileListAbsolute.txt
+    │       │       │   EduPlatform.Core.dll
+    │       │       │   EduPlatform.Core.GeneratedMSBuildEditorConfig.editorconfig
+    │       │       │   EduPlatform.Core.GlobalUsings.g.cs
+    │       │       │   EduPlatform.Core.pdb
+    │       │       │   EduPlatform.Core.sourcelink.json
+    │       │       │   
+    │       │       ├───ref
+    │       │       │       EduPlatform.Core.dll
+    │       │       │       
+    │       │       └───refint
+    │       │               EduPlatform.Core.dll
+    │       │               
+    │       └───Release
+    │           └───net9.0
+    │               │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+    │               │   EduPlatform.Core.AssemblyInfo.cs
+    │               │   EduPlatform.Core.AssemblyInfoInputs.cache
+    │               │   EduPlatform.Core.assets.cache
+    │               │   EduPlatform.Core.csproj.AssemblyReference.cache
+    │               │   EduPlatform.Core.GeneratedMSBuildEditorConfig.editorconfig
+    │               │   EduPlatform.Core.GlobalUsings.g.cs
+    │               │   
+    │               ├───ref
+    │               └───refint
+    ├───EduPlatform.Infrastructure
+    │   │   EduPlatform.Infrastructure.csproj
+    │   │   
+    │   ├───bin
+    │   │   ├───Debug
+    │   │   │   └───net9.0
+    │   │   │           EduPlatform.Core.dll
+    │   │   │           EduPlatform.Core.pdb
+    │   │   │           EduPlatform.Infrastructure.deps.json
+    │   │   │           EduPlatform.Infrastructure.dll
+    │   │   │           EduPlatform.Infrastructure.pdb
+    │   │   │           EduPlatform.Infrastructure.runtimeconfig.json
+    │   │   │           EduPlatform.Shared.dll
+    │   │   │           EduPlatform.Shared.pdb
+    │   │   │           
+    │   │   └───Release
+    │   │       └───net9.0
+    │   ├───Data
+    │   │   │   ApplicationDbContext.cs
+    │   │   │   DbInitializer.cs
+    │   │   │   
+    │   │   └───Configurations
+    │   ├───Migrations
+    │   │       20260214232616_InitialCreate.cs
+    │   │       20260214232616_InitialCreate.Designer.cs
+    │   │       20260214235906_AddStudentEntity.cs
+    │   │       20260214235906_AddStudentEntity.Designer.cs
+    │   │       20260215003240_AddInstructorAndChapterAndAcademicyearAndCourse.cs
+    │   │       20260215003240_AddInstructorAndChapterAndAcademicyearAndCourse.Designer.cs
+    │   │       20260215120308_AddVideoAndContent.cs
+    │   │       20260215120308_AddVideoAndContent.Designer.cs
+    │   │       20260215123720_UpdateVideoAndContent.cs
+    │   │       20260215123720_UpdateVideoAndContent.Designer.cs
+    │   │       20260215131326_AddEnrollmentCode.cs
+    │   │       20260215131326_AddEnrollmentCode.Designer.cs
+    │   │       ApplicationDbContextModelSnapshot.cs
+    │   │       
+    │   └───obj
+    │       │   EduPlatform.Infrastructure.csproj.nuget.dgspec.json
+    │       │   EduPlatform.Infrastructure.csproj.nuget.g.props
+    │       │   EduPlatform.Infrastructure.csproj.nuget.g.targets
+    │       │   project.assets.json
+    │       │   project.nuget.cache
+    │       │   
+    │       ├───Debug
+    │       │   └───net9.0
+    │       │       │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+    │       │       │   EduPlatf.70BA1961.Up2Date
+    │       │       │   EduPlatform.Infrastructure.AssemblyInfo.cs
+    │       │       │   EduPlatform.Infrastructure.AssemblyInfoInputs.cache
+    │       │       │   EduPlatform.Infrastructure.assets.cache
+    │       │       │   EduPlatform.Infrastructure.csproj.AssemblyReference.cache
+    │       │       │   EduPlatform.Infrastructure.csproj.BuildWithSkipAnalyzers
+    │       │       │   EduPlatform.Infrastructure.csproj.CoreCompileInputs.cache
+    │       │       │   EduPlatform.Infrastructure.csproj.FileListAbsolute.txt
+    │       │       │   EduPlatform.Infrastructure.dll
+    │       │       │   EduPlatform.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+    │       │       │   EduPlatform.Infrastructure.genruntimeconfig.cache
+    │       │       │   EduPlatform.Infrastructure.GlobalUsings.g.cs
+    │       │       │   EduPlatform.Infrastructure.pdb
+    │       │       │   EduPlatform.Infrastructure.sourcelink.json
+    │       │       │   
+    │       │       ├───ref
+    │       │       │       EduPlatform.Infrastructure.dll
+    │       │       │       
+    │       │       └───refint
+    │       │               EduPlatform.Infrastructure.dll
+    │       │               
+    │       └───Release
+    │           └───net9.0
+    │               │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+    │               │   EduPlatform.Infrastructure.AssemblyInfo.cs
+    │               │   EduPlatform.Infrastructure.AssemblyInfoInputs.cache
+    │               │   EduPlatform.Infrastructure.assets.cache
+    │               │   EduPlatform.Infrastructure.csproj.AssemblyReference.cache
+    │               │   EduPlatform.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+    │               │   EduPlatform.Infrastructure.GlobalUsings.g.cs
+    │               │   
+    │               ├───ref
+    │               └───refint
+    ├───EduPlatform.Shared
+    │   │   Class1.cs
+    │   │   EduPlatform.Shared.csproj
+    │   │   
+    │   ├───bin
+    │   │   ├───Debug
+    │   │   │   └───net9.0
+    │   │   │           EduPlatform.Shared.deps.json
+    │   │   │           EduPlatform.Shared.dll
+    │   │   │           EduPlatform.Shared.pdb
+    │   │   │           
+    │   │   └───Release
+    │   │       └───net9.0
+    │   └───obj
+    │       │   EduPlatform.Shared.csproj.nuget.dgspec.json
+    │       │   EduPlatform.Shared.csproj.nuget.g.props
+    │       │   EduPlatform.Shared.csproj.nuget.g.targets
+    │       │   project.assets.json
+    │       │   project.nuget.cache
+    │       │   
+    │       ├───Debug
+    │       │   └───net9.0
+    │       │       │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+    │       │       │   EduPlatform.Shared.AssemblyInfo.cs
+    │       │       │   EduPlatform.Shared.AssemblyInfoInputs.cache
+    │       │       │   EduPlatform.Shared.assets.cache
+    │       │       │   EduPlatform.Shared.csproj.CoreCompileInputs.cache
+    │       │       │   EduPlatform.Shared.csproj.FileListAbsolute.txt
+    │       │       │   EduPlatform.Shared.dll
+    │       │       │   EduPlatform.Shared.GeneratedMSBuildEditorConfig.editorconfig
+    │       │       │   EduPlatform.Shared.GlobalUsings.g.cs
+    │       │       │   EduPlatform.Shared.pdb
+    │       │       │   EduPlatform.Shared.sourcelink.json
+    │       │       │   
+    │       │       ├───ref
+    │       │       │       EduPlatform.Shared.dll
+    │       │       │       
+    │       │       └───refint
+    │       │               EduPlatform.Shared.dll
+    │       │               
+    │       └───Release
+    │           └───net9.0
+    │               │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+    │               │   EduPlatform.Shared.AssemblyInfo.cs
+    │               │   EduPlatform.Shared.AssemblyInfoInputs.cache
+    │               │   EduPlatform.Shared.assets.cache
+    │               │   EduPlatform.Shared.GeneratedMSBuildEditorConfig.editorconfig
+    │               │   EduPlatform.Shared.GlobalUsings.g.cs
+    │               │   
+    │               ├───ref
+    │               └───refint
+    └───EduPlatform.Web
+        │   appsettings.Development.json
+        │   appsettings.json
+        │   EduPlatform.Web.csproj
+        │   EduPlatform.Web.csproj.user
+        │   Program.cs
+        │   
+        ├───Areas
+        │   ├───Admin
+        │   │   ├───Controllers
+        │   │   │       DashboardController.cs
+        │   │   │       
+        │   │   └───Views
+        │   │       └───Dashboard
+        │   │               AssignInstructor.cshtml
+        │   │               Index.cshtml
+        │   │               Instructors.cshtml
+        │   │               
+        │   └───Instructor
+        │       ├───Controllers
+        │       │       CodeController.cs
+        │       │       CourseController.cs
+        │       │       DashboardController.cs
+        │       │       
+        │       └───Views
+        │           ├───Code
+        │           │       Generate.cshtml
+        │           │       Index.cshtml
+        │           │       
+        │           ├───Course
+        │           │       Create.cshtml
+        │           │       Details.cshtml
+        │           │       Index.cshtml
+        │           │       
+        │           └───Dashboard
+        │                   Index.cshtml
+        │                   
+        ├───bin
+        │   ├───Debug
+        │   │   └───net9.0
+        │   │       │   appsettings.Development.json
+        │   │       │   appsettings.json
+        │   │       │   Azure.Core.dll
+        │   │       │   Azure.Identity.dll
+        │   │       │   EduPlatform.Core.dll
+        │   │       │   EduPlatform.Core.pdb
+        │   │       │   EduPlatform.Infrastructure.dll
+        │   │       │   EduPlatform.Infrastructure.pdb
+        │   │       │   EduPlatform.Shared.dll
+        │   │       │   EduPlatform.Shared.pdb
+        │   │       │   EduPlatform.Web.deps.json
+        │   │       │   EduPlatform.Web.dll
+        │   │       │   EduPlatform.Web.exe
+        │   │       │   EduPlatform.Web.pdb
+        │   │       │   EduPlatform.Web.runtimeconfig.json
+        │   │       │   EduPlatform.Web.staticwebassets.endpoints.json
+        │   │       │   EduPlatform.Web.staticwebassets.runtime.json
+        │   │       │   Humanizer.dll
+        │   │       │   Microsoft.AspNetCore.Cryptography.Internal.dll
+        │   │       │   Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+        │   │       │   Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+        │   │       │   Microsoft.Bcl.AsyncInterfaces.dll
+        │   │       │   Microsoft.Build.Locator.dll
+        │   │       │   Microsoft.CodeAnalysis.CSharp.dll
+        │   │       │   Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+        │   │       │   Microsoft.CodeAnalysis.dll
+        │   │       │   Microsoft.CodeAnalysis.Workspaces.dll
+        │   │       │   Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.dll
+        │   │       │   Microsoft.CodeAnalysis.Workspaces.MSBuild.dll
+        │   │       │   Microsoft.Data.SqlClient.dll
+        │   │       │   Microsoft.EntityFrameworkCore.Abstractions.dll
+        │   │       │   Microsoft.EntityFrameworkCore.Design.dll
+        │   │       │   Microsoft.EntityFrameworkCore.dll
+        │   │       │   Microsoft.EntityFrameworkCore.Relational.dll
+        │   │       │   Microsoft.EntityFrameworkCore.SqlServer.dll
+        │   │       │   Microsoft.Extensions.Caching.Abstractions.dll
+        │   │       │   Microsoft.Extensions.Caching.Memory.dll
+        │   │       │   Microsoft.Extensions.Configuration.Abstractions.dll
+        │   │       │   Microsoft.Extensions.DependencyInjection.Abstractions.dll
+        │   │       │   Microsoft.Extensions.DependencyInjection.dll
+        │   │       │   Microsoft.Extensions.DependencyModel.dll
+        │   │       │   Microsoft.Extensions.Identity.Core.dll
+        │   │       │   Microsoft.Extensions.Identity.Stores.dll
+        │   │       │   Microsoft.Extensions.Logging.Abstractions.dll
+        │   │       │   Microsoft.Extensions.Logging.dll
+        │   │       │   Microsoft.Extensions.Options.dll
+        │   │       │   Microsoft.Extensions.Primitives.dll
+        │   │       │   Microsoft.Identity.Client.dll
+        │   │       │   Microsoft.Identity.Client.Extensions.Msal.dll
+        │   │       │   Microsoft.IdentityModel.Abstractions.dll
+        │   │       │   Microsoft.IdentityModel.JsonWebTokens.dll
+        │   │       │   Microsoft.IdentityModel.Logging.dll
+        │   │       │   Microsoft.IdentityModel.Protocols.dll
+        │   │       │   Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+        │   │       │   Microsoft.IdentityModel.Tokens.dll
+        │   │       │   Microsoft.SqlServer.Server.dll
+        │   │       │   Microsoft.Win32.SystemEvents.dll
+        │   │       │   Mono.TextTemplating.dll
+        │   │       │   System.ClientModel.dll
+        │   │       │   System.CodeDom.dll
+        │   │       │   System.Composition.AttributedModel.dll
+        │   │       │   System.Composition.Convention.dll
+        │   │       │   System.Composition.Hosting.dll
+        │   │       │   System.Composition.Runtime.dll
+        │   │       │   System.Composition.TypedParts.dll
+        │   │       │   System.Configuration.ConfigurationManager.dll
+        │   │       │   System.Drawing.Common.dll
+        │   │       │   System.IdentityModel.Tokens.Jwt.dll
+        │   │       │   System.Memory.Data.dll
+        │   │       │   System.Runtime.Caching.dll
+        │   │       │   System.Security.Cryptography.ProtectedData.dll
+        │   │       │   System.Security.Permissions.dll
+        │   │       │   System.Windows.Extensions.dll
+        │   │       │   
+        │   │       ├───cs
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───de
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───es
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───fr
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───it
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───ja
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───ko
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───pl
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───pt-BR
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───ru
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───runtimes
+        │   │       │   ├───unix
+        │   │       │   │   └───lib
+        │   │       │   │       └───net6.0
+        │   │       │   │               Microsoft.Data.SqlClient.dll
+        │   │       │   │               System.Drawing.Common.dll
+        │   │       │   │               
+        │   │       │   ├───win
+        │   │       │   │   └───lib
+        │   │       │   │       └───net6.0
+        │   │       │   │               Microsoft.Data.SqlClient.dll
+        │   │       │   │               Microsoft.Win32.SystemEvents.dll
+        │   │       │   │               System.Drawing.Common.dll
+        │   │       │   │               System.Runtime.Caching.dll
+        │   │       │   │               System.Security.Cryptography.ProtectedData.dll
+        │   │       │   │               System.Windows.Extensions.dll
+        │   │       │   │               
+        │   │       │   ├───win-arm
+        │   │       │   │   └───native
+        │   │       │   │           Microsoft.Data.SqlClient.SNI.dll
+        │   │       │   │           
+        │   │       │   ├───win-arm64
+        │   │       │   │   └───native
+        │   │       │   │           Microsoft.Data.SqlClient.SNI.dll
+        │   │       │   │           
+        │   │       │   ├───win-x64
+        │   │       │   │   └───native
+        │   │       │   │           Microsoft.Data.SqlClient.SNI.dll
+        │   │       │   │           
+        │   │       │   └───win-x86
+        │   │       │       └───native
+        │   │       │               Microsoft.Data.SqlClient.SNI.dll
+        │   │       │               
+        │   │       ├───tr
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       ├───zh-Hans
+        │   │       │       Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │       │       Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │       │       
+        │   │       └───zh-Hant
+        │   │               Microsoft.CodeAnalysis.CSharp.resources.dll
+        │   │               Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+        │   │               Microsoft.CodeAnalysis.resources.dll
+        │   │               Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+        │   │               Microsoft.CodeAnalysis.Workspaces.resources.dll
+        │   │               
+        │   └───Release
+        │       └───net9.0
+        ├───Controllers
+        │       AccountController.cs
+        │       HomeController.cs
+        │       
+        ├───Models
+        │       ErrorViewModel.cs
+        │       
+        ├───obj
+        │   │   EduPlatform.Web.csproj.nuget.dgspec.json
+        │   │   EduPlatform.Web.csproj.nuget.g.props
+        │   │   EduPlatform.Web.csproj.nuget.g.targets
+        │   │   project.assets.json
+        │   │   project.nuget.cache
+        │   │   
+        │   ├───Debug
+        │   │   └───net9.0
+        │   │       │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+        │   │       │   ApiEndpoints.json
+        │   │       │   apphost.exe
+        │   │       │   EduPlatf.9518BFC5.Up2Date
+        │   │       │   EduPlatform.Web.AssemblyInfo.cs
+        │   │       │   EduPlatform.Web.AssemblyInfoInputs.cache
+        │   │       │   EduPlatform.Web.assets.cache
+        │   │       │   EduPlatform.Web.csproj.AssemblyReference.cache
+        │   │       │   EduPlatform.Web.csproj.BuildWithSkipAnalyzers
+        │   │       │   EduPlatform.Web.csproj.CoreCompileInputs.cache
+        │   │       │   EduPlatform.Web.csproj.FileListAbsolute.txt
+        │   │       │   EduPlatform.Web.dll
+        │   │       │   EduPlatform.Web.GeneratedMSBuildEditorConfig.editorconfig
+        │   │       │   EduPlatform.Web.genruntimeconfig.cache
+        │   │       │   EduPlatform.Web.GlobalUsings.g.cs
+        │   │       │   EduPlatform.Web.MvcApplicationPartsAssemblyInfo.cache
+        │   │       │   EduPlatform.Web.pdb
+        │   │       │   EduPlatform.Web.RazorAssemblyInfo.cache
+        │   │       │   EduPlatform.Web.RazorAssemblyInfo.cs
+        │   │       │   EduPlatform.Web.sourcelink.json
+        │   │       │   rbcswa.dswa.cache.json
+        │   │       │   rjimswa.dswa.cache.json
+        │   │       │   rjsmcshtml.dswa.cache.json
+        │   │       │   rjsmrazor.dswa.cache.json
+        │   │       │   rpswa.dswa.cache.json
+        │   │       │   staticwebassets.build.endpoints.json
+        │   │       │   staticwebassets.build.json
+        │   │       │   staticwebassets.build.json.cache
+        │   │       │   staticwebassets.development.json
+        │   │       │   staticwebassets.references.upToDateCheck.txt
+        │   │       │   staticwebassets.removed.txt
+        │   │       │   staticwebassets.upToDateCheck.txt
+        │   │       │   
+        │   │       ├───compressed
+        │   │       │       0hp527vsgb-jj8uyg4cgr.gz
+        │   │       │       0m9ekkxiky-kbrnm935zg.gz
+        │   │       │       18megfni3i-ausgxo2sd3.gz
+        │   │       │       1htkjt2srg-fvhpjtyr6v.gz
+        │   │       │       4ko11ott97-j5mq2jizvt.gz
+        │   │       │       4yxichsmhc-6pdc2jztkx.gz
+        │   │       │       50vs7m6m2z-iovd86k7lj.gz
+        │   │       │       5uctgxm1l7-lcd1t2u6c8.gz
+        │   │       │       5zi0p72rv4-0i3buxo5is.gz
+        │   │       │       6na9821mlq-ft3s53vfgj.gz
+        │   │       │       6qjbbpz1i6-356vix0kms.gz
+        │   │       │       8i505xactk-cosvhxvwiu.gz
+        │   │       │       8tr64xnbtt-k8d9w2qqmf.gz
+        │   │       │       abpta1ijfi-pj5nd1wqec.gz
+        │   │       │       aedjllvlm0-v0zj4ognzu.gz
+        │   │       │       ai2d2n7u1j-47otxtyo56.gz
+        │   │       │       bbzp64p5kv-c2oey78nd0.gz
+        │   │       │       cfke8wgrwi-dxx9fxp4il.gz
+        │   │       │       dknvw7u0cx-khv3u5hwcm.gz
+        │   │       │       dtshuawjv2-d7shbmvgxk.gz
+        │   │       │       dxkwqrcqhh-rzd6atqjts.gz
+        │   │       │       f1kuz791as-2z0ns9nrw6.gz
+        │   │       │       f1nlznvrh7-ag7o75518u.gz
+        │   │       │       f7afvpsixk-erw9l3u2r3.gz
+        │   │       │       hniqga8vlu-notf2xhcfb.gz
+        │   │       │       ikmigh01aa-fsbi9cje9m.gz
+        │   │       │       j8pgxnmrh0-xtxxf3hu2r.gz
+        │   │       │       jrj8i7pp40-63fj8s7r0e.gz
+        │   │       │       jtbxor06j3-hrwsygsryq.gz
+        │   │       │       jwwvq0r9xu-aexeepp0ev.gz
+        │   │       │       kazpb16dks-83jwlth58m.gz
+        │   │       │       km5kl57wh8-493y06b0oq.gz
+        │   │       │       lhgf3xbx1i-o1o13a6vjx.gz
+        │   │       │       liqzzrztxu-87fc7y1x7t.gz
+        │   │       │       lkgaa7kt57-ub07r2b239.gz
+        │   │       │       m4ezp46bnu-mrlpezrjn3.gz
+        │   │       │       mo98n9eahw-muycvpuwrr.gz
+        │   │       │       njzonlepww-ee0r1s7dh0.gz
+        │   │       │       nvd024ubnv-jd9uben2k1.gz
+        │   │       │       nwb9555wtx-y7v9cxd14o.gz
+        │   │       │       owsxv24z18-ttgo8qnofa.gz
+        │   │       │       pvzlw3dux1-bqjiyaj88i.gz
+        │   │       │       pxnrcyvb1b-wup4ktia8c.gz
+        │   │       │       qb4yrs8a7b-6cfz1n2cew.gz
+        │   │       │       qpmcdn58c5-s35ty4nyc5.gz
+        │   │       │       rfvq1viov1-4v8eqarkd7.gz
+        │   │       │       rt40x2lrzp-0j3bgjxly4.gz
+        │   │       │       ryo8cyo5h1-b7pk76d08c.gz
+        │   │       │       sy7uoywz6f-wup4ktia8c.gz
+        │   │       │       syyop8t9v3-06098lyss8.gz
+        │   │       │       tkipg0je8r-h1s4sie4z3.gz
+        │   │       │       ugf96qx51r-nvvlpmu67g.gz
+        │   │       │       ukr9mp41u1-tdbxkamptv.gz
+        │   │       │       uozuooq325-pk9g2wxc8p.gz
+        │   │       │       v248ov0z5j-c2jlpeoesf.gz
+        │   │       │       v2ettvrzvv-vr1egmr9el.gz
+        │   │       │       v4vrejhvx6-r4e9w2rdcm.gz
+        │   │       │       x4ghrmq8u7-x0q3zqp4vz.gz
+        │   │       │       xald5ue7tp-37tfw0ft22.gz
+        │   │       │       xdvar4ajc3-lzl9nlhx6b.gz
+        │   │       │       xnx0u8s8ui-46ein0sx1k.gz
+        │   │       │       yrtty5zrc4-b9sayid5wm.gz
+        │   │       │       yv8uppluuh-61n19gt1b8.gz
+        │   │       │       zqwauzwdmv-mlv21k5csn.gz
+        │   │       │       
+        │   │       ├───ref
+        │   │       │       EduPlatform.Web.dll
+        │   │       │       
+        │   │       ├───refint
+        │   │       │       EduPlatform.Web.dll
+        │   │       │       
+        │   │       ├───scopedcss
+        │   │       │   ├───bundle
+        │   │       │   │       EduPlatform.Web.styles.css
+        │   │       │   │       
+        │   │       │   ├───projectbundle
+        │   │       │   │       EduPlatform.Web.bundle.scp.css
+        │   │       │   │       
+        │   │       │   └───Views
+        │   │       │       └───Shared
+        │   │       │               _Layout.cshtml.rz.scp.css
+        │   │       │               
+        │   │       └───staticwebassets
+        │   └───Release
+        │       └───net9.0
+        │           │   .NETCoreApp,Version=v9.0.AssemblyAttributes.cs
+        │           │   EduPlatform.Web.AssemblyInfo.cs
+        │           │   EduPlatform.Web.AssemblyInfoInputs.cache
+        │           │   EduPlatform.Web.assets.cache
+        │           │   EduPlatform.Web.csproj.AssemblyReference.cache
+        │           │   EduPlatform.Web.GeneratedMSBuildEditorConfig.editorconfig
+        │           │   EduPlatform.Web.GlobalUsings.g.cs
+        │           │   EduPlatform.Web.RazorAssemblyInfo.cache
+        │           │   EduPlatform.Web.RazorAssemblyInfo.cs
+        │           │   
+        │           ├───ref
+        │           └───refint
+        ├───Properties
+        │       launchSettings.json
+        │       
+        ├───ViewModels
+        │   ├───Account
+        │   │       LoginViewModel.cs
+        │   │       RegisterViewModel.cs
+        │   │       
+        │   └───Instructor
+        │           AddChapterViewModel.cs
+        │           AddCourseViewModel.cs
+        │           AddVideoViewModel.cs
+        │           GenerateCodeViewModel.cs
+        │           
+        ├───Views
+        │   │   _ViewImports.cshtml
+        │   │   _ViewStart.cshtml
+        │   │   
+        │   ├───Account
+        │   │       Login.cshtml
+        │   │       Register.cshtml
+        │   │       
+        │   ├───Home
+        │   │       Index.cshtml
+        │   │       Privacy.cshtml
+        │   │       
+        │   └───Shared
+        │           Error.cshtml
+        │           _Layout.cshtml
+        │           _Layout.cshtml.css
+        │           _LoginPartial.cshtml
+        │           _ValidationScriptsPartial.cshtml
+        │           
+        └───wwwroot
+            │   favicon.ico
+            │   
+            ├───css
+            │       site.css
+            │       
+            ├───js
+            │       site.js
+            │       
+            └───lib
+                ├───bootstrap
+                │   │   LICENSE
+                │   │   
+                │   └───dist
+                │       ├───css
+                │       │       bootstrap-grid.css
+                │       │       bootstrap-grid.css.map
+                │       │       bootstrap-grid.min.css
+                │       │       bootstrap-grid.min.css.map
+                │       │       bootstrap-grid.rtl.css
+                │       │       bootstrap-grid.rtl.css.map
+                │       │       bootstrap-grid.rtl.min.css
+                │       │       bootstrap-grid.rtl.min.css.map
+                │       │       bootstrap-reboot.css
+                │       │       bootstrap-reboot.css.map
+                │       │       bootstrap-reboot.min.css
+                │       │       bootstrap-reboot.min.css.map
+                │       │       bootstrap-reboot.rtl.css
+                │       │       bootstrap-reboot.rtl.css.map
+                │       │       bootstrap-reboot.rtl.min.css
+                │       │       bootstrap-reboot.rtl.min.css.map
+                │       │       bootstrap-utilities.css
+                │       │       bootstrap-utilities.css.map
+                │       │       bootstrap-utilities.min.css
+                │       │       bootstrap-utilities.min.css.map
+                │       │       bootstrap-utilities.rtl.css
+                │       │       bootstrap-utilities.rtl.css.map
+                │       │       bootstrap-utilities.rtl.min.css
+                │       │       bootstrap-utilities.rtl.min.css.map
+                │       │       bootstrap.css
+                │       │       bootstrap.css.map
+                │       │       bootstrap.min.css
+                │       │       bootstrap.min.css.map
+                │       │       bootstrap.rtl.css
+                │       │       bootstrap.rtl.css.map
+                │       │       bootstrap.rtl.min.css
+                │       │       bootstrap.rtl.min.css.map
+                │       │       
+                │       └───js
+                │               bootstrap.bundle.js
+                │               bootstrap.bundle.js.map
+                │               bootstrap.bundle.min.js
+                │               bootstrap.bundle.min.js.map
+                │               bootstrap.esm.js
+                │               bootstrap.esm.js.map
+                │               bootstrap.esm.min.js
+                │               bootstrap.esm.min.js.map
+                │               bootstrap.js
+                │               bootstrap.js.map
+                │               bootstrap.min.js
+                │               bootstrap.min.js.map
+                │               
+                ├───jquery
+                │   │   LICENSE.txt
+                │   │   
+                │   └───dist
+                │           jquery.js
+                │           jquery.min.js
+                │           jquery.min.map
+                │           jquery.slim.js
+                │           jquery.slim.min.js
+                │           jquery.slim.min.map
+                │           
+                ├───jquery-validation
+                │   │   LICENSE.md
+                │   │   
+                │   └───dist
+                │           additional-methods.js
+                │           additional-methods.min.js
+                │           jquery.validate.js
+                │           jquery.validate.min.js
+                │           
+                └───jquery-validation-unobtrusive
+                    │   LICENSE.txt
+                    │   
+                    └───dist
+                            jquery.validate.unobtrusive.js
+                            jquery.validate.unobtrusive.min.js
+                            
