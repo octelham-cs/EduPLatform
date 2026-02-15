@@ -94,5 +94,38 @@ namespace EduPlatform.Infrastructure.Services
                                e.Status == EnrollmentStatus.Active &&
                                e.ExpiresAt > DateTime.UtcNow);
         }
+
+
+        public async Task<List<Enrollment>> GetStudentEnrollmentsAsync(string userId)
+        {
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == userId);
+            if (student == null) return new List<Enrollment>();
+
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Instructor)
+                        .ThenInclude(i => i.User)
+                .Where(e => e.StudentId == student.Id)
+                .OrderByDescending(e => e.EnrolledAt)
+                .ToListAsync();
+
+            // تحديث الحالة
+            bool hasChanges = false;
+            foreach (var enrollment in enrollments)
+            {
+                if (enrollment.Status == EnrollmentStatus.Active && enrollment.ExpiresAt < DateTime.UtcNow)
+                {
+                    enrollment.Status = EnrollmentStatus.Expired;
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return enrollments;
+        }
     }
 }

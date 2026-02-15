@@ -1,0 +1,104 @@
+﻿@model EduPlatform.Web.ViewModels.Instructor.QuestionViewModel
+@{
+    ViewData["Title"] = "إضافة سؤال جديد";
+    var questionTypes = Html.GetEnumSelectList<EduPlatform.Core.Enums.QuestionType>();
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header text-white" style="background-color: #003366;">
+            <h4 class="mb-0">إضافة سؤال جديد</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SubjectId" class="form-label">المادة</label>
+                        <select asp-for="SubjectId" asp-items="Model.Subjects" class="form-select">
+                            <option value="">-- اختر المادة --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Type" class="form-label">نوع السؤال</label>
+                        <select asp-for="Type" asp-items="questionTypes" class="form-select" id="QuestionType">
+                            <option value="">-- اختر النوع --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="QuestionText" class="form-label">نص السؤال</label>
+                    <textarea asp-for="QuestionText" class="form-control" rows="3"></textarea>
+                </div>
+
+                <!-- قسم الاختيارات (يظهر فقط لاختيار من متعدد) -->
+                <div id="MultipleChoiceSection" style="display:none;">
+                    <h5 class="mt-3 mb-2">الاختيارات</h5>
+                    <div class="row">
+                        @for (int i = 0; i < Model.Options.Count; i++)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <input asp-for="Options[i]" class="form-control" placeholder="الاختيار @(i + 1)" />
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- قسم الإجابة الصحيحة -->
+                <div class="mb-3 mt-3">
+                    <label class="form-label">الإجابة الصحيحة</label>
+                    <div id="AnswerInput">
+                        <input asp-for="CorrectAnswer" class="form-control" placeholder="سيتم تحديدها تلقائياً حسب النوع" readonly />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="DifficultyLevel" class="form-label">مستوى الصعوبة (1-5)</label>
+                    <input asp-for="DifficultyLevel" type="number" class="form-control" min="1" max="5" />
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save"></i> حفظ السؤال
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const typeSelect = document.getElementById("QuestionType");
+        const mcqSection = document.getElementById("MultipleChoiceSection");
+        const answerDiv = document.getElementById("AnswerInput");
+
+        function toggleUI() {
+            const selectedValue = parseInt(typeSelect.value);
+
+            if (selectedValue === 1) { // Multiple Choice
+                mcqSection.style.display = "block";
+                answerDiv.innerHTML = '<select class="form-select" name="CorrectAnswer">' +
+                                      '<option value="0">الاختيار الأول</option>' +
+                                      '<option value="1">الاختيار الثاني</option>' +
+                                      '<option value="2">الاختيار الثالث</option>' +
+                                      '<option value="3">الاختيار الرابع</option>' +
+                                      '</select>';
+            } else if (selectedValue === 2) { // True/False
+                mcqSection.style.display = "none";
+                answerDiv.innerHTML = '<select class="form-select" name="CorrectAnswer">' +
+                                      '<option value="True">صح</option>' +
+                                      '<option value="False">خطأ</option>' +
+                                      '</select>';
+            } else {
+                mcqSection.style.display = "none";
+                answerDiv.innerHTML = '<input class="form-control" name="CorrectAnswer" placeholder="اختر نوع السؤال أولاً" readonly/>';
+            }
+        }
+
+        typeSelect.addEventListener("change", toggleUI);
+        document.addEventListener("DOMContentLoaded", toggleUI);
+    </script>
+}

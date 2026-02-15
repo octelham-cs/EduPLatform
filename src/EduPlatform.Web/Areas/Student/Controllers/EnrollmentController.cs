@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using EduPlatform.Core.Enums;
 using EduPlatform.Core.Interfaces;
+using EduPlatform.Web.ViewModels.Student;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace EduPlatform.Web.Areas.Student.Controllers
 {
@@ -47,11 +49,27 @@ namespace EduPlatform.Web.Areas.Student.Controllers
         }
 
         [HttpGet]
-        public IActionResult MyCourses()
+        public async Task<IActionResult> MyCourses()
         {
-            // هنا هنجيب الكورسات اللي الطالب مشترك فيها
-            // هنتعامل معاها في خطوة تانية
-            return View();
+            var enrollments = await _enrollmentService.GetStudentEnrollmentsAsync(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+
+            // تحويل للـ ViewModel
+            var viewModel = new MyEnrollmentsViewModel
+            {
+                Enrollments = enrollments.Select(e => new EnrollmentItemViewModel
+                {
+                    CourseId = e.CourseId,
+                    CourseTitle = e.Course?.Title ?? "غير معروف",
+                    InstructorName = e.Course?.Instructor?.User?.FullName ?? "غير معروف",
+                    EnrolledAt = e.EnrolledAt,
+                    ExpiresAt = e.ExpiresAt,
+                    Status = e.Status == EnrollmentStatus.Active ? "نشط" : "منتهي",
+                    IsExpired = e.Status == EnrollmentStatus.Expired,
+                    DaysRemaining = e.ExpiresAt > DateTime.UtcNow ? (e.ExpiresAt - DateTime.UtcNow).Days : 0
+                }).ToList()
+            };
+
+            return View(viewModel);
         }
     }
 }

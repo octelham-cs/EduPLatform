@@ -1,0 +1,64 @@
+﻿@model EduPlatform.Web.ViewModels.Student.MyEnrollmentsViewModel
+@{
+    ViewData["Title"] = "اشتراكاتي";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center" style="color: #003366;">📚 كورساتي واشتراكاتي</h2>
+
+    @if (!Model.Enrollments.Any())
+    {
+        <div class="alert alert-info text-center">
+            <h4>لا توجد اشتراكات حالياً</h4>
+            <p>قم بتفعيل كود اشتراك جديد للوصول للمحتوى.</p>
+            <a asp-action="Activate" class="btn btn-primary mt-2">تفعيل كود</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model.Enrollments)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm @(item.IsExpired ? "border-danger" : "border-success")" style="border-left: 5px solid;">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">@item.CourseTitle</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@item.InstructorName</h6>
+                            <hr />
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>تاريخ الاشتراك:</span>
+                                <span>@item.EnrolledAt.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>ينتهي في:</span>
+                                <span class="@(item.IsExpired ? "text-danger fw-bold" : "")">@item.ExpiresAt.ToString("dd/MM/yyyy")</span>
+                            </div>
+
+                            @if (!item.IsExpired)
+                            {
+                                <div class="progress mb-3">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="@item.DaysRemaining" aria-valuemin="0" aria-valuemax="100">
+                                        متبقي @item.DaysRemaining يوم
+                                    </div>
+                                </div>
+                                <a asp-area="Student" asp-controller="Course" asp-action="Details" asp-route-id="@item.CourseId" class="btn btn-primary w-100">
+                                    دخول للمادة
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger p-2 text-center mb-0">
+                                    ❌ الاشتراك منتهي
+                                </div>
+                                <a asp-action="Activate" class="btn btn-outline-danger w-100 mt-2">
+                                    تجديد الاشتراك
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

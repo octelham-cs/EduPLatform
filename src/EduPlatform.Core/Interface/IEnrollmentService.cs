@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using EduPlatform.Core.Entities;
+﻿using EduPlatform.Core.Entities;
 
 namespace EduPlatform.Core.Interfaces
 {
@@ -14,5 +13,8 @@ namespace EduPlatform.Core.Interfaces
         /// التحقق هل الطالب مشترك في مادة معينة
         /// </summary>
         Task<bool> IsStudentEnrolledAsync(string userId, int courseId);
+
+
+        Task<List<Enrollment>> GetStudentEnrollmentsAsync(string userId);
     }
 }

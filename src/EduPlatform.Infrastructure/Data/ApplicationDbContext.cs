@@ -25,6 +25,7 @@ namespace EduPlatform.Infrastructure.Data
         public DbSet<VideoProgress> VideoProgresses { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<EnrollmentCode> EnrollmentCodes { get; set; }
+        public DbSet<Question> Questions { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
