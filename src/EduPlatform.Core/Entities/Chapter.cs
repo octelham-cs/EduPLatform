@@ -1,4 +1,6 @@
-﻿namespace EduPlatform.Core.Entities
+﻿using System.Collections.Generic;
+
+namespace EduPlatform.Core.Entities
 {
     // الفصل/القسم داخل الكورس
     public class Chapter
@@ -22,5 +24,8 @@
 
         // Navigation Properties
         public Course Course { get; set; } = null!;
+
+        // الفيديوهات داخل الفصل
+        public ICollection<Video> Videos { get; set; } = new List<Video>();
     }
 }

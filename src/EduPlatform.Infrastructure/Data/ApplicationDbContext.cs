@@ -20,7 +20,10 @@ namespace EduPlatform.Infrastructure.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<Chapter> Chapters { get; set; }
         public DbSet<AcademicTerm> AcademicTerms { get; set; }
-
+        public DbSet<Video> Videos { get; set; }
+        public DbSet<AttachedFile> AttachedFiles { get; set; }
+        public DbSet<VideoProgress> VideoProgresses { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

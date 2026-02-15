@@ -1,4 +1,6 @@
-﻿namespace EduPlatform.Core.Entities
+﻿using System.Collections.Generic;
+
+namespace EduPlatform.Core.Entities
 {
     public class Student
     {
@@ -20,5 +22,11 @@
         public ApplicationUser User { get; set; } = null!;
         public GradeLevel GradeLevel { get; set; } = null!;
         public Branch? Branch { get; set; }
+
+        // الاشتراكات
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+
+        // تقدم الفيديوهات
+        public ICollection<VideoProgress> VideoProgresses { get; set; } = new List<VideoProgress>();
     }
 }

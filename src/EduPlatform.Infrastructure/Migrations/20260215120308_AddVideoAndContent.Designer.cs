@@ -4,6 +4,7 @@ using EduPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduPlatform.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260215120308_AddVideoAndContent")]
+    partial class AddVideoAndContent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -644,7 +647,7 @@ namespace EduPlatform.Infrastructure.Migrations
             modelBuilder.Entity("EduPlatform.Core.Entities.AttachedFile", b =>
                 {
                     b.HasOne("EduPlatform.Core.Entities.Video", "Video")
-                        .WithMany("AttachedFiles")
+                        .WithMany()
                         .HasForeignKey("VideoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -655,7 +658,7 @@ namespace EduPlatform.Infrastructure.Migrations
             modelBuilder.Entity("EduPlatform.Core.Entities.Chapter", b =>
                 {
                     b.HasOne("EduPlatform.Core.Entities.Course", "Course")
-                        .WithMany("Chapters")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -691,7 +694,7 @@ namespace EduPlatform.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("EduPlatform.Core.Entities.Student", "Student")
-                        .WithMany("Enrollments")
+                        .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -740,7 +743,7 @@ namespace EduPlatform.Infrastructure.Migrations
             modelBuilder.Entity("EduPlatform.Core.Entities.Video", b =>
                 {
                     b.HasOne("EduPlatform.Core.Entities.Chapter", "Chapter")
-                        .WithMany("Videos")
+                        .WithMany()
                         .HasForeignKey("ChapterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -751,7 +754,7 @@ namespace EduPlatform.Infrastructure.Migrations
             modelBuilder.Entity("EduPlatform.Core.Entities.VideoProgress", b =>
                 {
                     b.HasOne("EduPlatform.Core.Entities.Student", "Student")
-                        .WithMany("VideoProgresses")
+                        .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -816,28 +819,6 @@ namespace EduPlatform.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EduPlatform.Core.Entities.Chapter", b =>
-                {
-                    b.Navigation("Videos");
-                });
-
-            modelBuilder.Entity("EduPlatform.Core.Entities.Course", b =>
-                {
-                    b.Navigation("Chapters");
-                });
-
-            modelBuilder.Entity("EduPlatform.Core.Entities.Student", b =>
-                {
-                    b.Navigation("Enrollments");
-
-                    b.Navigation("VideoProgresses");
-                });
-
-            modelBuilder.Entity("EduPlatform.Core.Entities.Video", b =>
-                {
-                    b.Navigation("AttachedFiles");
                 });
 #pragma warning restore 612, 618
         }

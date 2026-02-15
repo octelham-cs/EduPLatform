@@ -1,4 +1,6 @@
-﻿namespace EduPlatform.Core.Entities
+﻿using System.Collections.Generic;
+
+namespace EduPlatform.Core.Entities
 {
     // الكورس = مادة يدرسها مدرس معين
     public class Course
@@ -29,5 +31,8 @@
         // Navigation Properties
         public Instructor Instructor { get; set; } = null!;
         public Subject Subject { get; set; } = null!;
+
+        // الفصول داخل الكورس
+        public ICollection<Chapter> Chapters { get; set; } = new List<Chapter>();
     }
 }
