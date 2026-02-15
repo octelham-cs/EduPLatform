@@ -1,0 +1,97 @@
+﻿@model EduPlatform.Web.ViewModels.Account.RegisterViewModel
+
+@{
+    ViewData["Title"] = "تسجيل حساب جديد";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">تسجيل حساب جديد</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <!-- الاسم الكامل -->
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="أدخل اسمك الكامل" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <!-- البريد الإلكتروني -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="example@email.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- رقم الهاتف -->
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="01xxxxxxxxx" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- كلمة السر -->
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" placeholder="6 حروف على الأقل (حروف وأرقام)" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <!-- تأكيد كلمة السر -->
+                        <div class="mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="أعد كتابة كلمة السر" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <!-- المستوى الدراسي -->
+                        <div class="mb-3">
+                            <label asp-for="GradeLevelId" class="form-label"></label>
+                            <select asp-for="GradeLevelId" class="form-select">
+                                <option value="">-- اختر المستوى الدراسي --</option>
+                                <option value="1">أولى ثانوي</option>
+                                <option value="2">ثانية ثانوي</option>
+                                <option value="3">ثالثة ثانوي</option>
+                            </select>
+                            <span asp-validation-for="GradeLevelId" class="text-danger"></span>
+                        </div>
+
+                        <!-- الشعبة -->
+                        <div class="mb-3">
+                            <label asp-for="BranchId" class="form-label"></label>
+                            <select asp-for="BranchId" class="form-select">
+                                <option value="">-- اختر الشعبة (اختياري) --</option>
+                                <option value="1">علمي علوم</option>
+                                <option value="2">علمي رياضة</option>
+                                <option value="3">أدبي</option>
+                            </select>
+                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                        </div>
+
+                        <!-- زر التسجيل -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">تسجيل</button>
+                        </div>
+                    </form>
+
+                    <hr />
+
+                    <p class="text-center">
+                        لديك حساب بالفعل؟ <a asp-action="Login">سجل دخولك هنا</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

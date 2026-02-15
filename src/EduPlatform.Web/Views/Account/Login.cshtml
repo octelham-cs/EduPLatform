@@ -1,0 +1,60 @@
+﻿@model EduPlatform.Web.ViewModels.Account.LoginViewModel
+
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">تسجيل الدخول</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Login" method="post">
+                        <input type="hidden" asp-for="ReturnUrl" />
+
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <!-- البريد أو الهاتف -->
+                        <div class="mb-3">
+                            <label asp-for="EmailOrPhone" class="form-label"></label>
+                            <input asp-for="EmailOrPhone" class="form-control" placeholder="البريد الإلكتروني أو رقم الهاتف" />
+                            <span asp-validation-for="EmailOrPhone" class="text-danger"></span>
+                        </div>
+
+                        <!-- كلمة السر -->
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" placeholder="كلمة السر" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <!-- تذكرني -->
+                        <div class="mb-3 form-check">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            <label asp-for="RememberMe" class="form-check-label"></label>
+                        </div>
+
+                        <!-- زر الدخول -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">دخول</button>
+                        </div>
+                    </form>
+
+                    <hr />
+
+                    <p class="text-center">
+                        ليس لديك حساب؟ <a asp-action="Register">سجل الآن</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

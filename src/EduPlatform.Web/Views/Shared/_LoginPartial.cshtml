@@ -1,0 +1,29 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using EduPlatform.Core.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <!-- المستخدم مسجل دخول -->
+        <li class="nav-item">
+            <span class="nav-link text-dark">مرحباً، @UserManager.GetUserAsync(User).Result?.FullName</span>
+        </li>
+        <li class="nav-item">
+            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                <button type="submit" class="nav-link btn btn-link text-dark">خروج</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <!-- المستخدم غير مسجل -->
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">تسجيل</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">دخول</a>
+        </li>
+    }
+</ul>
