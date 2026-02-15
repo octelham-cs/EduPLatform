@@ -1,0 +1,120 @@
+﻿@model IEnumerable<EduPlatform.Core.Entities.EnrollmentCode>
+
+@{
+    ViewData["Title"] = "أكوادي";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>أكواد الاشتراك</h2>
+        <div>
+            <a asp-action="Generate" class="btn btn-success">
+                ➕ توليد أكواد جديدة
+            </a>
+            <a asp-action="Export" class="btn btn-outline-primary">
+                📥 تصدير CSV
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <!-- فلتر -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">الكورس</label>
+                    <select name="courseId" class="form-select">
+                        <option value="">كل الكورسات</option>
+@foreach (var course in (ViewBag.Courses as IEnumerable<SelectListItem>) ?? new List<SelectListItem>())                        {
+                            <option value="@course.Value">@course.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">الحالة</label>
+                    <select name="status" class="form-select">
+                        <option value="">كل الحالات</option>
+                        <option value="Available">متاح</option>
+                        <option value="Used">مستخدم</option>
+                        <option value="Expired">منتهي</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">فلتر</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>الكود</th>
+                            <th>الكورس</th>
+                            <th>السعر</th>
+                            <th>الترم</th>
+                            <th>الحالة</th>
+                            <th>تاريخ الانتهاء</th>
+                            <th>المستخدم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var code in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <code class="bg-light p-1 rounded">@code.Code</code>
+                                </td>
+                                <td>@code.Course.Title</td>
+                                <td>@code.Price جنيه</td>
+                                <td>@code.AcademicTerm.Name</td>
+                                <td>
+                                    @switch (code.Status)
+                                    {
+                                        case EduPlatform.Core.Enums.CodeStatus.Available:
+                                            <span class="badge bg-success">متاح</span>
+                                            break;
+                                        case EduPlatform.Core.Enums.CodeStatus.Used:
+                                            <span class="badge bg-primary">مستخدم</span>
+                                            break;
+                                        case EduPlatform.Core.Enums.CodeStatus.Expired:
+                                            <span class="badge bg-danger">منتهي</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>@code.EndDate.ToString("yyyy/MM/dd")</td>
+                                <td>
+                                    @if (code.UsedByStudent != null)
+                                    {
+                                        <span>@code.UsedByStudent.User.FullName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <h5>لا توجد أكواد</h5>
+                    <p>لم تقم بتوليد أي أكواد بعد</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

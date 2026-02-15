@@ -6,21 +6,58 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        <!-- المستخدم مسجل دخول -->
+        var user = await UserManager.GetUserAsync(User);
+        var roles = await UserManager.GetRolesAsync(user);
+
+        @if (roles.Contains("Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                    📊 لوحة التحكم
+                </a>
+            </li>
+        }
+        else if (roles.Contains("Instructor"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Instructor" asp-controller="Dashboard" asp-action="Index">
+                    📊 لوحة التحكم
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Instructor" asp-controller="Course" asp-action="Index">
+                    📚 كورساتي
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Instructor" asp-controller="Code" asp-action="Index">
+                    🎫 أكوادي
+                </a>
+            </li>
+        }
+        else if (roles.Contains("Student"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Student" asp-action="Dashboard">
+                    📊 لوحة التحكم
+                </a>
+            </li>
+        }
+
         <li class="nav-item">
-            <span class="nav-link text-dark">مرحباً، @UserManager.GetUserAsync(User).Result?.FullName</span>
+            <span class="nav-link text-muted">مرحباً، @user.FullName</span>
         </li>
+
         <li class="nav-item">
             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                <button type="submit" class="nav-link btn btn-link text-dark">خروج</button>
+                <button type="submit" class="nav-link btn btn-link text-danger">خروج</button>
             </form>
         </li>
     }
     else
     {
-        <!-- المستخدم غير مسجل -->
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">تسجيل</a>
+            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">تسجيل طالب</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">دخول</a>

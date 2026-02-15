@@ -25,6 +25,9 @@ namespace EduPlatform.Infrastructure.Data
 
             // 4. إضافة الشعب
             await SeedBranchesAsync(context);
+
+            // 5. إضافة الاترمة
+            await SeedAcademicTermsAsync(context);
         }
 
         // ========================================
@@ -107,6 +110,42 @@ namespace EduPlatform.Infrastructure.Data
                 };
 
                 await context.Branches.AddRangeAsync(branches);
+                await context.SaveChangesAsync();
+            }
+        }
+
+
+
+        // ========================================
+        // 5. إضافة الأترمة الدراسية
+        // ========================================
+        private static async Task SeedAcademicTermsAsync(ApplicationDbContext context)
+        {
+            if (!await context.AcademicTerms.AnyAsync())
+            {
+                var currentYear = DateTime.Now.Year;
+
+                var terms = new List<AcademicTerm>
+        {
+            new AcademicTerm
+            {
+                Name = $"الترم الأول {currentYear}",
+                Year = currentYear,
+                StartDate = new DateTime(currentYear, 9, 1),
+                EndDate = new DateTime(currentYear + 1, 1, 31),
+                IsActive = true
+            },
+            new AcademicTerm
+            {
+                Name = $"الترم الثاني {currentYear}",
+                Year = currentYear,
+                StartDate = new DateTime(currentYear + 1, 2, 1),
+                EndDate = new DateTime(currentYear + 1, 6, 30),
+                IsActive = true
+            }
+        };
+
+                await context.AcademicTerms.AddRangeAsync(terms);
                 await context.SaveChangesAsync();
             }
         }

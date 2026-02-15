@@ -1,0 +1,98 @@
+﻿@model EduPlatform.Web.ViewModels.Instructor.GenerateCodeViewModel
+
+@{
+    ViewData["Title"] = "توليد أكواد";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>توليد أكواد اشتراك جديدة</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-action="Generate" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <!-- اختيار الكورس -->
+                        <div class="mb-3">
+                            <label asp-for="CourseId" class="form-label"></label>
+                            <select asp-for="CourseId" class="form-select">
+                                <option value="">-- اختر الكورس --</option>
+                                @foreach (var course in ViewBag.Courses)
+                                {
+                                    <option value="@course.Id">@course.Title (@course.Subject.Name)</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CourseId" class="text-danger"></span>
+                        </div>
+
+                        <!-- السعر -->
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label"></label>
+                            <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <!-- نسبة الخصم -->
+                        <div class="mb-3">
+                            <label asp-for="DiscountPercentage" class="form-label"></label>
+                            <input asp-for="DiscountPercentage" class="form-control" type="number" />
+                            <small class="text-muted">اتركه فارغ إذا لا يوجد خصم</small>
+                        </div>
+
+                        <!-- الترم الدراسي -->
+                        <div class="mb-3">
+                            <label asp-for="AcademicTermId" class="form-label"></label>
+                            <select asp-for="AcademicTermId" class="form-select">
+                                <option value="">-- اختر الترم --</option>
+                                @foreach (var term in ViewBag.AcademicTerms)
+                                {
+                                    <option value="@term.Id">@term.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="AcademicTermId" class="text-danger"></span>
+                        </div>
+
+                        <!-- عدد الأكواد -->
+                        <div class="mb-3">
+                            <label asp-for="Quantity" class="form-label"></label>
+                            <input asp-for="Quantity" class="form-control" type="number" />
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+
+                        <!-- ملاحظات -->
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+                        </div>
+
+                        <!-- أزرار -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">توليد الأكواد</button>
+                            <a asp-action="Index" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5>📋 ملاحظات</h5>
+                    <ul>
+                        <li>الكود يُستخدم مرة واحدة فقط</li>
+                        <li>صلاحية الكود تنتهي مع نهاية الترم</li>
+                        <li>الطالب يدخل الكود للاشتراك في الكورس</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
