@@ -1,0 +1,25 @@
+﻿@model EduPlatform.Core.Entities.QuizAttempt
+@{
+    ViewData["Title"] = "نتيجة الاختبار";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow-lg">
+        <div class="card-header bg-@(Model.Passed ? "success" : "danger") text-white">
+            <h3>@(Model.Passed ? "مبروك! لقد نجحت" : "للأسف، لم تنجح")</h3>
+        </div>
+        <div class="card-body py-5">
+            <h1 class="display-1">@Model.Score%</h1>
+            <p class="lead mt-3">درجتك في اختبار: @Model.Quiz.Title</p>
+
+            @if (Model.Passed)
+            {
+                <a href="#" class="btn btn-primary btn-lg mt-3">متابعة观看ة الفيديو التالي</a>
+            }
+            else
+            {
+                <a asp-action="Take" asp-route-id="@Model.QuizId" class="btn btn-warning btn-lg mt-3">إعادة المحاولة</a>
+            }
+        </div>
+    </div>
+</div>

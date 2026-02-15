@@ -26,6 +26,8 @@ namespace EduPlatform.Infrastructure.Data
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<EnrollmentCode> EnrollmentCodes { get; set; }
         public DbSet<Question> Questions { get; set; }
+        public DbSet<Quiz> Quizzes { get; set; }
+        public DbSet<QuizAttempt> QuizAttempts { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
