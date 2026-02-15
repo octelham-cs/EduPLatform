@@ -142,5 +142,76 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
 
             return View(terms);
         }
+
+
+        // ========================================
+        // GET: Admin/AssignInstructor
+        // ========================================
+        [HttpGet]
+        public async Task<IActionResult> AssignInstructor()
+        {
+            // جلب المستخدمين اللي مش مدرسين
+            var instructorUserIds = await _context.Instructors
+                .Select(i => i.UserId)
+                .ToListAsync();
+
+            var users = await _userManager.Users
+                .Where(u => !instructorUserIds.Contains(u.Id))
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+
+            return View(users);
+        }
+
+        // ========================================
+        // POST: Admin/AssignInstructor
+        // ========================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignInstructor(string userId, string? bio)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                TempData["Error"] = "المستخدم غير موجود";
+                return RedirectToAction(nameof(AssignInstructor));
+            }
+
+            // التحقق إن المستخدم مش مدرس بالفعل
+            var existingInstructor = await _context.Instructors
+                .AnyAsync(i => i.UserId == userId);
+
+            if (existingInstructor)
+            {
+                TempData["Error"] = "هذا المستخدم مدرس بالفعل";
+                return RedirectToAction(nameof(AssignInstructor));
+            }
+
+            // إنشاء سجل المدرس
+            var instructor = new EduPlatform.Core.Entities.Instructor
+            {
+                UserId = userId,
+                Bio = bio,
+                Status = InstructorStatus.Approved, // موافق عليه مباشرة
+                RegisteredAt = DateTime.Now,
+                ApprovedAt = DateTime.Now,
+                ApprovedBy = _userManager.GetUserId(User)
+            };
+
+            _context.Instructors.Add(instructor);
+
+            // إضافة دور المدرس
+            await _userManager.AddToRoleAsync(user, "Instructor");
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"تم تعيين {user.FullName} كمدرس بنجاح";
+            return RedirectToAction(nameof(Instructors));
+        }
+
     }
+
+
+
 }
