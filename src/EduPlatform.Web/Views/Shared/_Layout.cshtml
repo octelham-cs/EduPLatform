@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - EduPlatform</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 </head>
 <body>
     <header>
@@ -24,16 +25,42 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
                         </li>
                     </ul>
+
                     <partial name="_LoginPartial" />
+
+
+                    <!-- ضيف ده في الـ Navbar -->
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="#" id="notificationBell">
+                            <i class="fas fa-bell"></i>
+                            <!-- علامة حمراء لعدد الإشعارات -->
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notifCount" style="display:none;">
+                                0
+                            </span>
+                        </a>
+                        <!-- قائمة الإشعارات (Dropdown) -->
+                        <div class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="width: 300px; margin-left: -200px;">
+                            <h6 class="dropdown-header">الإشعارات</h6>
+                            <div id="notificationList">
+                                <!-- هنا هتظهر الإشعارات -->
+                            </div>
+                        </div>
+                    </li>
+
                 </div>
             </div>
         </nav>
     </header>
+
+
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+
+
 
     <footer class="border-top footer text-muted">
         <div class="container">
@@ -41,9 +68,55 @@
         </div>
     </footer>
 
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // 1. تحميل العداد عند فتح الصفحة
+            $.get('/Notification/GetUnreadCount', function (data) {
+                if (data.count > 0) {
+                    $('#notifCount').text(data.count).show();
+                }
+            });
+
+            // 2. الاتصال بـ SignalR
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl("/notificationHub")
+                .build();
+
+            connection.on("ReceiveNotification", function (notification) {
+                //زيادة العداد
+                var count = parseInt($('#notifCount').text()) || 0;
+                $('#notifCount').text(count + 1).show();
+
+                // عرض Toast أو إضافة للقائمة
+                toastr.success(notification.title + ": " + notification.message);
+
+                // إضافة للقائمة (بسيط)
+                $('#notificationList').prepend('<a class="dropdown-item" href="' + notification.url + '">' + notification.title + '</a>');
+            });
+
+            connection.start().catch(function (err) {
+                return console.error(err.toString());
+            });
+
+            // 3. فتح القائمة
+            $('#notificationBell').on('click', function (e) {
+                e.preventDefault();
+                $('#notificationDropdown').toggle();
+                // هنا ممكن نعمل Load للقائمة بالكامل من الـ Controller لو حابب
+            });
+        });
+    </script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

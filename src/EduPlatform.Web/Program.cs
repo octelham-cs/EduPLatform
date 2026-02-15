@@ -1,7 +1,11 @@
 using EduPlatform.Core.Entities;
 using EduPlatform.Infrastructure.Data;
+using EduPlatform.Web.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using EduPlatform.Web.Services;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +45,9 @@ builder.Services.AddScoped<EduPlatform.Core.Interfaces.IEnrollmentService, EduPl
 builder.Services.AddControllersWithViews();
 
 
+builder.Services.AddSignalR();
+
+builder.Services.AddScoped<EduPlatform.Core.Interfaces.INotificationService, NotificationService>();
 var app = builder.Build();
 
 
@@ -97,4 +104,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+
+app.MapHub<EduPlatform.Web.Hubs.NotificationHub>("/notificationHub");
 app.Run();

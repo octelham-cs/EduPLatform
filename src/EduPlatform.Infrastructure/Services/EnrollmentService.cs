@@ -14,6 +14,7 @@ namespace EduPlatform.Infrastructure.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly INotificationService _notificationService;
 
         public EnrollmentService(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -80,6 +81,19 @@ namespace EduPlatform.Infrastructure.Services
             _context.Enrollments.Add(enrollment);
             await _context.SaveChangesAsync();
 
+            var instructorUser = await _userManager.FindByIdAsync(enrollmentCode.Instructor.UserId);
+            if (instructorUser != null)
+            {
+                await _notificationService.SendNotificationAsync(
+                    instructorUser.Id,
+                    "اشتراك جديد",
+                    $"قام الطالب {user.FullName} بالاشتراك في كورس {enrollmentCode.Course.Title}.",
+                    $"/Instructor/Students"
+                );
+            }
+
+            return (true, $"تم تفعيل الاشتراك بنجاح...");
+
             return (true, $"تم تفعيل الاشتراك بنجاح في مادة: {enrollmentCode.Course?.Title ?? "المادة"}");
         }
 
@@ -126,6 +140,14 @@ namespace EduPlatform.Infrastructure.Services
             }
 
             return enrollments;
+        }
+
+
+        public EnrollmentService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, INotificationService notificationService)
+        {
+            _context = context;
+            _userManager = userManager;
+            _notificationService = notificationService; // أضفنا ده
         }
     }
 }
