@@ -101,14 +101,20 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
             ViewBag.Courses = new SelectList(courses, "Id", "Title");
             ViewBag.CoursePrices = courses.ToDictionary(c => c.Id, c => c.Price);
 
-            // تحميل الأترمة الدراسية
+            // تحميل الأترمة الدراسية - كـ List عادية وليس SelectList
             var terms = await _context.AcademicTerms
                 .Where(t => t.IsActive)
                 .OrderByDescending(t => t.StartDate)
-                .Select(t => new { t.Id, t.Name, t.StartDate, t.EndDate })
+                .Select(t => new AcademicTermViewModel
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    StartDate = t.StartDate,
+                    EndDate = t.EndDate
+                })
                 .ToListAsync();
 
-            ViewBag.AcademicTerms = new SelectList(terms, "Id", "Name");
+            ViewBag.AcademicTerms = terms; // ← الآن هي List وليس SelectList
 
             // تعيين التواريخ الافتراضية
             var today = DateTime.Today;
@@ -285,13 +291,20 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
 
             ViewBag.Courses = new SelectList(courses, "Id", "Title");
 
+            // هنا أيضاً نستخدم List وليس SelectList
             var terms = await _context.AcademicTerms
                 .Where(t => t.IsActive)
                 .OrderByDescending(t => t.StartDate)
-                .Select(t => new { t.Id, t.Name, t.StartDate, t.EndDate })
+                .Select(t => new AcademicTermViewModel
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    StartDate = t.StartDate,
+                    EndDate = t.EndDate
+                })
                 .ToListAsync();
 
-            ViewBag.AcademicTerms = new SelectList(terms, "Id", "Name");
+            ViewBag.AcademicTerms = terms;
         }
 
         private async Task<string> GenerateUniqueCode()
@@ -311,4 +324,13 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
             return code;
         }
     }
+}
+
+// أضف هذا الكلاس خارج الـ Controller (في نفس الملف)
+public class AcademicTermViewModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
 }

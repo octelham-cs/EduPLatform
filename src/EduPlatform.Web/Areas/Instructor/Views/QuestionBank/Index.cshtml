@@ -21,10 +21,16 @@
                             </h4>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a asp-action="Create" class="btn btn-primary">
+
+
+
+                            <a href="/Instructor/QuestionBank/Create" class="btn btn-primary">
                                 <i class="fas fa-plus me-1"></i>
                                 إضافة سؤال جديد
                             </a>
+
+
+
                         </div>
                     </div>
                 </div>
@@ -38,10 +44,20 @@
                             </div>
                             <h4 class="text-muted mb-3">لا توجد أسئلة في البنك</h4>
                             <p class="text-muted mb-4">ابدأ بإضافة أسئلة للاختبارات</p>
-                            <a asp-action="Create" class="btn btn-primary btn-lg">
+                            @* <a asp-action="Create" class="btn btn-primary btn-lg">
                                 <i class="fas fa-plus me-2"></i>
                                 إضافة سؤال جديد
+                            </a> *@
+
+
+
+
+                            <a href="/Instructor/QuestionBank/Create" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>
+                                إضافة سؤال جديد
                             </a>
+
+
                         </div>
                     }
                     else
