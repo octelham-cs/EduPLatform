@@ -1,6 +1,7 @@
 ﻿using EduPlatform.Core.Entities;
 using EduPlatform.Infrastructure.Data;
 using EduPlatform.Core.Enums;
+using EduPlatform.Web.ViewModels.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -29,21 +30,44 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             // إحصائيات عامة
-            ViewBag.TotalInstructors = await _context.Instructors.CountAsync();
-            ViewBag.PendingInstructors = await _context.Instructors
+            var totalInstructors = await _context.Instructors.CountAsync();
+            var pendingInstructors = await _context.Instructors
                 .CountAsync(i => i.Status == InstructorStatus.Pending);
-            ViewBag.TotalStudents = await _context.Students.CountAsync();
-            ViewBag.TotalCourses = await _context.Courses.CountAsync();
+            var approvedInstructors = await _context.Instructors
+                .CountAsync(i => i.Status == InstructorStatus.Approved);
+            var totalStudents = await _context.Students.CountAsync();
+            var totalCourses = await _context.Courses.CountAsync();
+            var totalVideos = await _context.Videos.CountAsync();
+            var totalCodes = await _context.EnrollmentCodes.CountAsync();
 
             // قائمة المدرسين المعلقين
-            var pendingInstructors = await _context.Instructors
+            var pendingInstructorsList = await _context.Instructors
                 .Include(i => i.User)
                 .Where(i => i.Status == InstructorStatus.Pending)
                 .OrderByDescending(i => i.RegisteredAt)
                 .Take(10)
+                .Select(i => new PendingInstructorViewModel
+                {
+                    Id = i.Id,
+                    Name = i.User != null ? i.User.FullName : "غير معروف",
+                    Email = i.User != null ? i.User.Email : "",
+                    RegisteredAt = i.RegisteredAt
+                })
                 .ToListAsync();
 
-            return View(pendingInstructors);
+            var viewModel = new AdminDashboardViewModel
+            {
+                TotalInstructors = totalInstructors,
+                PendingInstructors = pendingInstructors,
+                ApprovedInstructors = approvedInstructors,
+                TotalStudents = totalStudents,
+                TotalCourses = totalCourses,
+                TotalVideos = totalVideos,
+                TotalCodes = totalCodes,
+                PendingInstructorsList = pendingInstructorsList
+            };
+
+            return View(viewModel);
         }
 
         // ========================================
@@ -124,9 +148,14 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Subjects()
         {
             var subjects = await _context.Subjects
-                .Include(s => s.GradeLevelId)
                 .OrderBy(s => s.GradeLevelId)
                 .ToListAsync();
+
+            // جلب أسماء المستويات الدراسية
+            var gradeLevels = await _context.GradeLevels
+                .ToDictionaryAsync(g => g.Id, g => g.Name);
+
+            ViewBag.GradeLevels = gradeLevels;
 
             return View(subjects);
         }
@@ -142,7 +171,6 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
 
             return View(terms);
         }
-
 
         // ========================================
         // GET: Admin/AssignInstructor
@@ -193,7 +221,7 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             {
                 UserId = userId,
                 Bio = bio,
-                Status = InstructorStatus.Approved, // موافق عليه مباشرة
+                Status = InstructorStatus.Approved,
                 RegisteredAt = DateTime.Now,
                 ApprovedAt = DateTime.Now,
                 ApprovedBy = _userManager.GetUserId(User)
@@ -209,9 +237,5 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             TempData["Success"] = $"تم تعيين {user.FullName} كمدرس بنجاح";
             return RedirectToAction(nameof(Instructors));
         }
-
     }
-
-
-
 }

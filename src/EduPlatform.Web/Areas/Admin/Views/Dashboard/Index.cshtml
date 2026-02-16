@@ -1,86 +1,109 @@
-﻿<!-- src/EduPlatform.Web/Areas/Admin/Views/Dashboard/Index.cshtml -->
-@model EduPlatform.Web.ViewModels.Admin.AdminDashboardViewModel
+﻿@model EduPlatform.Web.ViewModels.Admin.AdminDashboardViewModel
 @{
     ViewData["Title"] = "لوحة تحكم الأدمن";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid py-4 fade-in">
-    <!-- العنوان -->
+    <!-- ترحيب أنيق -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card bg-dark text-white border-0">
-                <div class="card-body py-4">
-                    <h3 class="mb-2">
-                        <i class="fas fa-shield-alt me-2"></i>
-                        لوحة تحكم الأدمن
-                    </h3>
-                    <p class="mb-0 opacity-75">إدارة شاملة للمنصة والمستخدمين</p>
+            <div class="card border-0 overflow-hidden" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+                <div class="card-body p-4 position-relative">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2 fw-bold text-white">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                لوحة تحكم الأدمن
+                            </h2>
+                            <p class="mb-0 text-white-50 fs-5">إدارة شاملة للمنصة والمستخدمين</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-end">
+                                <div class="text-center px-4 border-start border-white border-opacity-25">
+                                    <h3 class="mb-0 fw-bold text-white">@DateTime.Now.ToString("dd MMMM")</h3>
+                                    <small class="text-white-50">@DateTime.Now.ToString("yyyy")</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ديكور خلفي -->
+                    <div class="position-absolute bottom-0 end-0 opacity-10" style="transform: translate(20%, 20%);">
+                        <i class="fas fa-shield-alt fa-10x text-white"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- الإحصائيات -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">طلبات المدرسين المعلقة</h6>
-                            <h2 class="mb-0 fw-bold text-warning">@Model.PendingInstructors</h2>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-user-clock text-warning fa-2x"></i>
+                            </div>
                         </div>
-                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-user-clock text-warning fa-xl"></i>
+                        <div class="flex-grow-1 me-3">
+                            <h6 class="text-muted mb-1">طلبات المدرسين المعلقة</h6>
+                            <h3 class="mb-0 fw-bold text-warning">@Model.PendingInstructors</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">إجمالي المدرسين</h6>
-                            <h2 class="mb-0 fw-bold">@Model.TotalInstructors</h2>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-chalkboard-teacher text-primary fa-2x"></i>
+                            </div>
                         </div>
-                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-chalkboard-teacher text-primary fa-xl"></i>
+                        <div class="flex-grow-1 me-3">
+                            <h6 class="text-muted mb-1">إجمالي المدرسين</h6>
+                            <h3 class="mb-0 fw-bold">@Model.TotalInstructors</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">إجمالي الطلاب</h6>
-                            <h2 class="mb-0 fw-bold">@Model.TotalStudents</h2>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-user-graduate text-success fa-2x"></i>
+                            </div>
                         </div>
-                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-user-graduate text-success fa-xl"></i>
+                        <div class="flex-grow-1 me-3">
+                            <h6 class="text-muted mb-1">إجمالي الطلاب</h6>
+                            <h3 class="mb-0 fw-bold">@Model.TotalStudents</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-xl-3 col-md-6">
             <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted mb-1">إجمالي الكورسات</h6>
-                            <h2 class="mb-0 fw-bold">@Model.TotalCourses</h2>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-book text-info fa-2x"></i>
+                            </div>
                         </div>
-                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
-                            <i class="fas fa-book text-info fa-xl"></i>
+                        <div class="flex-grow-1 me-3">
+                            <h6 class="text-muted mb-1">إجمالي الكورسات</h6>
+                            <h3 class="mb-0 fw-bold">@Model.TotalCourses</h3>
                         </div>
                     </div>
                 </div>
@@ -88,24 +111,26 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- المدرسين المعلقين -->
-        <div class="col-lg-8 mb-4">
+        <div class="col-lg-8">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
                         <i class="fas fa-user-clock text-warning me-2"></i>
                         طلبات الانضمام المعلقة
                     </h5>
-                    <span class="badge bg-warning text-dark">@Model.PendingInstructors طلب</span>
+                    <span class="badge bg-warning text-dark px-3 py-2">@Model.PendingInstructors طلب</span>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if (!Model.PendingInstructorsList.Any())
                     {
                         <div class="text-center py-5">
-                            <i class="fas fa-check-circle fa-4x text-success opacity-25 mb-3"></i>
-                            <h5 class="text-muted">لا توجد طلبات معلقة</h5>
-                            <p class="text-muted small">جميع الطلبات تمت معالجتها</p>
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-4x text-success opacity-50"></i>
+                            </div>
+                            <h5 class="text-muted mb-2">لا توجد طلبات معلقة</h5>
+                            <p class="text-muted small mb-0">جميع الطلبات تمت معالجتها</p>
                         </div>
                     }
                     else
@@ -114,20 +139,20 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>الاسم</th>
+                                        <th class="px-4">الاسم</th>
                                         <th>البريد الإلكتروني</th>
                                         <th>تاريخ التسجيل</th>
-                                        <th style="width: 180px" class="text-center">الإجراءات</th>
+                                        <th class="text-center px-4">الإجراءات</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var instructor in Model.PendingInstructorsList)
                                     {
                                         <tr>
-                                            <td>
+                                            <td class="px-4">
                                                 <div class="d-flex align-items-center">
-                                                    <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
-                                                        <i class="fas fa-user text-primary"></i>
+                                                    <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                                        <i class="fas fa-user text-warning"></i>
                                                     </div>
                                                     <span class="fw-semibold">@instructor.Name</span>
                                                 </div>
@@ -135,21 +160,20 @@
                                             <td>@instructor.Email</td>
                                             <td>
                                                 <small class="text-muted">
+                                                    <i class="fas fa-calendar-alt me-1"></i>
                                                     @instructor.RegisteredAt.ToString("dd/MM/yyyy HH:mm")
                                                 </small>
                                             </td>
-                                            <td>
+                                            <td class="px-4">
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <form asp-action="ApproveInstructor" method="post"
-                                                          asp-route-id="@instructor.Id" class="d-inline">
+                                                    <form action="/Admin/Dashboard/ApproveInstructor/@instructor.Id" method="post" class="d-inline">
                                                         @Html.AntiForgeryToken()
                                                         <button type="submit" class="btn btn-sm btn-success">
                                                             <i class="fas fa-check me-1"></i>
                                                             موافقة
                                                         </button>
                                                     </form>
-                                                    <form asp-action="RejectInstructor" method="post"
-                                                          asp-route-id="@instructor.Id" class="d-inline">
+                                                    <form action="/Admin/Dashboard/RejectInstructor/@instructor.Id" method="post" class="d-inline">
                                                         @Html.AntiForgeryToken()
                                                         <button type="submit" class="btn btn-sm btn-outline-danger">
                                                             <i class="fas fa-times me-1"></i>
@@ -165,55 +189,97 @@
                         </div>
                     }
                 </div>
+                @if (Model.PendingInstructorsList.Any())
+                {
+                    <div class="card-footer bg-white border-0 pb-4">
+                        <a href="/Admin/Dashboard/Instructors" class="text-warning text-decoration-none small fw-medium">
+                            عرض جميع المدرسين <i class="fas fa-arrow-left ms-1"></i>
+                        </a>
+                    </div>
+                }
             </div>
         </div>
 
-        <!-- إحصائيات إضافية -->
-        <div class="col-lg-4 mb-4">
+        <!-- إحصائيات إضافية وإجراءات سريعة -->
+        <div class="col-lg-4">
             <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">
                         <i class="fas fa-chart-pie text-info me-2"></i>
                         إحصائيات المنصة
                     </h5>
                 </div>
                 <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">
                                 <i class="fas fa-video text-danger me-2"></i>
                                 إجمالي الفيديوهات
                             </span>
-                            <span class="badge bg-danger rounded-pill">@Model.TotalVideos</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
+                            <span class="fw-bold">@Model.TotalVideos</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">
                                 <i class="fas fa-qrcode text-warning me-2"></i>
                                 إجمالي الأكواد
                             </span>
-                            <span class="badge bg-warning text-dark rounded-pill">@Model.TotalCodes</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
+                            <span class="fw-bold">@Model.TotalCodes</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">
                                 <i class="fas fa-check-circle text-success me-2"></i>
                                 المدرسين المعتمدين
                             </span>
-                            <span class="badge bg-success rounded-pill">@Model.ApprovedInstructors</span>
-                        </li>
-                    </ul>
+                            <span class="fw-bold">@Model.ApprovedInstructors</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: @(Model.TotalInstructors > 0 ? (Model.ApprovedInstructors * 100 / Model.TotalInstructors) : 0)%"></div>
+                        </div>
+                    </div>
 
-                    <hr class="my-3" />
+                    <hr class="my-4">
 
-                    <a asp-action="AssignInstructor" class="btn btn-primary w-100">
-                        <i class="fas fa-user-plus me-2"></i>
-                        تعيين مدرس جديد
-                    </a>
-                    <a asp-action="Instructors" class="btn btn-outline-primary w-100 mt-2">
-                        <i class="fas fa-list me-2"></i>
-                        عرض جميع المدرسين
-                    </a>
+                    <div class="d-grid gap-2">
+                        <a href="/Admin/Dashboard/AssignInstructor" class="btn btn-primary py-3">
+                            <i class="fas fa-user-plus me-2"></i>
+                            تعيين مدرس جديد
+                        </a>
+                        <a href="/Admin/Dashboard/Instructors" class="btn btn-outline-primary py-3">
+                            <i class="fas fa-list me-2"></i>
+                            عرض جميع المدرسين
+                        </a>
+                        <a href="/Admin/Dashboard/Students" class="btn btn-outline-success py-3">
+                            <i class="fas fa-users me-2"></i>
+                            إدارة الطلاب
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // تفعيل الـ tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+    </script>
+}
