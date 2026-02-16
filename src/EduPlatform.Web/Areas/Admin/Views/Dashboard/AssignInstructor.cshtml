@@ -1,4 +1,5 @@
 ﻿@using EduPlatform.Core.Entities
+@model List<ApplicationUser>
 @{
     ViewData["Title"] = "تعيين مدرس جديد";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,14 +9,23 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow border-0">
-                <div class="card-header bg-gradient-primary text-white py-3">
+                <div class="card-header bg-white py-3">
                     <h4 class="mb-0">
-                        <i class="fas fa-user-plus me-2"></i>
+                        <i class="fas fa-user-plus text-primary me-2"></i>
                         تعيين مدرس جديد
                     </h4>
                 </div>
 
                 <div class="card-body p-4">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
                     @if (TempData["Error"] != null)
                     {
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -25,57 +35,184 @@
                         </div>
                     }
 
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        اختر مستخدم من القائمة ليتم تعيينه كمدرس على المنصة
-                    </div>
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-4" id="assignTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="existing-user-tab" data-bs-toggle="tab"
+                                    data-bs-target="#existing-user" type="button" role="tab">
+                                <i class="fas fa-user-check me-2"></i>
+                                مستخدم موجود
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="new-user-tab" data-bs-toggle="tab"
+                                    data-bs-target="#new-user" type="button" role="tab">
+                                <i class="fas fa-user-plus me-2"></i>
+                                إنشاء مستخدم جديد
+                            </button>
+                        </li>
+                    </ul>
 
-                    @if (ViewBag.Users == null || !((List<ApplicationUser>)ViewBag.Users).Any())
-                    {
-                        <div class="text-center py-5">
-                            <i class="fas fa-users-slash fa-4x text-muted opacity-25 mb-3"></i>
-                            <h5 class="text-muted mb-3">لا يوجد مستخدمين متاحين</h5>
-                            <p class="text-muted">جميع المستخدمين الحاليين لديهم بالفعل دور المدرس أو الأدمن</p>
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="assignTabContent">
+                        <!-- Tab 1: مستخدم موجود -->
+                        <div class="tab-pane fade show active" id="existing-user" role="tabpanel">
+                            @if (Model != null && Model.Any())
+                            {
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    اختر مستخدم من القائمة ليتم تعيينه كمدرس على المنصة
+                                </div>
+
+                                <form action="/Admin/Dashboard/AssignInstructor" method="post">
+                                    @Html.AntiForgeryToken()
+
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-user text-primary me-1"></i>
+                                            اختر المستخدم
+                                        </label>
+                                        <select name="userId" class="form-select form-select-lg" required>
+                                            <option value="">-- اختر مستخدم --</option>
+                                            @foreach (var user in Model)
+                                            {
+                                                <option value="@user.Id">
+                                                    @user.FullName - @user.Email
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-info-circle text-primary me-1"></i>
+                                            السيرة الذاتية (اختياري)
+                                        </label>
+                                        <textarea name="bio" class="form-control" rows="3"
+                                              placeholder="مؤهلات المدرس، خبراته، ..."></textarea>
+                                    </div>
+
+                                    <hr class="my-4" />
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="/Admin/Dashboard/Instructors" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-arrow-right me-2"></i>
+                                            رجوع
+                                        </a>
+
+                                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                                            <i class="fas fa-check me-2"></i>
+                                            تعيين كمدرس
+                                        </button>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5">
+                                    <i class="fas fa-users-slash fa-4x text-muted opacity-25 mb-3"></i>
+                                    <h5 class="text-muted mb-3">لا يوجد مستخدمين متاحين</h5>
+                                    <p class="text-muted">جميع المستخدمين الحاليين لديهم بالفعل دور المدرس أو الأدمن</p>
+                                    <button class="btn btn-primary mt-3" onclick="document.getElementById('new-user-tab').click()">
+                                        <i class="fas fa-user-plus me-2"></i>
+                                        إنشاء مستخدم جديد
+                                    </button>
+                                </div>
+                            }
                         </div>
-                    }
-                    else
-                    {
-                        <form asp-action="AssignInstructor" method="post">
-                            @Html.AntiForgeryToken()
 
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">
-                                    <i class="fas fa-user text-primary me-1"></i>
-                                    اختر المستخدم
-                                </label>
-                                <select name="userId" class="form-select form-select-lg" required>
-                                    <option value="">-- اختر مستخدم --</option>
-                                    @foreach (var user in ViewBag.Users)
-                                    {
-                                        <option value="@user.Id">
-                                            @user.FullName - @user.Email
-                                        </option>
-                                    }
-                                </select>
+                        <!-- Tab 2: إنشاء مستخدم جديد -->
+                        <div class="tab-pane fade" id="new-user" role="tabpanel">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                أدخل بيانات المستخدم الجديد ليتم إنشاؤه وتعيينه كمدرس
                             </div>
 
-                            <hr class="my-4" />
+                            <form action="/Admin/Dashboard/CreateAndAssignInstructor" method="post">
+                                @Html.AntiForgeryToken()
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a asp-action="Instructors" class="btn btn-outline-secondary btn-lg">
-                                    <i class="fas fa-arrow-right me-2"></i>
-                                    رجوع
-                                </a>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-user text-primary me-1"></i>
+                                            الاسم الكامل
+                                        </label>
+                                        <input type="text" name="fullName" class="form-control form-control-lg"
+                                               placeholder="أدخل الاسم الكامل" required />
+                                    </div>
 
-                                <button type="submit" class="btn btn-primary btn-lg px-5">
-                                    <i class="fas fa-check me-2"></i>
-                                    تعيين كمدرس
-                                </button>
-                            </div>
-                        </form>
-                    }
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-envelope text-primary me-1"></i>
+                                            البريد الإلكتروني
+                                        </label>
+                                        <input type="email" name="email" class="form-control form-control-lg"
+                                               placeholder="example@domain.com" required />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-phone text-primary me-1"></i>
+                                            رقم الهاتف
+                                        </label>
+                                        <input type="tel" name="phoneNumber" class="form-control form-control-lg"
+                                               placeholder="01xxxxxxxxx" required />
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-lock text-primary me-1"></i>
+                                            كلمة المرور المؤقتة
+                                        </label>
+                                        <input type="text" name="password" class="form-control form-control-lg"
+                                               value="Edu@123456" readonly />
+                                        <small class="text-muted">سيتم إرسال كلمة المرور للبريد الإلكتروني</small>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-info-circle text-primary me-1"></i>
+                                        السيرة الذاتية (اختياري)
+                                    </label>
+                                    <textarea name="bio" class="form-control" rows="3"
+                                              placeholder="مؤهلات المدرس، خبراته، ..."></textarea>
+                                </div>
+
+                                <hr class="my-4" />
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="/Admin/Dashboard/Instructors" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-arrow-right me-2"></i>
+                                        رجوع
+                                    </a>
+
+                                    <button type="submit" class="btn btn-success btn-lg px-5">
+                                        <i class="fas fa-save me-2"></i>
+                                        إنشاء وتعيين كمدرس
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // تفعيل التبويب حسب الرسالة
+            @if (TempData["ActiveTab"] != null)
+            {
+                    <text>
+                    $('#' + '@TempData["ActiveTab"]').tab('show');
+                    </text>
+            }
+        });
+    </script>
+}

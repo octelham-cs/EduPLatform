@@ -237,5 +237,106 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             TempData["Success"] = $"تم تعيين {user.FullName} كمدرس بنجاح";
             return RedirectToAction(nameof(Instructors));
         }
+
+
+
+        // ========================================
+        // POST: Admin/CreateAndAssignInstructor
+        // ========================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAndAssignInstructor(CreateInstructorViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "يرجى إدخال البيانات بشكل صحيح";
+                TempData["ActiveTab"] = "new-user-tab";
+                return RedirectToAction(nameof(AssignInstructor));
+            }
+
+            // التحقق من عدم وجود الإيميل مسبقاً
+            var existingUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("Email", "البريد الإلكتروني مستخدم بالفعل");
+                TempData["Error"] = "البريد الإلكتروني مستخدم بالفعل";
+                TempData["ActiveTab"] = "new-user-tab";
+                return RedirectToAction(nameof(AssignInstructor));
+            }
+
+            // التحقق من عدم وجود رقم الهاتف مسبقاً
+            var existingPhone = await _userManager.Users
+                .AnyAsync(u => u.PhoneNumber == model.PhoneNumber);
+            if (existingPhone)
+            {
+                ModelState.AddModelError("PhoneNumber", "رقم الهاتف مستخدم بالفعل");
+                TempData["Error"] = "رقم الهاتف مستخدم بالفعل";
+                TempData["ActiveTab"] = "new-user-tab";
+                return RedirectToAction(nameof(AssignInstructor));
+            }
+
+            // إنشاء كلمة مرور عشوائية
+            var password = GenerateRandomPassword();
+
+            // إنشاء المستخدم الجديد
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                FullName = model.FullName,
+                PhoneNumber = model.PhoneNumber,
+                CreatedAt = DateTime.Now,
+                IsActive = true
+            };
+
+            var result = await _userManager.CreateAsync(user, password);
+
+            if (result.Succeeded)
+            {
+                // إضافة دور المدرس
+                await _userManager.AddToRoleAsync(user, "Instructor");
+
+                // إنشاء سجل المدرس
+                var instructor = new EduPlatform.Core.Entities.Instructor
+                {
+                    UserId = user.Id,
+                    Bio = model.Bio,
+                    Status = InstructorStatus.Approved,
+                    RegisteredAt = DateTime.Now,
+                    ApprovedAt = DateTime.Now,
+                    ApprovedBy = _userManager.GetUserId(User)
+                };
+
+                _context.Instructors.Add(instructor);
+                await _context.SaveChangesAsync();
+
+                // TODO: إرسال إيميل بكلمة المرور للمدرس الجديد
+                // await _emailService.SendWelcomeEmail(user.Email, user.FullName, password);
+
+                TempData["Success"] = $"تم إنشاء وتعيين {user.FullName} كمدرس بنجاح. كلمة المرور: {password}";
+                return RedirectToAction(nameof(Instructors));
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            TempData["Error"] = "حدث خطأ أثناء إنشاء المستخدم";
+            TempData["ActiveTab"] = "new-user-tab";
+            return RedirectToAction(nameof(AssignInstructor));
+        }
+
+        // دالة مساعدة لتوليد كلمة مرور عشوائية
+        private string GenerateRandomPassword()
+        {
+            const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+            var random = new Random();
+            var password = new string(Enumerable.Repeat(chars, 8)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            // إضافة أرقام وحروف كبيرة لضمان قوة كلمة المرور
+            return password + "A1!";
+        }
     }
 }
