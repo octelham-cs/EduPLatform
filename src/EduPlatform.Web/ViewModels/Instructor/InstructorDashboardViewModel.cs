@@ -12,9 +12,13 @@ namespace EduPlatform.Web.ViewModels.Instructor
         public int ActiveCodes { get; set; }
         public int AvailableCodes { get; set; }
         public int UsedCodes { get; set; }
+        public int TotalQuizzes { get; set; }
+        public int RecentQuizAttempts { get; set; }
+
 
         public List<RecentStudentViewModel> RecentStudents { get; set; } = new();
         public List<RecentCodeViewModel> RecentCodes { get; set; } = new();
+        public List<RecentQuizViewModel> RecentQuizzes { get; set; } = new();
     }
 
     public class RecentStudentViewModel
@@ -30,4 +34,21 @@ namespace EduPlatform.Web.ViewModels.Instructor
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
     }
+
+
+
+    public class RecentQuizViewModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string CourseName { get; set; } = string.Empty;
+        public int AttemptsCount { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
 }
+
+
+
+
+
+
+

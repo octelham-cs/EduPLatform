@@ -374,6 +374,17 @@
                                 <span>بنك الأسئلة</span>
                             </a>
                         </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "Quiz") ? "active" : "")"
+                               asp-area="Instructor" asp-controller="Quiz" asp-action="Index">
+                                <i class="fas fa-tasks"></i>
+                                <span>الكويزات</span>
+                            </a>
+                        </li>
+
+
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Instructor" asp-controller="Student" asp-action="Index">
                                 <i class="fas fa-users"></i>

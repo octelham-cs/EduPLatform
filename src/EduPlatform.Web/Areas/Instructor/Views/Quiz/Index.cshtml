@@ -1,0 +1,157 @@
+﻿@model List<EduPlatform.Web.ViewModels.Instructor.QuizViewModel>
+@{
+    ViewData["Title"] = "إدارة الاختبارات";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0 fade-in">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0">
+                                <i class="fas fa-tasks text-primary me-2"></i>
+                                إدارة الاختبارات
+                            </h4>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="/Instructor/Quiz/Create" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>
+                                إنشاء اختبار جديد
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-tasks fa-5x text-muted opacity-25"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">لا توجد اختبارات حتى الآن</h4>
+                            <p class="text-muted mb-4">ابدأ بإنشاء اختبارات لطلابك</p>
+                            <a href="/Instructor/Quiz/Create" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus me-2"></i>
+                                إنشاء اختبار جديد
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px">#</th>
+                                        <th>عنوان الاختبار</th>
+                                        <th>الكورس</th>
+                                        <th>النوع</th>
+                                        <th>الوقت</th>
+                                        <th>درجة النجاح</th>
+                                        <th>عدد الأسئلة</th>
+                                        <th>عدد المحاولات</th>
+                                        <th style="width: 150px">الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var (quiz, index) in Model.Select((q, i) => (q, i + 1)))
+                                    {
+                                        <tr>
+                                            <td class="text-muted">@index</td>
+                                            <td>
+                                                <span class="fw-semibold">@quiz.Title</span>
+                                            </td>
+                                            <td>@quiz.CourseName</td>
+                                            <td>
+                                                @if (quiz.Type == "Progress")
+                                                {
+                                                    <span class="badge bg-info-subtle text-info px-3 py-2">
+                                                        <i class="fas fa-chart-line me-1"></i> تقدم
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning-subtle text-warning px-3 py-2">
+                                                        <i class="fas fa-star me-1"></i> تقييمي
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>@quiz.TimeLimit دقيقة</td>
+                                            <td>
+                                                <span class="fw-bold">@quiz.PassingScore%</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">@quiz.QuestionsCount</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">@quiz.AttemptsCount</span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="/Instructor/Quiz/Results/@quiz.Id"
+                                                       class="btn btn-sm btn-outline-success" title="النتائج">
+                                                        <i class="fas fa-chart-bar"></i>
+                                                    </a>
+                                                    <a href="/Instructor/Quiz/Edit/@quiz.Id"
+                                                       class="btn btn-sm btn-outline-primary" title="تعديل">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-quiz"
+                                                            data-id="@quiz.Id" title="حذف">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('.delete-quiz').click(function() {
+                var id = $(this).data('id');
+
+                Swal.fire({
+                    title: 'هل أنت متأكد؟',
+                    text: "لن تستطيع التراجع عن هذا الإجراء!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'نعم، احذف!',
+                    cancelButtonText: 'إلغاء'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post('/Instructor/Quiz/Delete/' + id, {
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        }, function() {
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

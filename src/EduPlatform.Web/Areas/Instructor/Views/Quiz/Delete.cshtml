@@ -1,0 +1,56 @@
+﻿@model EduPlatform.Web.ViewModels.Instructor.QuizViewModel
+@{
+    ViewData["Title"] = "حذف الاختبار";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        تأكيد الحذف
+                    </h4>
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-tasks fa-4x text-danger opacity-50"></i>
+                    </div>
+
+                    <h5 class="mb-3">هل أنت متأكد من حذف هذا الاختبار؟</h5>
+
+                    <div class="bg-light p-3 rounded mb-4">
+                        <p class="mb-1"><strong>عنوان الاختبار:</strong> @Model.Title</p>
+                        <p class="mb-1"><strong>الكورس:</strong> @Model.CourseName</p>
+                        <p class="mb-0"><strong>عدد الأسئلة:</strong> @Model.QuestionsCount</p>
+                    </div>
+
+                    <p class="text-muted mb-4">
+                        <i class="fas fa-info-circle me-1"></i>
+                        هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع محاولات الطلاب المرتبطة بهذا الاختبار.
+                    </p>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/Instructor/Quiz" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="fas fa-times me-2"></i>
+                                إلغاء
+                            </a>
+
+                            <button type="submit" class="btn btn-danger btn-lg px-4">
+                                <i class="fas fa-trash me-2"></i>
+                                تأكيد الحذف
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

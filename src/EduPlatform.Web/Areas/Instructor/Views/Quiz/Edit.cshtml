@@ -1,6 +1,6 @@
 ﻿@model EduPlatform.Web.ViewModels.Instructor.CreateQuizViewModel
 @{
-    ViewData["Title"] = "إنشاء اختبار جديد";
+    ViewData["Title"] = "تعديل الاختبار";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -14,10 +14,10 @@
                 </a>
                 <div>
                     <h2 class="mb-1">
-                        <i class="fas fa-tasks text-primary ms-2"></i>
-                        إنشاء اختبار جديد
+                        <i class="fas fa-edit text-primary ms-2"></i>
+                        تعديل الاختبار
                     </h2>
-                    <p class="text-muted mb-0">أضف اختباراً جديداً لطلابك</p>
+                    <p class="text-muted mb-0">تعديل بيانات الاختبار والأسئلة</p>
                 </div>
             </div>
 
@@ -30,8 +30,9 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form asp-action="Create" method="post" id="quizForm">
+                    <form action="/Instructor/Quiz/Edit" method="post" id="quizForm">
                         @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
 
                         <div class="row mb-4">
                             <div class="col-md-6">
@@ -39,7 +40,7 @@
                                     <i class="fas fa-heading text-primary me-1"></i>
                                     عنوان الاختبار
                                 </label>
-                                <input asp-for="Title" class="form-control form-control-lg" placeholder="أدخل عنوان الاختبار" required />
+                                <input asp-for="Title" class="form-control form-control-lg" required />
                                 <span asp-validation-for="Title" class="text-danger small"></span>
                             </div>
 
@@ -61,7 +62,7 @@
                                     <i class="fas fa-clock text-primary me-1"></i>
                                     الوقت (بالدقائق)
                                 </label>
-                                <input asp-for="TimeLimit" type="number" min="1" max="180" class="form-control" value="30" required />
+                                <input asp-for="TimeLimit" type="number" min="1" max="180" class="form-control" required />
                                 <span asp-validation-for="TimeLimit" class="text-danger small"></span>
                             </div>
 
@@ -71,7 +72,7 @@
                                     درجة النجاح
                                 </label>
                                 <div class="input-group">
-                                    <input asp-for="PassingScore" type="number" min="1" max="100" class="form-control" value="60" required />
+                                    <input asp-for="PassingScore" type="number" min="1" max="100" class="form-control" required />
                                     <span class="input-group-text bg-light">%</span>
                                 </div>
                                 <span asp-validation-for="PassingScore" class="text-danger small"></span>
@@ -97,16 +98,17 @@
                                 <i class="fas fa-question-circle text-primary me-1"></i>
                                 اختر الأسئلة
                             </label>
-                            <div class="border rounded p-3" style="max-height: 400px; overflow-y: auto; background-color: #f8fafc;">
+                            <div class="border rounded p-3" style="max-height: 400px; overflow-y: auto;">
                                 @if (Model.AvailableQuestions != null && Model.AvailableQuestions.Any())
                                 {
                                     @foreach (var q in Model.AvailableQuestions)
                                     {
-                                        <div class="form-check mb-2 p-2 border-bottom">
+                                        <div class="form-check mb-2">
                                             <input class="form-check-input" type="checkbox"
                                                    name="SelectedQuestionIds" value="@q.Id"
-                                                   id="q_@q.Id">
-                                            <label class="form-check-label fw-medium" for="q_@q.Id">
+                                                   id="q_@q.Id"
+                                                   @(Model.SelectedQuestionIds.Contains(q.Id) ? "checked" : "")>
+                                            <label class="form-check-label" for="q_@q.Id">
                                                 @q.QuestionText
                                                 <small class="text-muted d-block">@q.SubjectName</small>
                                             </label>
@@ -115,15 +117,10 @@
                                 }
                                 else
                                 {
-                                    <div class="text-center py-4">
-                                        <i class="fas fa-question-circle fa-3x text-muted opacity-25 mb-3"></i>
-                                        <p class="text-muted mb-0">لا توجد أسئلة متاحة</p>
-                                        <p class="text-muted small">أضف أسئلة أولاً من بنك الأسئلة</p>
-                                        <a href="/Instructor/QuestionBank/Create" class="btn btn-primary btn-sm mt-2">
-                                            <i class="fas fa-plus me-1"></i>
-                                            إضافة سؤال جديد
-                                        </a>
-                                    </div>
+                                    <p class="text-muted text-center py-3">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        لا توجد أسئلة متاحة. أضف أسئلة أولاً من بنك الأسئلة.
+                                    </p>
                                 }
                             </div>
                             <small class="text-muted">
@@ -140,7 +137,7 @@
 
                             <button type="submit" class="btn btn-primary btn-lg px-5">
                                 <i class="fas fa-save me-2"></i>
-                                حفظ الاختبار
+                                حفظ التعديلات
                             </button>
                         </div>
                     </form>

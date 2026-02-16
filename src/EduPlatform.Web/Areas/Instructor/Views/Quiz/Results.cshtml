@@ -1,0 +1,128 @@
+﻿@model EduPlatform.Web.ViewModels.Instructor.QuizResultsViewModel
+@{
+    ViewData["Title"] = "نتائج الاختبار";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0 fade-in">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0">
+                                <i class="fas fa-chart-bar text-primary me-2"></i>
+                                نتائج الاختبار: @Model.QuizTitle
+                            </h4>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a href="/Instructor/Quiz" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right me-1"></i>
+                                عودة للاختبارات
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- إحصائيات سريعة -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-primary bg-opacity-10 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                    <h5 class="mb-0">@Model.TotalAttempts</h5>
+                                    <small class="text-muted">إجمالي المحاولات</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success bg-opacity-10 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                    <h5 class="mb-0">@Model.PassedCount</h5>
+                                    <small class="text-muted">ناجح</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-danger bg-opacity-10 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
+                                    <h5 class="mb-0">@Model.FailedCount</h5>
+                                    <small class="text-muted">راسب</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info bg-opacity-10 border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                                    <h5 class="mb-0">@Model.AverageScore%</h5>
+                                    <small class="text-muted">متوسط الدرجات</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- جدول النتائج -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 50px">#</th>
+                                    <th>الطالب</th>
+                                    <th>تاريخ الاختبار</th>
+                                    <th>الدرجة</th>
+                                    <th>النتيجة</th>
+                                    <th>وقت الاختبار</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var (attempt, index) in Model.Attempts.Select((a, i) => (a, i + 1)))
+                                {
+                                    <tr>
+                                        <td class="text-muted">@index</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-semibold">@attempt.StudentName</h6>
+                                                    <small class="text-muted">@attempt.StudentEmail</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@attempt.AttemptDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            <span class="fw-bold">@attempt.Score%</span>
+                                        </td>
+                                        <td>
+                                            @if (attempt.Passed)
+                                            {
+                                                <span class="badge bg-success-subtle text-success px-3 py-2">
+                                                    <i class="fas fa-check me-1"></i> ناجح
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger px-3 py-2">
+                                                    <i class="fas fa-times me-1"></i> راسب
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <small>@attempt.TimeTaken دقيقة</small>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
