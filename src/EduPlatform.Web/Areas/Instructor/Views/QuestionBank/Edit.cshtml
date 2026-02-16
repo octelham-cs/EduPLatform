@@ -1,8 +1,6 @@
-﻿@model EduPlatform.Core.Entities.Question
+﻿@model EduPlatform.Web.ViewModels.Instructor.AddQuestionViewModel
 @{
     ViewData["Title"] = "تعديل السؤال";
-    var subjects = ViewBag.Subjects as List<EduPlatform.Core.Entities.Subject>;
-    var chapters = ViewBag.Chapters as List<EduPlatform.Core.Entities.Chapter>;
 }
 
 <div class="container-fluid py-4">
@@ -30,17 +28,15 @@
 
                         <!-- اختيار نوع السؤال -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold">
+                            <label asp-for="QuestionType" class="form-label fw-bold">
                                 <i class="fas fa-list-ul text-primary ms-2"></i>
                                 نوع السؤال <span class="text-danger">*</span>
                             </label>
                             <select asp-for="QuestionType" class="form-select form-select-lg" id="questionTypeSelect" required>
-                                <option value="0">اختيار من متعدد (Multiple Choice)</option>
-                                <option value="1">اختيارات متعددة (Multiple Select)</option>
-                                <option value="2">صح/خطأ (True/False)</option>
-                                <option value="3">توصيل (Matching)</option>
-                                <option value="4">ترتيب (Ordering)</option>
-                                <option value="5">إكمال الفراغات (Fill in the Blanks)</option>
+                                <option value="MultipleChoice">اختيار من متعدد</option>
+                                <option value="MultipleSelect">اختيارات متعددة</option>
+                                <option value="TrueFalse">صح/خطأ</option>
+                                <option value="FillInTheBlanks">إكمال الفراغات</option>
                             </select>
                             <span asp-validation-for="QuestionType" class="text-danger"></span>
                         </div>
@@ -70,17 +66,8 @@
                                     <i class="fas fa-book text-primary ms-2"></i>
                                     المادة <span class="text-danger">*</span>
                                 </label>
-                                <select asp-for="SubjectId" class="form-select" id="subjectSelect" required>
+                                <select asp-for="SubjectId" asp-items="ViewBag.Subjects" class="form-select" required>
                                     <option value="">-- اختر المادة --</option>
-                                    @if (subjects != null)
-                                    {
-                                        @foreach (var subject in subjects)
-                                        {
-                                            <option value="@subject.Id" selected="@(subject.Id == Model.SubjectId)">
-                                                @subject.Name
-                                            </option>
-                                        }
-                                    }
                                 </select>
                                 <span asp-validation-for="SubjectId" class="text-danger"></span>
                             </div>
@@ -90,17 +77,8 @@
                                     <i class="fas fa-book-open text-primary ms-2"></i>
                                     الفصل (اختياري)
                                 </label>
-                                <select asp-for="ChapterId" class="form-select" id="chapterSelect">
+                                <select asp-for="ChapterId" asp-items="ViewBag.Chapters" class="form-select">
                                     <option value="">-- اختر الفصل --</option>
-                                    @if (chapters != null)
-                                    {
-                                        @foreach (var chapter in chapters)
-                                        {
-                                            <option value="@chapter.Id" selected="@(chapter.Id == Model.ChapterId)">
-                                                @chapter.Title
-                                            </option>
-                                        }
-                                    }
                                 </select>
                             </div>
                         </div>
@@ -112,7 +90,7 @@
                                 مستوى الصعوبة
                             </label>
                             <div class="d-flex align-items-center gap-3">
-                                <input type="range" asp-for="DifficultyLevel" class="form-range"
+                                <input asp-for="DifficultyLevel" type="range" class="form-range"
                                        min="1" max="5" id="difficultyRange">
                                 <div class="difficulty-display">
                                     <span id="difficultyStars"></span>
@@ -120,12 +98,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Hidden fields -->
-                        <input type="hidden" name="optionsJson" id="optionsJson">
-                        <input type="hidden" name="correctAnswerJson" id="correctAnswerJson">
-                        <input type="hidden" asp-for="CreatedAt">
-                        <input type="hidden" asp-for="IsActive">
 
                     </div>
                     <div class="card-footer bg-light p-4">
@@ -150,10 +122,11 @@
     }
 
     <script>
-        // البيانات الحالية
-        var currentOptionsJson = '@Html.Raw(Model.OptionsJson)';
-        var currentCorrectAnswerJson = '@Html.Raw(Model.CorrectAnswerJson)';
-        var currentQuestionType = @((int)Model.QuestionType);
+        // البيانات الحالية من Model
+        var currentQuestionType = '@Model.QuestionType';
+        var currentOptions = @Html.Raw(Json.Serialize(Model.Options ?? new List<string>()));
+        var currentCorrectIndex = @(Model.CorrectAnswerIndex ?? 0);
+        var currentCorrectBool = @(Model.CorrectAnswerBool?.ToString().ToLower() ?? "false");
 
         $(document).ready(function() {
 
@@ -163,23 +136,6 @@
             // تحميل الخيارات الحالية
             renderQuestionOptions(currentQuestionType, true);
 
-            // تحديث الفصول عند اختيار المادة
-            $('#subjectSelect').on('change', function() {
-                var subjectId = $(this).val();
-                var chapterSelect = $('#chapterSelect');
-
-                chapterSelect.empty();
-                chapterSelect.append('<option value="">-- اختر الفصل --</option>');
-
-                if (subjectId) {
-                    $.get('/Instructor/QuestionBank/GetChaptersBySubject', { subjectId: subjectId }, function(data) {
-                        $.each(data, function(index, chapter) {
-                            chapterSelect.append('<option value="' + chapter.id + '">' + chapter.name + '</option>');
-                        });
-                    });
-                }
-            });
-
             // تحديث نجوم الصعوبة
             $('#difficultyRange').on('input', function() {
                 updateDifficultyDisplay($(this).val());
@@ -187,48 +143,8 @@
 
             // تغيير نوع السؤال
             $('#questionTypeSelect').on('change', function() {
-                var questionType = parseInt($(this).val());
+                var questionType = $(this).val();
                 renderQuestionOptions(questionType, false);
-            });
-
-            // حفظ البيانات قبل الإرسال
-            $('#questionForm').on('submit', function(e) {
-                var questionType = parseInt($('#questionTypeSelect').val());
-                var options = [];
-                var correctAnswer = [];
-
-                switch(questionType) {
-                    case 0: // Multiple Choice
-                        $('.option-input').each(function() {
-                            options.push($(this).val());
-                        });
-                        correctAnswer = [parseInt($('input[name="correctOption"]:checked').val())];
-                        break;
-
-                    case 1: // Multiple Select
-                        $('.option-input').each(function() {
-                            options.push($(this).val());
-                        });
-                        $('.correct-checkbox:checked').each(function() {
-                            correctAnswer.push(parseInt($(this).val()));
-                        });
-                        break;
-
-                    case 2: // True/False
-                        options = ['صح', 'خطأ'];
-                        correctAnswer = [$('input[name="trueFalseAnswer"]:checked').val() === 'true' ? 0 : 1];
-                        break;
-
-                    case 5: // Fill in the Blanks
-                        $('.blank-input').each(function() {
-                            correctAnswer.push($(this).val());
-                        });
-                        options = correctAnswer;
-                        break;
-                }
-
-                $('#optionsJson').val(JSON.stringify(options));
-                $('#correctAnswerJson').val(JSON.stringify(correctAnswer));
             });
         });
 
@@ -254,11 +170,9 @@
 
         function renderQuestionOptions(type, loadExisting) {
             var html = '';
-            var existingOptions = loadExisting ? JSON.parse(currentOptionsJson) : [];
-            var existingAnswers = loadExisting ? JSON.parse(currentCorrectAnswerJson) : [];
 
             switch(type) {
-                case 0: // Multiple Choice
+                case 'MultipleChoice':
                     html = `
                         <div class="mb-4">
                             <label class="form-label fw-bold">
@@ -268,16 +182,16 @@
                             <div id="optionsList">`;
 
                     for (var i = 0; i < 4; i++) {
-                        var optionValue = loadExisting && existingOptions[i] ? existingOptions[i] : '';
-                        var isCorrect = loadExisting && existingAnswers.includes(i);
+                        var optionValue = loadExisting && currentOptions[i] ? currentOptions[i] : '';
+                        var isCorrect = loadExisting && currentCorrectIndex === i;
 
                         html += `
                             <div class="input-group mb-2">
                                 <span class="input-group-text">
-                                    <input type="radio" name="correctOption" value="${i}" ${isCorrect ? 'checked' : ''} required>
+                                    <input type="radio" name="CorrectAnswerIndex" value="${i}" ${isCorrect ? 'checked' : ''} required>
                                 </span>
-                                <input type="text" class="form-control option-input" value="${optionValue}"
-                                       placeholder="الاختيار ${i + 1}" required>
+                                <input type="text" name="Options[${i}]" class="form-control"
+                                       value="${optionValue}" placeholder="الاختيار ${i + 1}" required>
                             </div>`;
                     }
 
@@ -290,40 +204,8 @@
                         </div>`;
                     break;
 
-                case 1: // Multiple Select
-                    html = `
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-check-square text-primary ms-2"></i>
-                                الاختيارات <span class="text-danger">*</span>
-                            </label>
-                            <div id="optionsList">`;
-
-                    for (var i = 0; i < 4; i++) {
-                        var optionValue = loadExisting && existingOptions[i] ? existingOptions[i] : '';
-                        var isCorrect = loadExisting && existingAnswers.includes(i);
-
-                        html += `
-                            <div class="input-group mb-2">
-                                <span class="input-group-text">
-                                    <input type="checkbox" class="correct-checkbox" value="${i}" ${isCorrect ? 'checked' : ''}>
-                                </span>
-                                <input type="text" class="form-control option-input" value="${optionValue}"
-                                       placeholder="الاختيار ${i + 1}" required>
-                            </div>`;
-                    }
-
-                    html += `
-                            </div>
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle ms-1"></i>
-                                اختر الإجابات الصحيحة (يمكن اختيار أكثر من واحدة)
-                            </small>
-                        </div>`;
-                    break;
-
-                case 2: // True/False
-                    var isTrue = loadExisting && existingAnswers[0] === 0;
+                case 'TrueFalse':
+                    var isTrue = loadExisting && currentCorrectBool === 'true';
 
                     html = `
                         <div class="mb-4">
@@ -333,17 +215,17 @@
                             </label>
                             <div class="d-flex gap-3">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="trueFalseAnswer"
-                                           id="answerTrue" value="true" ${isTrue ? 'checked' : ''} required>
-                                    <label class="form-check-label" for="answerTrue">
+                                    <input class="form-check-input" type="radio" name="CorrectAnswerBool"
+                                           value="true" ${isTrue ? 'checked' : ''} required>
+                                    <label class="form-check-label">
                                         <i class="fas fa-check-circle text-success ms-1"></i>
                                         صح
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="trueFalseAnswer"
-                                           id="answerFalse" value="false" ${!isTrue ? 'checked' : ''}>
-                                    <label class="form-check-label" for="answerFalse">
+                                    <input class="form-check-input" type="radio" name="CorrectAnswerBool"
+                                           value="false" ${!isTrue ? 'checked' : ''}>
+                                    <label class="form-check-label">
                                         <i class="fas fa-times-circle text-danger ms-1"></i>
                                         خطأ
                                     </label>
@@ -351,54 +233,9 @@
                             </div>
                         </div>`;
                     break;
-
-                case 5: // Fill in the Blanks
-                    html = `
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-pen text-primary ms-2"></i>
-                                الإجابات الصحيحة <span class="text-danger">*</span>
-                            </label>
-                            <div class="alert alert-info">
-                                <i class="fas fa-lightbulb ms-2"></i>
-                                استخدم [___] في نص السؤال لتحديد الفراغات
-                            </div>
-                            <div id="blanksList">`;
-
-                    var blanksCount = loadExisting && existingAnswers.length > 0 ? existingAnswers.length : 1;
-
-                    for (var i = 0; i < blanksCount; i++) {
-                        var blankValue = loadExisting && existingAnswers[i] ? existingAnswers[i] : '';
-
-                        html += `
-                            <div class="input-group mb-2">
-                                <span class="input-group-text">الفراغ ${i + 1}</span>
-                                <input type="text" class="form-control blank-input" value="${blankValue}"
-                                       placeholder="الإجابة الصحيحة" required>
-                            </div>`;
-                    }
-
-                    html += `
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addBlank()">
-                                <i class="fas fa-plus ms-1"></i>
-                                إضافة فراغ
-                            </button>
-                        </div>`;
-                    break;
             }
 
             $('#optionsArea').html(html);
-        }
-
-        function addBlank() {
-            var count = $('.blank-input').length + 1;
-            var html = `
-                <div class="input-group mb-2">
-                    <span class="input-group-text">الفراغ ${count}</span>
-                    <input type="text" class="form-control blank-input" placeholder="الإجابة الصحيحة" required>
-                </div>`;
-            $('#blanksList').append(html);
         }
     </script>
 
