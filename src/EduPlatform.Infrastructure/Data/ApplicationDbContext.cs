@@ -1,6 +1,7 @@
 ﻿using EduPlatform.Core.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace EduPlatform.Infrastructure.Data
 {
@@ -42,6 +43,14 @@ namespace EduPlatform.Infrastructure.Data
         .WithMany(s => s.EnrollmentCodes)
         .HasForeignKey(e => e.UsedBy)
         .OnDelete(DeleteBehavior.SetNull);
+
+
+            builder.Entity<Instructor>()
+      .HasOne(i => i.Subject)
+      .WithMany()
+      .HasForeignKey(i => i.SubjectId)
+      .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

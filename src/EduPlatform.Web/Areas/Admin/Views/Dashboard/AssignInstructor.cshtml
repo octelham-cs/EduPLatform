@@ -1,4 +1,6 @@
 ﻿@using EduPlatform.Core.Entities
+@using EduPlatform.Web.ViewModels.Admin
+
 @model List<ApplicationUser>
 @{
     ViewData["Title"] = "تعيين مدرس جديد";
@@ -38,14 +40,16 @@
                     <!-- Tabs -->
                     <ul class="nav nav-tabs mb-4" id="assignTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="existing-user-tab" data-bs-toggle="tab"
+                            <button class="nav-link @(TempData["ActiveTab"]?.ToString() != "new-user-tab" ? "active" : "")"
+                                    id="existing-user-tab" data-bs-toggle="tab"
                                     data-bs-target="#existing-user" type="button" role="tab">
                                 <i class="fas fa-user-check me-2"></i>
                                 مستخدم موجود
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="new-user-tab" data-bs-toggle="tab"
+                            <button class="nav-link @(TempData["ActiveTab"]?.ToString() == "new-user-tab" ? "active" : "")"
+                                    id="new-user-tab" data-bs-toggle="tab"
                                     data-bs-target="#new-user" type="button" role="tab">
                                 <i class="fas fa-user-plus me-2"></i>
                                 إنشاء مستخدم جديد
@@ -56,14 +60,10 @@
                     <!-- Tab Content -->
                     <div class="tab-content" id="assignTabContent">
                         <!-- Tab 1: مستخدم موجود -->
-                        <div class="tab-pane fade show active" id="existing-user" role="tabpanel">
+                        <div class="tab-pane fade @(TempData["ActiveTab"]?.ToString() != "new-user-tab" ? "show active" : "")"
+                             id="existing-user" role="tabpanel">
                             @if (Model != null && Model.Any())
                             {
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    اختر مستخدم من القائمة ليتم تعيينه كمدرس على المنصة
-                                </div>
-
                                 <form action="/Admin/Dashboard/AssignInstructor" method="post">
                                     @Html.AntiForgeryToken()
 
@@ -72,7 +72,7 @@
                                             <i class="fas fa-user text-primary me-1"></i>
                                             اختر المستخدم
                                         </label>
-                                        <select name="userId" class="form-select form-select-lg" required>
+                                        <select name="UserId" class="form-select form-select-lg" required>
                                             <option value="">-- اختر مستخدم --</option>
                                             @foreach (var user in Model)
                                             {
@@ -85,10 +85,24 @@
 
                                     <div class="mb-4">
                                         <label class="form-label fw-bold">
+                                            <i class="fas fa-book text-primary me-1"></i>
+                                            المادة التي سيدرسها
+                                        </label>
+                                        <select name="SubjectId" class="form-select form-select-lg" required>
+                                            <option value="">-- اختر المادة --</option>
+                                            @foreach (var subject in ViewBag.Subjects)
+                                            {
+                                                <option value="@subject.Id">@subject.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">
                                             <i class="fas fa-info-circle text-primary me-1"></i>
                                             السيرة الذاتية (اختياري)
                                         </label>
-                                        <textarea name="bio" class="form-control" rows="3"
+                                        <textarea name="Bio" class="form-control" rows="3"
                                               placeholder="مؤهلات المدرس، خبراته، ..."></textarea>
                                     </div>
 
@@ -121,13 +135,14 @@
                             }
                         </div>
 
-                        <!-- Tab 2: إنشاء مستخدم جديد -->
-                        <div class="tab-pane fade" id="new-user" role="tabpanel">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                أدخل بيانات المستخدم الجديد ليتم إنشاؤه وتعيينه كمدرس
-                            </div>
 
+
+
+
+
+                        <!-- Tab 2: إنشاء مستخدم جديد -->
+                        <div class="tab-pane fade @(TempData["ActiveTab"]?.ToString() == "new-user-tab" ? "show active" : "")"
+                             id="new-user" role="tabpanel">
                             <form action="/Admin/Dashboard/CreateAndAssignInstructor" method="post">
                                 @Html.AntiForgeryToken()
 
@@ -137,8 +152,9 @@
                                             <i class="fas fa-user text-primary me-1"></i>
                                             الاسم الكامل
                                         </label>
-                                        <input type="text" name="fullName" class="form-control form-control-lg"
-                                               placeholder="أدخل الاسم الكامل" required />
+                                        <input type="text" name="FullName" class="form-control form-control-lg"
+                                               placeholder="أدخل الاسم الكامل" required
+                                               value="@(TempData["FormFullName"] ?? "")" />
                                     </div>
 
                                     <div class="col-md-6 mb-3">
@@ -146,8 +162,9 @@
                                             <i class="fas fa-envelope text-primary me-1"></i>
                                             البريد الإلكتروني
                                         </label>
-                                        <input type="email" name="email" class="form-control form-control-lg"
-                                               placeholder="example@domain.com" required />
+                                        <input type="email" name="Email" class="form-control form-control-lg"
+                                               placeholder="example@domain.com" required
+                                               value="@(TempData["FormEmail"] ?? "")" />
                                     </div>
                                 </div>
 
@@ -157,8 +174,9 @@
                                             <i class="fas fa-phone text-primary me-1"></i>
                                             رقم الهاتف
                                         </label>
-                                        <input type="tel" name="phoneNumber" class="form-control form-control-lg"
-                                               placeholder="01xxxxxxxxx" required />
+                                        <input type="tel" name="PhoneNumber" class="form-control form-control-lg"
+                                               placeholder="01xxxxxxxxx" required
+                                               value="@(TempData["FormPhoneNumber"] ?? "")" />
                                     </div>
 
                                     <div class="col-md-6 mb-3">
@@ -166,10 +184,30 @@
                                             <i class="fas fa-lock text-primary me-1"></i>
                                             كلمة المرور المؤقتة
                                         </label>
-                                        <input type="text" name="password" class="form-control form-control-lg"
-                                               value="Edu@123456" readonly />
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-lg"
+                                                   id="generatedPassword" value="@ViewBag.GeneratedPassword" readonly />
+                                            <button class="btn btn-outline-primary" type="button" onclick="regeneratePassword()">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
                                         <small class="text-muted">سيتم إرسال كلمة المرور للبريد الإلكتروني</small>
+                                        <input type="hidden" name="Password" id="passwordHidden" value="@ViewBag.GeneratedPassword" />
                                     </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-book text-primary me-1"></i>
+                                        المادة التي سيدرسها
+                                    </label>
+                                    <select name="SubjectId" class="form-select form-select-lg" required>
+                                        <option value="">-- اختر المادة --</option>
+                                        @foreach (var subject in ViewBag.Subjects)
+                                        {
+                                            <option value="@subject.Id">@subject.Name</option>
+                                        }
+                                    </select>
                                 </div>
 
                                 <div class="mb-4">
@@ -177,8 +215,8 @@
                                         <i class="fas fa-info-circle text-primary me-1"></i>
                                         السيرة الذاتية (اختياري)
                                     </label>
-                                    <textarea name="bio" class="form-control" rows="3"
-                                              placeholder="مؤهلات المدرس، خبراته، ..."></textarea>
+                                    <textarea name="Bio" class="form-control" rows="3"
+                                              placeholder="مؤهلات المدرس، خبراته، ...">@(TempData["FormBio"] ?? "")</textarea>
                                 </div>
 
                                 <hr class="my-4" />
@@ -196,6 +234,14 @@
                                 </div>
                             </form>
                         </div>
+
+
+
+
+
+
+
+
                     </div>
                 </div>
             </div>
@@ -205,14 +251,16 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            // تفعيل التبويب حسب الرسالة
-            @if (TempData["ActiveTab"] != null)
-            {
-                    <text>
-                    $('#' + '@TempData["ActiveTab"]').tab('show');
-                    </text>
+        function regeneratePassword() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+            let password = "";
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-        });
+            password += "A1!";
+
+            document.getElementById('generatedPassword').value = password;
+            document.getElementById('passwordHidden').value = password;
+        }
     </script>
 }

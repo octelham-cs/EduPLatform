@@ -77,6 +77,7 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
         {
             var instructors = await _context.Instructors
                 .Include(i => i.User)
+                .Include(i => i.Subject)
                 .OrderByDescending(i => i.RegisteredAt)
                 .ToListAsync();
 
@@ -183,22 +184,40 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 .Select(i => i.UserId)
                 .ToListAsync();
 
+            var adminUserIds = (await _userManager.GetUsersInRoleAsync("Admin"))
+                .Select(u => u.Id)
+                .ToList();
+
             var users = await _userManager.Users
-                .Where(u => !instructorUserIds.Contains(u.Id))
+                .Where(u => !instructorUserIds.Contains(u.Id) && !adminUserIds.Contains(u.Id))
                 .OrderBy(u => u.FullName)
                 .ToListAsync();
+
+            // جلب المواد
+            var subjects = await _context.Subjects
+                .OrderBy(s => s.Name)
+                .ToListAsync();
+
+            ViewBag.Subjects = subjects;
+            ViewBag.GeneratedPassword = GenerateRandomPassword();
 
             return View(users);
         }
 
         // ========================================
-        // POST: Admin/AssignInstructor
+        // POST: Admin/AssignInstructor (لتعيين مستخدم موجود)
         // ========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AssignInstructor(string userId, string? bio)
+        public async Task<IActionResult> AssignInstructor(AssignInstructorViewModel model)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            if (!ModelState.IsValid || string.IsNullOrEmpty(model.UserId))
+            {
+                TempData["Error"] = "يرجى اختيار مستخدم ومادة";
+                return RedirectToAction(nameof(AssignInstructor));
+            }
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
 
             if (user == null)
             {
@@ -208,7 +227,7 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
 
             // التحقق إن المستخدم مش مدرس بالفعل
             var existingInstructor = await _context.Instructors
-                .AnyAsync(i => i.UserId == userId);
+                .AnyAsync(i => i.UserId == model.UserId);
 
             if (existingInstructor)
             {
@@ -219,8 +238,9 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             // إنشاء سجل المدرس
             var instructor = new EduPlatform.Core.Entities.Instructor
             {
-                UserId = userId,
-                Bio = bio,
+                UserId = model.UserId,
+                Bio = model.Bio,
+                SubjectId = model.SubjectId,
                 Status = InstructorStatus.Approved,
                 RegisteredAt = DateTime.Now,
                 ApprovedAt = DateTime.Now,
@@ -238,8 +258,6 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             return RedirectToAction(nameof(Instructors));
         }
 
-
-
         // ========================================
         // POST: Admin/CreateAndAssignInstructor
         // ========================================
@@ -251,6 +269,13 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             {
                 TempData["Error"] = "يرجى إدخال البيانات بشكل صحيح";
                 TempData["ActiveTab"] = "new-user-tab";
+
+                // تخزين البيانات في TempData بشكل منفصل
+                TempData["FormFullName"] = model.FullName;
+                TempData["FormEmail"] = model.Email;
+                TempData["FormPhoneNumber"] = model.PhoneNumber;
+                TempData["FormBio"] = model.Bio;
+
                 return RedirectToAction(nameof(AssignInstructor));
             }
 
@@ -261,6 +286,10 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 ModelState.AddModelError("Email", "البريد الإلكتروني مستخدم بالفعل");
                 TempData["Error"] = "البريد الإلكتروني مستخدم بالفعل";
                 TempData["ActiveTab"] = "new-user-tab";
+                TempData["FormFullName"] = model.FullName;
+                TempData["FormEmail"] = model.Email;
+                TempData["FormPhoneNumber"] = model.PhoneNumber;
+                TempData["FormBio"] = model.Bio;
                 return RedirectToAction(nameof(AssignInstructor));
             }
 
@@ -272,6 +301,10 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 ModelState.AddModelError("PhoneNumber", "رقم الهاتف مستخدم بالفعل");
                 TempData["Error"] = "رقم الهاتف مستخدم بالفعل";
                 TempData["ActiveTab"] = "new-user-tab";
+                TempData["FormFullName"] = model.FullName;
+                TempData["FormEmail"] = model.Email;
+                TempData["FormPhoneNumber"] = model.PhoneNumber;
+                TempData["FormBio"] = model.Bio;
                 return RedirectToAction(nameof(AssignInstructor));
             }
 
@@ -301,6 +334,7 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 {
                     UserId = user.Id,
                     Bio = model.Bio,
+                    SubjectId = model.SubjectId,
                     Status = InstructorStatus.Approved,
                     RegisteredAt = DateTime.Now,
                     ApprovedAt = DateTime.Now,
@@ -310,10 +344,7 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 _context.Instructors.Add(instructor);
                 await _context.SaveChangesAsync();
 
-                // TODO: إرسال إيميل بكلمة المرور للمدرس الجديد
-                // await _emailService.SendWelcomeEmail(user.Email, user.FullName, password);
-
-                TempData["Success"] = $"تم إنشاء وتعيين {user.FullName} كمدرس بنجاح. كلمة المرور: {password}";
+                TempData["Success"] = $"✅ تم إنشاء وتعيين {user.FullName} كمدرس بنجاح.\nكلمة المرور: {password}";
                 return RedirectToAction(nameof(Instructors));
             }
 
@@ -324,10 +355,16 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
 
             TempData["Error"] = "حدث خطأ أثناء إنشاء المستخدم";
             TempData["ActiveTab"] = "new-user-tab";
+            TempData["FormFullName"] = model.FullName;
+            TempData["FormEmail"] = model.Email;
+            TempData["FormPhoneNumber"] = model.PhoneNumber;
+            TempData["FormBio"] = model.Bio;
             return RedirectToAction(nameof(AssignInstructor));
         }
 
+        // ========================================
         // دالة مساعدة لتوليد كلمة مرور عشوائية
+        // ========================================
         private string GenerateRandomPassword()
         {
             const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
@@ -335,7 +372,6 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             var password = new string(Enumerable.Repeat(chars, 8)
                 .Select(s => s[random.Next(s.Length)]).ToArray());
 
-            // إضافة أرقام وحروف كبيرة لضمان قوة كلمة المرور
             return password + "A1!";
         }
     }

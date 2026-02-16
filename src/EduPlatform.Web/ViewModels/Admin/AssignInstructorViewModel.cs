@@ -2,12 +2,18 @@
 
 namespace EduPlatform.Web.ViewModels.Admin
 {
-    public class AssignExistingUserViewModel
+    public class AssignInstructorViewModel
     {
         [Required(ErrorMessage = "يجب اختيار مستخدم")]
+        [Display(Name = "المستخدم")]
         public string UserId { get; set; } = string.Empty;
 
+        [Display(Name = "السيرة الذاتية")]
         public string? Bio { get; set; }
+
+        [Required(ErrorMessage = "يجب اختيار مادة للمدرس")]
+        [Display(Name = "المادة")]
+        public int SubjectId { get; set; }
     }
 
     public class CreateInstructorViewModel
@@ -29,5 +35,9 @@ namespace EduPlatform.Web.ViewModels.Admin
 
         [Display(Name = "السيرة الذاتية")]
         public string? Bio { get; set; }
+
+        [Required(ErrorMessage = "يجب اختيار مادة للمدرس")]
+        [Display(Name = "المادة")]
+        public int SubjectId { get; set; }
     }
 }

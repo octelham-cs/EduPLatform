@@ -26,21 +26,11 @@
                 </div>
 
                 <div class="card-body">
-                    <!-- رسائل النجاح والخطأ -->
                     @if (TempData["Success"] != null)
                     {
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="fas fa-check-circle me-2"></i>
                             @TempData["Success"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-
-                    @if (TempData["Error"] != null)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            @TempData["Error"]
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
@@ -64,20 +54,20 @@
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 50px">#</th>
+                                    <th>#</th>
                                     <th>المدرس</th>
+                                    <th>المادة</th>
                                     <th>البريد الإلكتروني</th>
-                                    <th>رقم الهاتف</th>
                                     <th>الحالة</th>
                                     <th>تاريخ التسجيل</th>
-                                    <th style="width: 150px">الإجراءات</th>
+                                    <th>الإجراءات</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var (instructor, index) in Model.Select((i, idx) => (i, idx + 1)))
                                 {
                                     <tr data-status="@instructor.Status">
-                                        <td class="text-muted">@index</td>
+                                        <td>@index</td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
@@ -85,15 +75,13 @@
                                                 </div>
                                                 <div>
                                                     <h6 class="mb-0 fw-semibold">@instructor.User?.FullName</h6>
-                                                    @if (!string.IsNullOrEmpty(instructor.Bio))
-                                                    {
-                                                        <small class="text-muted">@(instructor.Bio.Length > 30 ? instructor.Bio.Substring(0, 30) + "..." : instructor.Bio)</small>
-                                                    }
                                                 </div>
                                             </div>
                                         </td>
+                                        <td>
+                                            <span class="badge bg-info">@(instructor.Subject?.Name ?? "غير محدد")</span>
+                                        </td>
                                         <td>@instructor.User?.Email</td>
-                                        <td>@instructor.User?.PhoneNumber</td>
                                         <td>
                                             @switch (instructor.Status)
                                             {
@@ -112,14 +100,9 @@
                                                         <i class="fas fa-times me-1"></i> مرفوض
                                                     </span>
                                                     break;
-                                                default:
-                                                    <span class="badge bg-secondary px-3 py-2">غير معروف</span>
-                                                    break;
                                             }
                                         </td>
-                                        <td>
-                                            <small>@instructor.RegisteredAt.ToString("dd/MM/yyyy")</small>
-                                        </td>
+                                        <td>@instructor.RegisteredAt.ToString("dd/MM/yyyy")</td>
                                         <td>
                                             <div class="btn-group">
                                                 @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
@@ -137,10 +120,6 @@
                                                         </button>
                                                     </form>
                                                 }
-                                                <a href="/Admin/Dashboard/InstructorDetails/@instructor.Id"
-                                                   class="btn btn-sm btn-outline-info" title="التفاصيل">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -169,7 +148,6 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            // فلترة الحالة
             $('#statusFilter').change(function() {
                 var status = $(this).val();
                 $('tbody tr').each(function() {
@@ -181,7 +159,6 @@
                 });
             });
 
-            // البحث
             $('#searchInput').on('keyup', function() {
                 var value = $(this).val().toLowerCase();
                 $('tbody tr').filter(function() {

@@ -4,8 +4,7 @@ using EduPlatform.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using EduPlatform.Web.Services;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using EduPlatform.Core.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,18 +36,34 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-builder.Services.AddScoped<EduPlatform.Core.Interfaces.IEnrollmentService, EduPlatform.Infrastructure.Services.EnrollmentService>();
-
-// Add services to the container.
+// ===========================================
+// 3. إضافة Services
+// ===========================================
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddSignalR();
 
-builder.Services.AddScoped<EduPlatform.Core.Interfaces.INotificationService, NotificationService>();
+// Services الخاصة بالمشروع
+builder.Services.AddScoped<IEnrollmentService, EduPlatform.Infrastructure.Services.EnrollmentService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
-var app = builder.Build();
+// ===========================================
+// 4. إضافة Session (دعم الجلسات)
+// ===========================================
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
-// Configure the HTTP request pipeline.
+// ✅ كل Services لازم تضاف قبل builder.Build()
+
+var app = builder.Build(); // ✅ هنا فقط نعمل Build
+
+// ===========================================
+// 5. إعداد Middleware (الـ Pipeline)
+// ===========================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -58,7 +73,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// ترتيب مهم: Authentication قبل Authorization
+// ✅ Session لازم قبل Authentication
+app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -77,7 +94,7 @@ app.MapControllerRoute(
 app.MapHub<EduPlatform.Web.Hubs.NotificationHub>("/notificationHub");
 
 // ===========================================
-// 5. تهيئة قاعدة البيانات (Seeding) - مرة واحدة فقط
+// 6. تهيئة قاعدة البيانات (Seeding)
 // ===========================================
 using (var scope = app.Services.CreateScope())
 {

@@ -1,4 +1,5 @@
 ﻿using EduPlatform.Core.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduPlatform.Core.Entities
 {
@@ -29,5 +30,12 @@ namespace EduPlatform.Core.Entities
 
         // Navigation Properties
         public ApplicationUser User { get; set; } = null!;
+
+
+
+        public int SubjectId { get; set; }
+
+        [ForeignKey(nameof(SubjectId))]
+        public virtual Subject? Subject { get; set; }
     }
 }
