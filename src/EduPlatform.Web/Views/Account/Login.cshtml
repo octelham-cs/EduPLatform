@@ -1,53 +1,90 @@
 ﻿@model EduPlatform.Web.ViewModels.Account.LoginViewModel
-
 @{
     ViewData["Title"] = "تسجيل الدخول";
     Layout = "_Layout";
 }
 
-<div class="container mt-5">
+<div class="container-fluid py-5">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-5">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4 class="mb-0">تسجيل الدخول</h4>
+            <div class="card shadow border-0 rounded-4 overflow-hidden">
+                <!-- Header بتدرج أنيق -->
+                <div class="card-header border-0 text-center py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="bg-white bg-opacity-20 rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="fas fa-sign-in-alt fa-2x text-white"></i>
+                    </div>
+                    <h3 class="text-white fw-bold mb-0">تسجيل الدخول</h3>
+                    <p class="text-white text-opacity-75 mb-0 mt-2">مرحباً بعودتك! أدخل بياناتك للدخول</p>
                 </div>
-                <div class="card-body">
+
+                <div class="card-body p-4">
                     <form asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="ReturnUrl" />
 
-                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <!-- عرض الأخطاء -->
+                        <div asp-validation-summary="All" class="alert alert-danger" style="display: none;"></div>
 
                         <!-- البريد أو الهاتف -->
-                        <div class="mb-3">
-                            <label asp-for="EmailOrPhone" class="form-label"></label>
-                            <input asp-for="EmailOrPhone" class="form-control" placeholder="البريد الإلكتروني أو رقم الهاتف" />
-                            <span asp-validation-for="EmailOrPhone" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="EmailOrPhone" class="form-label fw-bold text-muted mb-2">
+                                <i class="fas fa-user text-primary ms-1"></i>
+                                البريد الإلكتروني أو رقم الهاتف
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                </span>
+                                <input asp-for="EmailOrPhone" class="form-control border-0 bg-light py-3"
+                                       placeholder="example@domain.com أو 01xxxxxxxxx" />
+                            </div>
+                            <span asp-validation-for="EmailOrPhone" class="text-danger small"></span>
                         </div>
 
                         <!-- كلمة السر -->
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" placeholder="كلمة السر" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label fw-bold text-muted mb-2">
+                                <i class="fas fa-lock text-primary ms-1"></i>
+                                كلمة السر
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-key text-primary"></i>
+                                </span>
+                                <input asp-for="Password" type="password" class="form-control border-0 bg-light py-3"
+                                       placeholder="أدخل كلمة السر" />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
                         </div>
 
                         <!-- تذكرني -->
-                        <div class="mb-3 form-check">
-                            <input asp-for="RememberMe" class="form-check-input" />
-                            <label asp-for="RememberMe" class="form-check-label"></label>
+                        <div class="mb-4 d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input asp-for="RememberMe" class="form-check-input" />
+                                <label asp-for="RememberMe" class="form-check-label text-muted">
+                                    تذكرني في هذا الجهاز
+                                </label>
+                            </div>
+                            <a href="#" class="text-primary text-decoration-none small">نسيت كلمة السر؟</a>
                         </div>
 
                         <!-- زر الدخول -->
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">دخول</button>
+                            <button type="submit" class="btn btn-primary py-3 fw-bold"
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                دخول
+                            </button>
                         </div>
                     </form>
+                </div>
 
-                    <hr />
-
-                    <p class="text-center">
-                        ليس لديك حساب؟ <a asp-action="Register">سجل الآن</a>
+                <div class="card-footer bg-white border-0 pb-4 text-center">
+                    <p class="mb-0 text-muted">
+                        ليس لديك حساب؟
+                        <a asp-action="Register" class="text-primary fw-bold text-decoration-none">
+                            سجل الآن
+                        </a>
                     </p>
                 </div>
             </div>
@@ -57,4 +94,12 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // عرض الأخطاء إذا وجدت
+        $(document).ready(function() {
+            if ($('.validation-summary-errors').length > 0) {
+                $('.alert-danger').show();
+            }
+        });
+    </script>
 }

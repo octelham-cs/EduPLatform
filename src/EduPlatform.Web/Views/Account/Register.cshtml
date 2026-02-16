@@ -1,90 +1,173 @@
 ﻿@model EduPlatform.Web.ViewModels.Account.RegisterViewModel
-
 @{
     ViewData["Title"] = "تسجيل حساب جديد";
     Layout = "_Layout";
 }
 
-<div class="container mt-5">
+<div class="container-fluid py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4 class="mb-0">تسجيل حساب جديد</h4>
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow border-0 rounded-4 overflow-hidden">
+                <!-- Header بتدرج أنيق -->
+                <div class="card-header border-0 text-center py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="bg-white bg-opacity-20 rounded-circle d-inline-flex p-3 mb-3">
+                        <i class="fas fa-user-plus fa-2x text-white"></i>
+                    </div>
+                    <h3 class="text-white fw-bold mb-0">إنشاء حساب جديد</h3>
+                    <p class="text-white text-opacity-75 mb-0 mt-2">انضم إلينا وابدأ رحلة التعلم</p>
                 </div>
-                <div class="card-body">
+
+                <div class="card-body p-4">
                     <form asp-action="Register" method="post">
-                        <div asp-validation-summary="All" class="text-danger"></div>
+                        @Html.AntiForgeryToken()
 
-                        <!-- الاسم الكامل -->
-                        <div class="mb-3">
-                            <label asp-for="FullName" class="form-label"></label>
-                            <input asp-for="FullName" class="form-control" placeholder="أدخل اسمك الكامل" />
-                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        <!-- عرض الأخطاء -->
+                        <div asp-validation-summary="All" class="alert alert-danger" style="display: none;"></div>
+
+                        <div class="row">
+                            <!-- الاسم الكامل -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="FullName" class="form-label fw-bold text-muted mb-2">
+                                    <i class="fas fa-user text-primary ms-1"></i>
+                                    الاسم الكامل
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fas fa-user text-primary"></i>
+                                    </span>
+                                    <input asp-for="FullName" class="form-control border-0 bg-light py-3"
+                                           placeholder="أدخل اسمك الكامل" />
+                                </div>
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <!-- البريد الإلكتروني -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Email" class="form-label fw-bold text-muted mb-2">
+                                    <i class="fas fa-envelope text-primary ms-1"></i>
+                                    البريد الإلكتروني
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fas fa-envelope text-primary"></i>
+                                    </span>
+                                    <input asp-for="Email" class="form-control border-0 bg-light py-3"
+                                           placeholder="example@domain.com" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
                         </div>
 
-                        <!-- البريد الإلكتروني -->
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" placeholder="example@email.com" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
+                        <div class="row">
+                            <!-- رقم الهاتف -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="PhoneNumber" class="form-label fw-bold text-muted mb-2">
+                                    <i class="fas fa-phone text-primary ms-1"></i>
+                                    رقم الهاتف
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fas fa-phone text-primary"></i>
+                                    </span>
+                                    <input asp-for="PhoneNumber" class="form-control border-0 bg-light py-3"
+                                           placeholder="01xxxxxxxxx" />
+                                </div>
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <!-- المستوى الدراسي -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="GradeLevelId" class="form-label fw-bold text-muted mb-2">
+                                    <i class="fas fa-graduation-cap text-primary ms-1"></i>
+                                    المستوى الدراسي
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fas fa-graduation-cap text-primary"></i>
+                                    </span>
+                                    <select asp-for="GradeLevelId" class="form-select border-0 bg-light py-3">
+                                        <option value="">-- اختر المستوى --</option>
+                                        <option value="1">أولى ثانوي</option>
+                                        <option value="2">ثانية ثانوي</option>
+                                        <option value="3">ثالثة ثانوي</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="GradeLevelId" class="text-danger small"></span>
+                            </div>
                         </div>
 
-                        <!-- رقم الهاتف -->
-                        <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label"></label>
-                            <input asp-for="PhoneNumber" class="form-control" placeholder="01xxxxxxxxx" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
+                        <div class="row">
+                            <!-- كلمة السر -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="Password" class="form-label fw-bold text-muted mb-2">
+                                    <i class="fas fa-lock text-primary ms-1"></i>
+                                    كلمة السر
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fas fa-lock text-primary"></i>
+                                    </span>
+                                    <input asp-for="Password" type="password" class="form-control border-0 bg-light py-3"
+                                           placeholder="6 حروف على الأقل" />
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                                <small class="text-muted d-block mt-1">يجب أن تحتوي على حروف وأرقام</small>
+                            </div>
 
-                        <!-- كلمة السر -->
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" placeholder="6 حروف على الأقل (حروف وأرقام)" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-
-                        <!-- تأكيد كلمة السر -->
-                        <div class="mb-3">
-                            <label asp-for="ConfirmPassword" class="form-label"></label>
-                            <input asp-for="ConfirmPassword" class="form-control" placeholder="أعد كتابة كلمة السر" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
-
-                        <!-- المستوى الدراسي -->
-                        <div class="mb-3">
-                            <label asp-for="GradeLevelId" class="form-label"></label>
-                            <select asp-for="GradeLevelId" class="form-select">
-                                <option value="">-- اختر المستوى الدراسي --</option>
-                                <option value="1">أولى ثانوي</option>
-                                <option value="2">ثانية ثانوي</option>
-                                <option value="3">ثالثة ثانوي</option>
-                            </select>
-                            <span asp-validation-for="GradeLevelId" class="text-danger"></span>
+                            <!-- تأكيد كلمة السر -->
+                            <div class="col-md-6 mb-4">
+                                <label asp-for="ConfirmPassword" class="form-label fw-bold text-muted mb-2">
+                                    <i class="fas fa-lock text-primary ms-1"></i>
+                                    تأكيد كلمة السر
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0">
+                                        <i class="fas fa-check-circle text-primary"></i>
+                                    </span>
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control border-0 bg-light py-3"
+                                           placeholder="أعد كتابة كلمة السر" />
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
                         </div>
 
                         <!-- الشعبة -->
-                        <div class="mb-3">
-                            <label asp-for="BranchId" class="form-label"></label>
-                            <select asp-for="BranchId" class="form-select">
-                                <option value="">-- اختر الشعبة (اختياري) --</option>
-                                <option value="1">علمي علوم</option>
-                                <option value="2">علمي رياضة</option>
-                                <option value="3">أدبي</option>
-                            </select>
-                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="BranchId" class="form-label fw-bold text-muted mb-2">
+                                <i class="fas fa-sitemap text-primary ms-1"></i>
+                                الشعبة (اختياري)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <i class="fas fa-sitemap text-primary"></i>
+                                </span>
+                                <select asp-for="BranchId" class="form-select border-0 bg-light py-3">
+                                    <option value="">-- اختر الشعبة --</option>
+                                    <option value="1">علمي علوم</option>
+                                    <option value="2">علمي رياضة</option>
+                                    <option value="3">أدبي</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="BranchId" class="text-danger small"></span>
                         </div>
 
                         <!-- زر التسجيل -->
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">تسجيل</button>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary py-3 fw-bold"
+                                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                <i class="fas fa-user-plus me-2"></i>
+                                تسجيل حساب جديد
+                            </button>
                         </div>
                     </form>
+                </div>
 
-                    <hr />
-
-                    <p class="text-center">
-                        لديك حساب بالفعل؟ <a asp-action="Login">سجل دخولك هنا</a>
+                <div class="card-footer bg-white border-0 pb-4 text-center">
+                    <p class="mb-0 text-muted">
+                        لديك حساب بالفعل؟
+                        <a asp-action="Login" class="text-primary fw-bold text-decoration-none">
+                            سجل دخولك هنا
+                        </a>
                     </p>
                 </div>
             </div>
@@ -94,4 +177,11 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            if ($('.validation-summary-errors').length > 0) {
+                $('.alert-danger').show();
+            }
+        });
+    </script>
 }

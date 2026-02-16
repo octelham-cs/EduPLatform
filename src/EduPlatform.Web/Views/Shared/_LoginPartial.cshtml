@@ -3,64 +3,185 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
+<ul class="navbar-nav align-items-center gap-2">
     @if (SignInManager.IsSignedIn(User))
     {
         var user = await UserManager.GetUserAsync(User);
         var roles = await UserManager.GetRolesAsync(user);
 
+        <!-- القوائم المنسدلة للـ Admin/Instructor -->
         @if (roles.Contains("Admin"))
         {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                    📊 لوحة التحكم
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-white" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    لوحة التحكم
                 </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                            <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Instructors">
+                            <i class="fas fa-chalkboard-teacher me-2 text-success"></i>
+                            المدرسين
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Admin" asp-controller="Student" asp-action="Index">
+                            <i class="fas fa-user-graduate me-2 text-info"></i>
+                            الطلاب
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Admin" asp-controller="Subject" asp-action="Index">
+                            <i class="fas fa-book-open me-2 text-warning"></i>
+                            المواد
+                        </a>
+                    </li>
+                </ul>
             </li>
         }
         else if (roles.Contains("Instructor"))
         {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="Instructor" asp-controller="Dashboard" asp-action="Index">
-                    📊 لوحة التحكم
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-white" href="#" id="instructorDropdown" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-chalkboard-teacher me-1"></i>
+                    المنصة
                 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="Instructor" asp-controller="Course" asp-action="Index">
-                    📚 كورساتي
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="Instructor" asp-controller="Code" asp-action="Index">
-                    🎫 أكوادي
-                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="Dashboard" asp-action="Index">
+                            <i class="fas fa-home me-2 text-primary"></i>
+                            الرئيسية
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="Course" asp-action="Index">
+                            <i class="fas fa-book me-2 text-success"></i>
+                            الكورسات
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="Video" asp-action="Index">
+                            <i class="fas fa-video me-2 text-danger"></i>
+                            الفيديوهات
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="Code" asp-action="Index">
+                            <i class="fas fa-qrcode me-2 text-warning"></i>
+                            الأكواد
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="QuestionBank" asp-action="Index">
+                            <i class="fas fa-question-circle me-2 text-info"></i>
+                            بنك الأسئلة
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="Quiz" asp-action="Index">
+                            <i class="fas fa-tasks me-2 text-secondary"></i>
+                            الكويزات
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="Student" asp-action="Index">
+                            <i class="fas fa-users me-2 text-success"></i>
+                            الطلاب
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" asp-area="Instructor" asp-controller="Report" asp-action="Index">
+                            <i class="fas fa-chart-bar me-2 text-primary"></i>
+                            التقارير
+                        </a>
+                    </li>
+                </ul>
             </li>
         }
         else if (roles.Contains("Student"))
         {
             <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Student" asp-action="Dashboard">
-                    📊 لوحة التحكم
+                <a class="nav-link text-white" asp-area="" asp-controller="Student" asp-action="Dashboard">
+                    <i class="fas fa-tachometer-alt me-1"></i>
+                    لوحة التحكم
                 </a>
             </li>
         }
 
-        <li class="nav-item">
-            <span class="nav-link text-muted">مرحباً، @user.FullName</span>
-        </li>
+        <!-- صورة المستخدم والقائمة الشخصية -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                <div class="rounded-circle bg-white bg-opacity-25 p-2 me-2">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <span class="text-white">@user.FullName</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" href="/Account/Profile">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>
+                        الملف الشخصي
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="/Account/ChangePassword">
+                        <i class="fas fa-cog me-2 text-secondary"></i>
+                        الإعدادات
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
 
-        <li class="nav-item">
-            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                <button type="submit" class="nav-link btn btn-link text-danger">خروج</button>
-            </form>
+
+                    <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            تسجيل خروج
+                        </button>
+                    </form>
+
+
+
+
+                    
+
+                
+
+                
+
+
+
+                </li>
+            </ul>
         </li>
     }
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">تسجيل طالب</a>
+            <a class="nav-link text-white" asp-controller="Account" asp-action="Register">
+                <i class="fas fa-user-plus me-1"></i>
+                تسجيل طالب
+            </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">دخول</a>
+            <a class="nav-link btn btn-outline-light px-4 rounded-pill" asp-controller="Account" asp-action="Login">
+                <i class="fas fa-sign-in-alt me-1"></i>
+                دخول
+            </a>
         </li>
     }
 </ul>
+
+
+
+
+

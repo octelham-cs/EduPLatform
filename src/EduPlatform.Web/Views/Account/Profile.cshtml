@@ -1,0 +1,102 @@
+﻿@model EduPlatform.Web.ViewModels.Account.ProfileViewModel
+@{
+    ViewData["Title"] = "الملف الشخصي";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle text-primary me-2"></i>
+                        الملف الشخصي
+                    </h5>
+                </div>
+
+                <div class="card-body p-4">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Profile" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">الاسم الكامل</label>
+                                <input asp-for="FullName" class="form-control" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">البريد الإلكتروني</label>
+                                <input asp-for="Email" class="form-control" readonly disabled />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">رقم الهاتف</label>
+                                <input asp-for="PhoneNumber" class="form-control" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">تاريخ التسجيل</label>
+                                <input asp-for="CreatedAt" class="form-control" value="@Model.CreatedAt.ToString("yyyy-MM-dd")" readonly disabled />
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Bio) || !string.IsNullOrEmpty(Model.Qualifications))
+                        {
+                            <hr />
+                            <h6 class="fw-bold mb-3">معلومات إضافية</h6>
+
+                            @if (!string.IsNullOrEmpty(Model.Bio))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">السيرة الذاتية</label>
+                                    <textarea asp-for="Bio" class="form-control" rows="3"></textarea>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.Qualifications))
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">المؤهلات</label>
+                                    <textarea asp-for="Qualifications" class="form-control" rows="2"></textarea>
+                                </div>
+                            }
+                        }
+
+                        <hr />
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a asp-action="ChangePassword" class="btn btn-outline-primary">
+                                <i class="fas fa-key me-2"></i>
+                                تغيير كلمة المرور
+                            </a>
+
+                            <button type="submit" class="btn btn-primary px-5">
+                                <i class="fas fa-save me-2"></i>
+                                حفظ التغييرات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

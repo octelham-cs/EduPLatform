@@ -4,36 +4,245 @@
     --accent-color: #FFC107; /* الذهبي */
     --text-color: #333;
     --success-color: #28a745;
+    /* إضافة المتغيرات الجديدة */
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --sidebar-width: 280px; /* زودنا العرض من 250 لـ 280 */
+}
+
+/* ===== التنسيقات العامة ===== */
+* {
+    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--secondary-color);
     color: var(--text-color);
+    min-height: 100vh;
     direction: rtl;
 }
 
-/* Navbar Styling */
+/* ===== الـ Navbar ===== */
 .navbar {
-    background-color: var(--primary-color) !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    background: var(--primary-gradient) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 0.75rem 1rem;
 }
 
-.navbar-brand, .nav-link {
-    color: #fff !important;
-    font-weight: 600;
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: white !important;
 }
 
-    .nav-link:hover {
-        color: var(--accent-color) !important;
+    .navbar-brand i {
+        font-size: 1.3rem;
+        color: rgba(255,255,255,0.9);
     }
 
-/* Card Styling */
+.navbar-nav .nav-link {
+    font-weight: 500;
+    color: rgba(255,255,255,0.9) !important;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+    .navbar-nav .nav-link:hover {
+        color: white !important;
+        background: rgba(255,255,255,0.1);
+        transform: translateY(-1px);
+    }
+
+    .navbar-nav .nav-link i {
+        margin-left: 0.5rem;
+        font-size: 1rem;
+    }
+
+/* ===== الـ Dropdown Menu ===== */
+.dropdown-menu {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    min-width: 220px;
+}
+
+.dropdown-item {
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+    .dropdown-item i {
+        width: 20px;
+        margin-left: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .dropdown-item:hover {
+        background: #f8f9fa;
+        color: #667eea;
+        transform: translateX(-5px);
+    }
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+    border-color: #e9ecef;
+}
+
+/* ===== صورة المستخدم ===== */
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+}
+
+    .user-avatar i {
+        font-size: 1rem;
+        color: white;
+        margin: 0 !important;
+    }
+
+/* ===== أزرار تسجيل الدخول ===== */
+.btn-login {
+    background: rgba(255,255,255,0.15);
+    color: white !important;
+    border-radius: 50px !important;
+    padding: 0.5rem 1.5rem !important;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+    .btn-login:hover {
+        background: rgba(255,255,255,0.25);
+        transform: translateY(-1px);
+    }
+
+.btn-register {
+    background: white !important;
+    color: #667eea !important;
+    border-radius: 50px !important;
+    padding: 0.5rem 1.5rem !important;
+    font-weight: 600 !important;
+}
+
+    .btn-register:hover {
+        background: #f8f9fa !important;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+    }
+
+/* ===== زر الـ Toggler ===== */
+.navbar-toggler {
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 0.5rem;
+}
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+
+/* ===== الـ Sidebar ===== */
+.sidebar {
+    position: fixed;
+    top: 64px;
+    right: 0;
+    width: var(--sidebar-width);
+    height: calc(100vh - 64px);
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    overflow-y: auto;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+    .sidebar.collapsed {
+        width: 70px;
+    }
+
+    .sidebar .nav-item {
+        margin: 4px 8px;
+    }
+
+    .sidebar .nav-link {
+        color: rgba(255,255,255,0.7);
+        padding: 14px 20px; /* زودنا padding */
+        margin: 4px 12px; /* زودنا margin */
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 15px; /* زودنا المسافة بين الأيقونة والنص */
+        width: calc(100% - 24px); /* عشان ياخد المساحة كلها */
+    }
+
+        .sidebar .nav-link:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            transform: translateX(-5px);
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background: var(--primary-gradient);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .sidebar .nav-link i {
+            width: 24px; /* زودنا عرض الأيقونة */
+            font-size: 1.2rem; /* زودنا حجم الأيقونة */
+            text-align: center;
+        }
+
+        .sidebar .nav-link span {
+            font-weight: 500;
+            font-size: 1rem; /* زودنا حجم الخط */
+        }
+
+.sidebar-header {
+    padding: 20px 20px; /* زودنا padding */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 15px;
+}
+
+    .sidebar-header h6 {
+        color: rgba(255,255,255,0.5);
+        font-size: 0.85rem; /* زودنا حجم الخط */
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0;
+    }
+
+    .sidebar-header i {
+        margin-left: 8px;
+        font-size: 1rem;
+    }
+
+/* ===== المحتوى الرئيسي ===== */
+.main-content {
+    margin-right: var(--sidebar-width);
+    padding: 20px;
+    min-height: calc(100vh - 64px);
+    transition: all 0.3s ease;
+}
+
+    .main-content.expanded {
+        margin-right: 70px;
+    }
+
+/* ===== البطاقات ===== */
 .card {
     border: none;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     background: #fff;
 }
 
@@ -43,56 +252,194 @@ body {
     }
 
 .card-header {
-    background-color: transparent;
+    background: transparent;
     border-bottom: 1px solid #eee;
-    font-weight: bold;
+    font-weight: 700;
+    padding: 15px 20px;
 }
 
-/* Buttons */
-.btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+    .card-header h5, .card-header h6 {
+        color: var(--primary-color);
+        margin: 0;
+    }
+
+.card-body {
+    padding: 20px;
+}
+
+/* ===== الأزرار ===== */
+.btn {
+    font-weight: 600;
     border-radius: 25px;
     padding: 10px 30px;
-    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    color: white;
 }
 
     .btn-primary:hover {
-        background-color: #002244;
-        border-color: #002244;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 
 .btn-success {
-    background-color: var(--success-color);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
     border-radius: 25px;
 }
 
-/* Forms */
-.form-control {
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    padding: 12px;
-}
-
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(0, 51, 102, 0.25);
+    .btn-success:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-2px);
     }
 
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-    color: var(--primary-color);
-    font-weight: 700;
-}
-
-/* Table */
+/* ===== الجداول ===== */
 .table {
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
+    margin-bottom: 0;
 }
 
     .table thead {
         background-color: var(--primary-color);
         color: #fff;
     }
+
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 16px;
+            border: none;
+        }
+
+    .table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+/* ===== الشارات ===== */
+.badge {
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* ===== العناوين ===== */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* ===== عناصر النماذج ===== */
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0, 51, 102, 0.25);
+    }
+
+/* ===== حاوية الـ Toast ===== */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+}
+
+/* ===== التجاوب مع الشاشات الصغيرة ===== */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+    }
+
+    .main-content {
+        margin-right: 0;
+    }
+
+    .navbar-nav {
+        margin-top: 1rem;
+    }
+
+        .navbar-nav .nav-link {
+            padding: 0.75rem 1rem;
+        }
+
+    .dropdown-menu {
+        background: rgba(255,255,255,0.1);
+        box-shadow: none;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .dropdown-item {
+        color: white;
+    }
+
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+    .dropdown-divider {
+        border-color: rgba(255,255,255,0.2);
+    }
+
+    .sidebar .nav-link {
+        width: calc(100% - 32px);
+        margin: 4px 16px;
+    }
+}
+
+/* ===== شريط التمرير المخصص ===== */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a1a1a1;
+    }
+
+/* ===== حركة الظهور ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
