@@ -1,167 +1,136 @@
-﻿<!-- src/EduPlatform.Web/Areas/Instructor/Views/QuestionBank/Create.cshtml -->
-@model EduPlatform.Web.ViewModels.Instructor.AddQuestionViewModel
+﻿@model EduPlatform.Core.Entities.Question
 @{
     ViewData["Title"] = "إضافة سؤال جديد";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    var subjects = ViewBag.Subjects as List<EduPlatform.Core.Entities.Subject>;
 }
 
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            <div class="card shadow border-0">
-                <div class="card-header bg-gradient-primary text-white py-3">
-                    <h4 class="mb-0">
-                        <i class="fas fa-question-circle me-2"></i>
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary me-3">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-plus-circle text-primary ms-2"></i>
                         إضافة سؤال جديد
-                    </h4>
-                </div>
-
-                <div class="card-body p-4">
-                    <form asp-action="Create" method="post" id="questionForm">
-                        @Html.AntiForgeryToken()
-
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <div class="mb-4">
-                                    <label asp-for="QuestionType" class="form-label fw-bold">
-                                        <i class="fas fa-list text-primary me-1"></i>
-                                        نوع السؤال
-                                    </label>
-                                    <select asp-for="QuestionType" class="form-select form-select-lg" id="questionType" required>
-                                        <option value="MultipleChoice">اختيار من متعدد</option>
-                                        <option value="TrueFalse">صح / خطأ</option>
-                                        <option value="MultipleSelect">اختيارات متعددة</option>
-                                    </select>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label asp-for="QuestionText" class="form-label fw-bold">
-                                        <i class="fas fa-pen text-primary me-1"></i>
-                                        نص السؤال
-                                    </label>
-                                    <textarea asp-for="QuestionText" class="form-control" rows="3"
-                                              placeholder="اكتب السؤال هنا..." required></textarea>
-                                    <span asp-validation-for="QuestionText" class="text-danger small"></span>
-                                </div>
-
-                                <!-- اختيارات للاختيار من متعدد -->
-                                <div id="multipleChoiceSection">
-                                    <label class="form-label fw-bold">
-                                        <i class="fas fa-list-ul text-info me-1"></i>
-                                        الاختيارات
-                                    </label>
-
-                                    @for (int i = 0; i < 4; i++)
-                                    {
-                                        <div class="input-group mb-2">
-                                            <div class="input-group-text">
-                                                <input type="radio" name="CorrectAnswerIndex" value="@i"
-                                                       class="form-check-input" @(i == 0 ? "checked" : "") />
-                                            </div>
-                                            <input type="text" name="Options[@i]" class="form-control"
-                                                   placeholder="الاختيار @(i + 1)" />
-                                            <span class="input-group-text bg-light">صحيح</span>
-                                        </div>
-                                    }
-
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        اختر الإجابة الصحيحة بتحديد الدائرة بجانب الاختيار
-                                    </small>
-                                </div>
-
-                                <!-- صح / خطأ -->
-                                <div id="trueFalseSection" style="display: none;">
-                                    <label class="form-label fw-bold">
-                                        <i class="fas fa-check-circle text-success me-1"></i>
-                                        الإجابة الصحيحة
-                                    </label>
-                                    <div class="btn-group w-100" role="group">
-                                        <input type="radio" class="btn-check" name="CorrectAnswerBool"
-                                               id="trueAnswer" value="true" checked />
-                                        <label class="btn btn-outline-success btn-lg" for="trueAnswer">
-                                            <i class="fas fa-check me-2"></i> صح
-                                        </label>
-
-                                        <input type="radio" class="btn-check" name="CorrectAnswerBool"
-                                               id="falseAnswer" value="false" />
-                                        <label class="btn btn-outline-danger btn-lg" for="falseAnswer">
-                                            <i class="fas fa-times me-2"></i> خطأ
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                <div class="card bg-light border-0">
-                                    <div class="card-body">
-                                        <h6 class="fw-bold mb-3">
-                                            <i class="fas fa-cog me-2"></i>
-                                            إعدادات السؤال
-                                        </h6>
-
-                                        <div class="mb-3">
-                                            <label asp-for="SubjectId" class="form-label">المادة</label>
-                                            <select asp-for="SubjectId" class="form-select" required>
-                                                <option value="">-- اختر --</option>
-                                                @if (ViewBag.Subjects != null)
-                                                {
-                                                    @foreach (var subject in ViewBag.Subjects)
-                                                    {
-                                                        <option value="@subject.Value">@subject.Text</option>
-                                                    }
-                                                }
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label asp-for="ChapterId" class="form-label">الفصل (اختياري)</label>
-                                            <select asp-for="ChapterId" class="form-select">
-                                                <option value="">-- بدون --</option>
-                                                @if (ViewBag.Chapters != null)
-                                                {
-                                                    @foreach (var chapter in ViewBag.Chapters)
-                                                    {
-                                                        <option value="@chapter.Value">@chapter.Text</option>
-                                                    }
-                                                }
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label asp-for="DifficultyLevel" class="form-label">مستوى الصعوبة</label>
-                                            <div class="d-flex gap-1">
-                                                @for (int i = 1; i <= 5; i++)
-                                                {
-                                                    <button type="button" class="btn btn-outline-warning difficulty-btn"
-                                                            data-value="@i">
-                                                        <i class="fas fa-star"></i>
-                                                    </button>
-                                                }
-                                            </div>
-                                            <input asp-for="DifficultyLevel" type="hidden" value="3" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-4" />
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
-                                <i class="fas fa-arrow-right me-2"></i>
-                                رجوع
-                            </a>
-
-                            <button type="submit" class="btn btn-primary btn-lg px-5">
-                                <i class="fas fa-save me-2"></i>
-                                حفظ السؤال
-                            </button>
-                        </div>
-                    </form>
+                    </h2>
+                    <p class="text-muted mb-0">أضف سؤالاً إلى بنك الأسئلة</p>
                 </div>
             </div>
+
+            <form asp-action="Create" method="post" id="questionForm">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+
+                        <!-- اختيار نوع السؤال -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-list-ul text-primary ms-2"></i>
+                                نوع السؤال <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="QuestionType" class="form-select form-select-lg" id="questionTypeSelect" required>
+                                <option value="">-- اختر نوع السؤال --</option>
+                                <option value="0">اختيار من متعدد (Multiple Choice)</option>
+                                <option value="1">اختيارات متعددة (Multiple Select)</option>
+                                <option value="2">صح/خطأ (True/False)</option>
+                                <option value="3">توصيل (Matching)</option>
+                                <option value="4">ترتيب (Ordering)</option>
+                                <option value="5">إكمال الفراغات (Fill in the Blanks)</option>
+                            </select>
+                            <span asp-validation-for="QuestionType" class="text-danger"></span>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- نص السؤال -->
+                        <div class="mb-4">
+                            <label asp-for="QuestionText" class="form-label fw-bold">
+                                <i class="fas fa-question-circle text-primary ms-2"></i>
+                                نص السؤال <span class="text-danger">*</span>
+                            </label>
+                            <textarea asp-for="QuestionText" class="form-control" rows="4"
+                                      placeholder="اكتب السؤال هنا..." required></textarea>
+                            <span asp-validation-for="QuestionText" class="text-danger"></span>
+                        </div>
+
+                        <!-- منطقة الاختيارات (تتغير حسب نوع السؤال) -->
+                        <div id="optionsArea"></div>
+
+                        <hr class="my-4">
+
+                        <!-- المادة والفصل -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="SubjectId" class="form-label fw-bold">
+                                    <i class="fas fa-book text-primary ms-2"></i>
+                                    المادة <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="SubjectId" class="form-select" id="subjectSelect" required>
+                                    <option value="">-- اختر المادة --</option>
+                                    @if (subjects != null)
+                                    {
+                                        @foreach (var subject in subjects)
+                                        {
+                                            <option value="@subject.Id">@subject.Name</option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="SubjectId" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ChapterId" class="form-label fw-bold">
+                                    <i class="fas fa-book-open text-primary ms-2"></i>
+                                    الفصل (اختياري)
+                                </label>
+                                <select asp-for="ChapterId" class="form-select" id="chapterSelect">
+                                    <option value="">-- اختر الفصل --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- مستوى الصعوبة -->
+                        <div class="mb-4">
+                            <label asp-for="DifficultyLevel" class="form-label fw-bold">
+                                <i class="fas fa-chart-line text-primary ms-2"></i>
+                                مستوى الصعوبة
+                            </label>
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="range" asp-for="DifficultyLevel" class="form-range"
+                                       min="1" max="5" value="3" id="difficultyRange">
+                                <div class="difficulty-display">
+                                    <span id="difficultyStars">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-muted"></i>
+                                        <i class="fas fa-star text-muted"></i>
+                                    </span>
+                                    <small class="text-muted d-block" id="difficultyText">متوسط</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden fields for JSON data -->
+                        <input type="hidden" name="optionsJson" id="optionsJson">
+                        <input type="hidden" name="correctAnswerJson" id="correctAnswerJson">
+
+                    </div>
+                    <div class="card-footer bg-light p-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="fas fa-save ms-2"></i>
+                            حفظ السؤال
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                            <i class="fas fa-times ms-2"></i>
+                            إلغاء
+                        </a>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -173,39 +142,269 @@
 
     <script>
         $(document).ready(function() {
+
+            // تحديث الفصول عند اختيار المادة
+            $('#subjectSelect').on('change', function() {
+                var subjectId = $(this).val();
+                var chapterSelect = $('#chapterSelect');
+
+                chapterSelect.empty();
+                chapterSelect.append('<option value="">-- اختر الفصل --</option>');
+
+                if (subjectId) {
+                    $.get('/Instructor/QuestionBank/GetChaptersBySubject', { subjectId: subjectId }, function(data) {
+                        $.each(data, function(index, chapter) {
+                            chapterSelect.append('<option value="' + chapter.id + '">' + chapter.name + '</option>');
+                        });
+                    });
+                }
+            });
+
+            // تحديث نجوم الصعوبة
+            $('#difficultyRange').on('input', function() {
+                var level = $(this).val();
+                updateDifficultyDisplay(level);
+            });
+
+            function updateDifficultyDisplay(level) {
+                var stars = '';
+                var text = '';
+
+                for (var i = 1; i <= 5; i++) {
+                    stars += '<i class="fas fa-star ' + (i <= level ? 'text-warning' : 'text-muted') + '"></i> ';
+                }
+
+                switch(level) {
+                    case '1': text = 'سهل جداً'; break;
+                    case '2': text = 'سهل'; break;
+                    case '3': text = 'متوسط'; break;
+                    case '4': text = 'صعب'; break;
+                    case '5': text = 'صعب جداً'; break;
+                }
+
+                $('#difficultyStars').html(stars);
+                $('#difficultyText').text(text);
+            }
+
             // تغيير نوع السؤال
-            $('#questionType').change(function() {
-                var type = $(this).val();
-
-                if (type === 'MultipleChoice' || type === 'MultipleSelect') {
-                    $('#multipleChoiceSection').show();
-                    $('#trueFalseSection').hide();
-                } else if (type === 'TrueFalse') {
-                    $('#multipleChoiceSection').hide();
-                    $('#trueFalseSection').show();
-                }
+            $('#questionTypeSelect').on('change', function() {
+                var questionType = parseInt($(this).val());
+                renderQuestionOptions(questionType);
             });
 
-            // مستوى الصعوبة
-            $('.difficulty-btn').click(function() {
-                var value = $(this).data('value');
-                $('#DifficultyLevel').val(value);
+            function renderQuestionOptions(type) {
+                var html = '';
 
-                $('.difficulty-btn').each(function(i) {
-                    if (i < value) {
-                        $(this).removeClass('btn-outline-warning').addClass('btn-warning');
-                    } else {
-                        $(this).removeClass('btn-warning').addClass('btn-outline-warning');
-                    }
-                });
-            });
+                switch(type) {
+                    case 0: // Multiple Choice
+                        html = `
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-list text-primary ms-2"></i>
+                                    الاختيارات <span class="text-danger">*</span>
+                                </label>
+                                <div id="optionsList">
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="radio" name="correctOption" value="0" required>
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الأول" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="radio" name="correctOption" value="1">
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الثاني" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="radio" name="correctOption" value="2">
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الثالث" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="radio" name="correctOption" value="3">
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الرابع" required>
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle ms-1"></i>
+                                    اختر الإجابة الصحيحة عن طريق الضغط على الدائرة
+                                </small>
+                            </div>
+                        `;
+                        break;
 
-            // تعيين المستوى الافتراضي
-            $('.difficulty-btn').each(function(i) {
-                if (i < 3) {
-                    $(this).removeClass('btn-outline-warning').addClass('btn-warning');
+                    case 1: // Multiple Select
+                        html = `
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-check-square text-primary ms-2"></i>
+                                    الاختيارات <span class="text-danger">*</span>
+                                </label>
+                                <div id="optionsList">
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="checkbox" class="correct-checkbox" value="0">
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الأول" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="checkbox" class="correct-checkbox" value="1">
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الثاني" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="checkbox" class="correct-checkbox" value="2">
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الثالث" required>
+                                    </div>
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">
+                                            <input type="checkbox" class="correct-checkbox" value="3">
+                                        </span>
+                                        <input type="text" class="form-control option-input" placeholder="الاختيار الرابع" required>
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle ms-1"></i>
+                                    اختر الإجابات الصحيحة (يمكن اختيار أكثر من واحدة)
+                                </small>
+                            </div>
+                        `;
+                        break;
+
+                    case 2: // True/False
+                        html = `
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-toggle-on text-primary ms-2"></i>
+                                    الإجابة الصحيحة <span class="text-danger">*</span>
+                                </label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="trueFalseAnswer"
+                                               id="answerTrue" value="true" required>
+                                        <label class="form-check-label" for="answerTrue">
+                                            <i class="fas fa-check-circle text-success ms-1"></i>
+                                            صح
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="trueFalseAnswer"
+                                               id="answerFalse" value="false">
+                                        <label class="form-check-label" for="answerFalse">
+                                            <i class="fas fa-times-circle text-danger ms-1"></i>
+                                            خطأ
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+
+                    case 5: // Fill in the Blanks
+                        html = `
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-pen text-primary ms-2"></i>
+                                    الإجابات الصحيحة <span class="text-danger">*</span>
+                                </label>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-lightbulb ms-2"></i>
+                                    استخدم [___] في نص السؤال لتحديد الفراغات
+                                </div>
+                                <div id="blanksList">
+                                    <div class="input-group mb-2">
+                                        <span class="input-group-text">الفراغ 1</span>
+                                        <input type="text" class="form-control blank-input" placeholder="الإجابة الصحيحة" required>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addBlank()">
+                                    <i class="fas fa-plus ms-1"></i>
+                                    إضافة فراغ
+                                </button>
+                            </div>
+                        `;
+                        break;
+
+                    default:
+                        html = '<div class="alert alert-warning">يرجى اختيار نوع السؤال أولاً</div>';
                 }
+
+                $('#optionsArea').html(html);
+            }
+
+            // حفظ البيانات قبل الإرسال
+            $('#questionForm').on('submit', function(e) {
+                var questionType = parseInt($('#questionTypeSelect').val());
+                var options = [];
+                var correctAnswer = [];
+
+                switch(questionType) {
+                    case 0: // Multiple Choice
+                        $('.option-input').each(function(index) {
+                            options.push($(this).val());
+                        });
+                        correctAnswer = [parseInt($('input[name="correctOption"]:checked').val())];
+                        break;
+
+                    case 1: // Multiple Select
+                        $('.option-input').each(function(index) {
+                            options.push($(this).val());
+                        });
+                        $('.correct-checkbox:checked').each(function() {
+                            correctAnswer.push(parseInt($(this).val()));
+                        });
+                        break;
+
+                    case 2: // True/False
+                        options = ['صح', 'خطأ'];
+                        correctAnswer = [$('input[name="trueFalseAnswer"]:checked').val() === 'true' ? 0 : 1];
+                        break;
+
+                    case 5: // Fill in the Blanks
+                        $('.blank-input').each(function() {
+                            correctAnswer.push($(this).val());
+                        });
+                        options = correctAnswer; // للفراغات، الخيارات هي نفسها الإجابات
+                        break;
+                }
+
+                $('#optionsJson').val(JSON.stringify(options));
+                $('#correctAnswerJson').val(JSON.stringify(correctAnswer));
             });
         });
+
+        function addBlank() {
+            var count = $('.blank-input').length + 1;
+            var html = `
+                <div class="input-group mb-2">
+                    <span class="input-group-text">الفراغ ${count}</span>
+                    <input type="text" class="form-control blank-input" placeholder="الإجابة الصحيحة" required>
+                </div>
+            `;
+            $('#blanksList').append(html);
+        }
     </script>
+
+    <style>
+        .difficulty-display {
+            min-width: 150px;
+        }
+
+        .form-check-input:checked {
+            background-color: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .input-group-text {
+            min-width: 50px;
+            justify-content: center;
+        }
+    </style>
 }
