@@ -17,7 +17,7 @@
                             </h4>
                         </div>
                         <div class="col-md-6 text-end">
-                            <a asp-action="AssignInstructor" class="btn btn-primary">
+                            <a href="/Admin/Dashboard/AssignInstructor" class="btn btn-primary">
                                 <i class="fas fa-user-plus me-1"></i>
                                 تعيين مدرس جديد
                             </a>
@@ -26,6 +26,25 @@
                 </div>
 
                 <div class="card-body">
+                    <!-- رسائل النجاح والخطأ -->
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
                     <!-- فلترة -->
                     <div class="row mb-4">
                         <div class="col-md-4 mb-2">
@@ -105,20 +124,20 @@
                                             <div class="btn-group">
                                                 @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
                                                 {
-                                                    <form asp-action="ApproveInstructor" method="post" asp-route-id="@instructor.Id" class="d-inline">
+                                                    <form action="/Admin/Dashboard/ApproveInstructor/@instructor.Id" method="post" class="d-inline">
                                                         @Html.AntiForgeryToken()
                                                         <button type="submit" class="btn btn-sm btn-success" title="موافقة">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
-                                                    <form asp-action="RejectInstructor" method="post" asp-route-id="@instructor.Id" class="d-inline">
+                                                    <form action="/Admin/Dashboard/RejectInstructor/@instructor.Id" method="post" class="d-inline">
                                                         @Html.AntiForgeryToken()
                                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="رفض">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </form>
                                                 }
-                                                <a asp-action="InstructorDetails" asp-route-id="@instructor.Id"
+                                                <a href="/Admin/Dashboard/InstructorDetails/@instructor.Id"
                                                    class="btn btn-sm btn-outline-info" title="التفاصيل">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
@@ -135,6 +154,10 @@
                         <div class="text-center py-5">
                             <i class="fas fa-users fa-4x text-muted opacity-25 mb-3"></i>
                             <h5 class="text-muted">لا يوجد مدرسين</h5>
+                            <a href="/Admin/Dashboard/AssignInstructor" class="btn btn-primary mt-3">
+                                <i class="fas fa-user-plus me-2"></i>
+                                تعيين أول مدرس
+                            </a>
                         </div>
                     }
                 </div>
