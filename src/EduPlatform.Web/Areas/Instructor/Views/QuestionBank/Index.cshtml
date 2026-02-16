@@ -5,6 +5,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
+@Html.AntiForgeryToken()
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -128,4 +131,55 @@
             });
         });
     </script>
+
+
+        // حذف السؤال
+    function deleteQuestion(id) {
+        Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: "لن تستطيع التراجع عن هذا الإجراء!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'نعم، احذف!',
+            cancelButtonText: 'إلغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/Instructor/QuestionBank/Delete/' + id,
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'تم الحذف!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'خطأ!',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ!',
+                            text: 'حدث خطأ أثناء الحذف'
+                        });
+                    }
+                });
+            }
+        });
+    }
 }
