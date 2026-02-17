@@ -27,44 +27,30 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             _logger = logger;
         }
 
-        // GET: /Admin/Student
         public async Task<IActionResult> Index(string searchTerm = "", int page = 1)
         {
             int pageSize = 10;
-
-            // بنجيب كل الطلاب من جدول Students مباشرة
-            var studentsQuery = _context.Students
+            var query = _context.Students
                 .Include(s => s.User)
                 .Include(s => s.GradeLevel)
                 .Include(s => s.Branch)
                 .AsQueryable();
 
-            // بحث
             if (!string.IsNullOrEmpty(searchTerm))
-            {
-                studentsQuery = studentsQuery.Where(s =>
+                query = query.Where(s =>
                     s.User.FullName.Contains(searchTerm) ||
                     s.User.Email.Contains(searchTerm) ||
                     s.User.PhoneNumber.Contains(searchTerm));
-            }
 
-            // ترتيب حسب تاريخ التسجيل
-            studentsQuery = studentsQuery.OrderByDescending(s => s.RegisteredAt);
+            query = query.OrderByDescending(s => s.RegisteredAt);
 
-            // Pagination
-            var totalItems = await studentsQuery.CountAsync();
-            var students = await studentsQuery
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var totalItems = await query.CountAsync();
+            var students = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            // تحويل لـ ViewModel
             var viewModel = new List<StudentListViewModel>();
             foreach (var student in students)
             {
-                var enrollmentsCount = await _context.Enrollments
-                    .CountAsync(e => e.StudentId == student.Id);
-
+                var count = await _context.Enrollments.CountAsync(e => e.StudentId == student.Id);
                 viewModel.Add(new StudentListViewModel
                 {
                     Id = student.Id,
@@ -75,7 +61,7 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                     Branch = student.Branch?.Name ?? "-",
                     RegisteredAt = student.RegisteredAt,
                     IsActive = student.User.IsActive,
-                    EnrollmentsCount = enrollmentsCount
+                    EnrollmentsCount = count
                 });
             }
 
@@ -86,7 +72,6 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             return View(viewModel);
         }
 
-        // GET: /Admin/Student/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var student = await _context.Students
@@ -99,28 +84,20 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                             .ThenInclude(i => i.User)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (student == null)
-            {
-                return NotFound();
-            }
+            if (student == null) return NotFound();
 
-            // نجيب تقدم الطالب في كل مادة
             var progress = new Dictionary<string, int>();
             foreach (var enrollment in student.Enrollments.Where(e => e.Status == EnrollmentStatus.Active))
             {
-                var totalVideos = await _context.Videos
-                    .CountAsync(v => v.Chapter.CourseId == enrollment.CourseId);
-
-                var watchedVideos = await _context.VideoProgresses
-                    .CountAsync(vp => vp.StudentId == student.Id &&
-                                      vp.Video.Chapter.CourseId == enrollment.CourseId &&
-                                      vp.IsCompleted);
-
-                var percentage = totalVideos > 0 ? (watchedVideos * 100) / totalVideos : 0;
-                progress.Add(enrollment.Course.Title, percentage);
+                var total = await _context.Videos.CountAsync(v => v.Chapter.CourseId == enrollment.CourseId);
+                var watched = await _context.VideoProgresses.CountAsync(vp =>
+                    vp.StudentId == student.Id &&
+                    vp.Video.Chapter.CourseId == enrollment.CourseId &&
+                    vp.IsCompleted);
+                progress[enrollment.Course.Title] = total > 0 ? (watched * 100) / total : 0;
             }
 
-            var viewModel = new StudentDetailsViewModel
+            var vm = new StudentDetailsViewModel
             {
                 Id = student.Id,
                 FullName = student.User.FullName,
@@ -133,32 +110,28 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 LastLogin = student.User.LastLogin,
                 Enrollments = student.Enrollments.Select(e => new StudentEnrollmentViewModel
                 {
-                    CourseName = e.Course.Title,
-                    InstructorName = e.Course.Instructor?.User?.FullName ?? "-",
+                    CourseName = e.Course?.Title ?? "-",
+                    InstructorName = e.Course?.Instructor?.User?.FullName ?? "-",
                     EnrolledAt = e.EnrolledAt,
                     ExpiresAt = e.ExpiresAt,
                     Status = e.Status.ToString(),
-                    Progress = progress.ContainsKey(e.Course.Title) ? progress[e.Course.Title] : 0
+                    Progress = progress.ContainsKey(e.Course?.Title ?? "") ? progress[e.Course.Title] : 0
                 }).ToList(),
                 Progress = progress
             };
 
-            return View(viewModel);
+            return View(vm);
         }
 
-        // GET: /Admin/Student/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             var student = await _context.Students
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            if (student == null)
-            {
-                return NotFound();
-            }
+            if (student == null) return NotFound();
 
-            var viewModel = new StudentEditViewModel
+            return View(new StudentEditViewModel
             {
                 Id = student.Id,
                 FullName = student.User.FullName,
@@ -169,55 +142,38 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 IsActive = student.User.IsActive,
                 GradeLevels = await _context.GradeLevels.ToListAsync(),
                 Branches = await _context.Branches.ToListAsync()
-            };
-
-            return View(viewModel);
+            });
         }
 
-        // POST: /Admin/Student/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, StudentEditViewModel viewModel)
+        public async Task<IActionResult> Edit(int id, StudentEditViewModel vm)
         {
-            if (id != viewModel.Id)
-            {
-                return NotFound();
-            }
+            if (id != vm.Id) return NotFound();
 
             if (!ModelState.IsValid)
             {
-                viewModel.GradeLevels = await _context.GradeLevels.ToListAsync();
-                viewModel.Branches = await _context.Branches.ToListAsync();
-                return View(viewModel);
+                vm.GradeLevels = await _context.GradeLevels.ToListAsync();
+                vm.Branches = await _context.Branches.ToListAsync();
+                return View(vm);
             }
 
-            var student = await _context.Students
-                .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.Id == id);
-
-            if (student == null)
-            {
-                return NotFound();
-            }
+            var student = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == id);
+            if (student == null) return NotFound();
 
             try
             {
-                // تعديل بيانات الطالب
-                student.User.FullName = viewModel.FullName;
-                student.User.Email = viewModel.Email;
-                student.User.UserName = viewModel.Email; // مهم عشان Identity
-                student.User.PhoneNumber = viewModel.PhoneNumber;
-                student.User.IsActive = viewModel.IsActive;
-
-                student.GradeLevelId = viewModel.GradeLevelId;
-                student.BranchId = viewModel.BranchId;
-
-                // لو غيرنا الإيميل، لازم نحدث الـ NormalizedEmail
-                student.User.NormalizedEmail = viewModel.Email.ToUpper();
-                student.User.NormalizedUserName = viewModel.Email.ToUpper();
+                student.User.FullName = vm.FullName;
+                student.User.Email = vm.Email;
+                student.User.UserName = vm.Email;
+                student.User.NormalizedEmail = vm.Email.ToUpper();
+                student.User.NormalizedUserName = vm.Email.ToUpper();
+                student.User.PhoneNumber = vm.PhoneNumber;
+                student.User.IsActive = vm.IsActive;
+                student.GradeLevelId = vm.GradeLevelId ?? student.GradeLevelId;
+                student.BranchId = vm.BranchId;
 
                 await _context.SaveChangesAsync();
-
                 TempData["Success"] = "تم تحديث بيانات الطالب بنجاح";
                 return RedirectToAction(nameof(Index));
             }
@@ -225,25 +181,17 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             {
                 _logger.LogError(ex, "خطأ في تحديث الطالب");
                 ModelState.AddModelError("", "حدث خطأ أثناء تحديث البيانات");
-
-                viewModel.GradeLevels = await _context.GradeLevels.ToListAsync();
-                viewModel.Branches = await _context.Branches.ToListAsync();
-                return View(viewModel);
+                vm.GradeLevels = await _context.GradeLevels.ToListAsync();
+                vm.Branches = await _context.Branches.ToListAsync();
+                return View(vm);
             }
         }
 
-        // POST: /Admin/Student/ToggleStatus/5
         [HttpPost]
         public async Task<IActionResult> ToggleStatus(int id)
         {
-            var student = await _context.Students
-                .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.Id == id);
-
-            if (student == null)
-            {
-                return NotFound();
-            }
+            var student = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == id);
+            if (student == null) return NotFound();
 
             student.User.IsActive = !student.User.IsActive;
             await _context.SaveChangesAsync();
@@ -256,14 +204,10 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
             });
         }
 
-        // GET: /Admin/Student/Enrollments/5
         public async Task<IActionResult> Enrollments(int id)
         {
-            var student = await _context.Students.FindAsync(id);
-            if (student == null)
-            {
-                return NotFound();
-            }
+            var student = await _context.Students.Include(s => s.User).FirstOrDefaultAsync(s => s.Id == id);
+            if (student == null) return NotFound();
 
             var enrollments = await _context.Enrollments
                 .Include(e => e.Course)
@@ -275,6 +219,7 @@ namespace EduPlatform.Web.Areas.Admin.Controllers
                 .ToListAsync();
 
             ViewBag.StudentName = student.User?.FullName ?? "طالب";
+            ViewBag.StudentId = id;
             return View(enrollments);
         }
     }

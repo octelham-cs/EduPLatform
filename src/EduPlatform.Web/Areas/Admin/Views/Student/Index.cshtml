@@ -1,135 +1,191 @@
 ﻿@model List<EduPlatform.Web.ViewModels.Admin.StudentListViewModel>
-
 @{
     ViewData["Title"] = "إدارة الطلاب";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid fade-in">
-    <!-- Header -->
+<div class="container-fluid py-4 fade-in">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
-            <i class="fas fa-user-graduate text-primary me-2"></i>
-            إدارة الطلاب
-        </h2>
-        <div>
-            <a href="#" onclick="window.print()" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-print me-1"></i> طباعة
-            </a>
-            <a href="#" class="btn btn-success" id="exportExcel">
-                <i class="fas fa-file-excel me-1"></i> تصدير Excel
-            </a>
-        </div>
+        <h4 class="mb-0"><i class="fas fa-user-graduate text-primary me-2"></i>إدارة الطلاب</h4>
     </div>
 
-    <!-- Search Card -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-8">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0"
-                               name="searchTerm" value="@ViewBag.SearchTerm"
-                               placeholder="بحث بالاسم أو البريد الإلكتروني أو رقم الهاتف...">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-users text-primary fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">إجمالي الطلاب</h6>
+                            <h3 class="mb-0 fw-bold">@Model.Count</h3>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i> بحث
-                    </button>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-user-check text-success fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">طلاب نشطون</h6>
+                            <h3 class="mb-0 fw-bold text-success">@Model.Count(s => s.IsActive)</h3>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-danger">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-user-slash text-danger fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">طلاب موقوفون</h6>
+                            <h3 class="mb-0 fw-bold text-danger">@Model.Count(s => !s.IsActive)</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-book-open text-info fa-2x"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">إجمالي الاشتراكات</h6>
+                            <h3 class="mb-0 fw-bold">@Model.Sum(s => s.EnrollmentsCount)</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Students Table -->
-    <div class="card">
-        <div class="card-body">
+    <div class="card shadow border-0">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-list text-primary me-2"></i>قائمة الطلاب</h5>
+                </div>
+                <div class="col-md-8">
+                    <form method="get" class="d-flex gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0"
+                                   name="searchTerm" value="@ViewBag.SearchTerm"
+                                   placeholder="بحث بالاسم أو البريد أو الهاتف...">
+                        </div>
+                        <button type="submit" class="btn btn-primary px-3">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
             @if (!Model.Any())
             {
                 <div class="text-center py-5">
-                    <div class="rounded-circle bg-light d-inline-flex p-4 mb-3">
-                        <i class="fas fa-user-graduate fa-3x text-muted"></i>
-                    </div>
-                    <h5 class="text-muted">لا يوجد طلاب حتى الآن</h5>
+                    <i class="fas fa-user-graduate fa-4x text-muted opacity-25 mb-3"></i>
+                    <h5 class="text-muted">لا يوجد طلاب</h5>
                 </div>
             }
             else
             {
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th>#</th>
+                                <th class="px-4">#</th>
                                 <th>الطالب</th>
-                                <th>معلومات الاتصال</th>
+                                <th>رقم الهاتف</th>
                                 <th>المستوى / الشعبة</th>
                                 <th>تاريخ التسجيل</th>
                                 <th>الحالة</th>
                                 <th>الاشتراكات</th>
-                                <th>الإجراءات</th>
+                                <th class="text-center">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
                             @for (int i = 0; i < Model.Count; i++)
                             {
-                                var student = Model[i];
+                                var s = Model[i];
                                 <tr>
-                                    <td>@((ViewBag.CurrentPage - 1) * 10 + i + 1)</td>
+                                    <td class="px-4 text-muted">@((ViewBag.CurrentPage - 1) * 10 + i + 1)</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
                                                 <i class="fas fa-user-graduate text-primary"></i>
                                             </div>
                                             <div>
-                                                <h6 class="mb-0">@student.FullName</h6>
-                                                <small class="text-muted">@student.Email</small>
+                                                <h6 class="mb-0 fw-semibold">@s.FullName</h6>
+                                                <small class="text-muted">@s.Email</small>
                                             </div>
                                         </div>
                                     </td>
+                                    <td><small class="text-muted">@(s.PhoneNumber ?? "-")</small></td>
                                     <td>
-                                        <div><i class="fas fa-phone-alt me-1 text-muted"></i> @student.PhoneNumber</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">@student.GradeLevel</span>
-                                        @if (!string.IsNullOrEmpty(student.Branch))
+                                        @if (s.GradeLevel != "-")
                                         {
-                                            <span class="badge bg-secondary">@student.Branch</span>
+                                            <span class="badge bg-info">@s.GradeLevel</span>
+                                        }
+                                        @if (s.Branch != "-")
+                                        {
+                                            <span class="badge bg-secondary">@s.Branch</span>
                                         }
                                     </td>
-                                    <td>@student.RegisteredAt.ToString("yyyy/MM/dd")</td>
+                                    <td><small class="text-muted">@s.RegisteredAt.ToString("dd/MM/yyyy")</small></td>
                                     <td>
-                                        @if (student.IsActive)
+                                        @if (s.IsActive)
                                         {
-                                            <span class="badge bg-success">نشط</span>
+                                            <span class="badge bg-success px-3 py-2"><i class="fas fa-check me-1"></i>نشط</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger">موقوف</span>
+
+                                            <span class="badge bg-danger px-3 py-2"><i class="fas fa-ban me-1"></i>موقوف</span>
                                         }
                                     </td>
                                     <td>
-                                        <span class="badge bg-primary">@student.EnrollmentsCount</span>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">@s.EnrollmentsCount</span>
                                     </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a asp-action="Details" asp-route-id="@student.Id"
-                                               class="btn btn-sm btn-outline-info" title="تفاصيل">
+                                    <td class="text-center px-4">
+                                        <div class="btn-group">
+                                            <a href="/Admin/Student/Details/@s.Id" class="btn btn-sm btn-outline-info" title="تفاصيل">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a asp-action="Edit" asp-route-id="@student.Id"
-                                               class="btn btn-sm btn-outline-warning" title="تعديل">
+                                            <a href="/Admin/Student/Edit/@s.Id" class="btn btn-sm btn-outline-warning" title="تعديل">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a asp-action="Enrollments" asp-route-id="@student.Id"
-                                               class="btn btn-sm btn-outline-success" title="الاشتراكات">
+                                            <a href="/Admin/Student/Enrollments/@s.Id" class="btn btn-sm btn-outline-success" title="الاشتراكات">
                                                 <i class="fas fa-book"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm @(student.IsActive ? "btn-outline-danger" : "btn-outline-success")"
-                                                    onclick="toggleStatus(@student.Id)" title="@(student.IsActive ? "تعطيل" : "تفعيل")">
-                                                <i class="fas @(student.IsActive ? "fa-ban" : "fa-check")"></i>
+                                            <button type="button"
+                                                    class="btn btn-sm @(s.IsActive ? "btn-outline-danger" : "btn-outline-success")"
+                                                    onclick="toggleStatus(@s.Id, '@s.FullName', @s.IsActive.ToString().ToLower())">
+                                                <i class="fas @(s.IsActive ? "fa-ban" : "fa-check")"></i>
                                             </button>
                                         </div>
                                     </td>
@@ -138,20 +194,20 @@
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Pagination -->
                 @if (ViewBag.TotalPages > 1)
                 {
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                                    <a class="page-link" href="?page=@i&searchTerm=@ViewBag.SearchTerm">@i</a>
-                                </li>
-                            }
-                        </ul>
-                    </nav>
+                    <div class="p-3 border-top">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                @for (int p = 1; p <= ViewBag.TotalPages; p++)
+                                {
+                                    <li class="page-item @(p == ViewBag.CurrentPage ? "active" : "")">
+                                        <a class="page-link" href="?page=@p&searchTerm=@ViewBag.SearchTerm">@p</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
                 }
             }
         </div>
@@ -159,43 +215,28 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function toggleStatus(id) {
+        function toggleStatus(id, name, isActive) {
             Swal.fire({
-                title: 'تأكيد',
-                text: 'هل أنت متأكد من تغيير حالة الطالب؟',
+                title: isActive ? 'تعطيل الحساب' : 'تفعيل الحساب',
+                html: `هل تريد <strong>${isActive ? 'تعطيل' : 'تفعيل'}</strong> حساب: <b>${name}</b>؟`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'نعم',
+                confirmButtonColor: isActive ? '#dc3545' : '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: isActive ? 'نعم، تعطيل' : 'نعم، تفعيل',
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.post('/Admin/Student/ToggleStatus/' + id)
-                        .done(function(response) {
-                            if (response.success) {
-                                Swal.fire('تم', response.message, 'success')
+                        .done(function (r) {
+                            if (r.success) {
+                                Swal.fire({ title: 'تم', text: r.message, icon: 'success', timer: 1500, showConfirmButton: false })
                                     .then(() => location.reload());
-                            } else {
-                                Swal.fire('خطأ', 'حدث خطأ', 'error');
                             }
-                        })
-                        .fail(function() {
-                            Swal.fire('خطأ', 'حدث خطأ في الاتصال', 'error');
                         });
                 }
             });
-        }
-
-        @if (TempData["Success"] != null)
-        {
-                <text>
-                $(document).ready(function() {
-                    Swal.fire('تم', '@TempData["Success"]', 'success');
-                });
-                </text>
         }
     </script>
 }
