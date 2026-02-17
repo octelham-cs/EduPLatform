@@ -1,0 +1,346 @@
+﻿@using EduPlatform.Core.Enums
+@model List<EduPlatform.Core.Entities.Enrollment>
+
+@{
+    ViewData["Title"] = "اشتراكاتي";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var activeEnrollments = Model.Where(e => e.Status == EnrollmentStatus.Active).ToList();
+    var expiredEnrollments = Model.Where(e => e.Status == EnrollmentStatus.Expired).ToList();
+}
+
+<!-- Activate Code Modal -->
+<div class="modal fade" id="activateCodeModal" tabindex="-1" aria-labelledby="activateCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activateCodeModalLabel">
+                    <i class="fas fa-key ms-2 text-primary"></i>
+                    تفعيل كود اشتراك
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="activationCode" class="form-label fw-bold">أدخل الكود</label>
+                    <input type="text" class="form-control" id="activationCode" placeholder="مثال: EDU-AR1-3A9F">
+                    <div class="invalid-feedback" id="codeError"></div>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle ms-2"></i>
+                    الكود مكون من 8-20 حرف وأرقام
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" id="activateCodeBtn">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" id="activateSpinner"></span>
+                    تفعيل
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-3">
+                    <i class="fas fa-check-circle fa-3x text-success"></i>
+                </div>
+                <h4 class="mb-3" id="successTitle">تم التفعيل بنجاح!</h4>
+                <p class="mb-2" id="successMessage"></p>
+                <p class="text-muted small" id="successExpiry"></p>
+                <div class="mt-4">
+                    <button type="button" class="btn btn-primary" id="goToCourseBtn">اذهب للكورس</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid fade-in">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-book-open text-primary ms-2"></i>
+            اشتراكاتي
+        </h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#activateCodeModal">
+            <i class="fas fa-key ms-2"></i>
+            تفعيل كود جديد
+        </button>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="enrollmentTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active" type="button" role="tab">
+                <i class="fas fa-check-circle ms-2 text-success"></i>
+                نشط (@activeEnrollments.Count)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="expired-tab" data-bs-toggle="tab" data-bs-target="#expired" type="button" role="tab">
+                <i class="fas fa-clock ms-2 text-secondary"></i>
+                منتهي (@expiredEnrollments.Count)
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Active Enrollments -->
+        <div class="tab-pane fade show active" id="active" role="tabpanel">
+            @if (!activeEnrollments.Any())
+            {
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-check-circle fa-4x text-muted opacity-50"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">لا يوجد اشتراكات نشطة</h5>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#activateCodeModal">
+                        <i class="fas fa-key ms-2"></i>
+                        فعّل كود للبدء
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var enrollment in activeEnrollments)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0 course-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <span class="badge bg-success mb-2">
+                                                <i class="fas fa-check-circle ms-1"></i> نشط
+                                            </span>
+                                        </div>
+                                        <i class="fas fa-book-open fa-3x text-primary opacity-25"></i>
+                                    </div>
+
+                                    <h5 class="card-title fw-bold mb-3">@enrollment.Course?.Title</h5>
+
+                                    <p class="card-text small text-muted mb-3">
+                                        <i class="fas fa-chalkboard-teacher ms-1"></i>
+                                        @(enrollment.Course?.Instructor?.User?.FullName ?? "غير محدد")
+                                    </p>
+
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between small mb-1">
+                                            <span class="text-muted">
+                                                <i class="fas fa-calendar-alt ms-1"></i> تاريخ البدء:
+                                            </span>
+                                            <span class="fw-semibold">@enrollment.EnrolledAt.ToString("yyyy/MM/dd")</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span class="text-muted">
+                                                <i class="fas fa-hourglass-end ms-1"></i> تاريخ الانتهاء:
+                                            </span>
+                                            <span class="fw-semibold">@enrollment.ExpiresAt.ToString("yyyy/MM/dd")</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- زر متابعة المشاهدة - بالطريقة الجديدة -->
+                                    <a href="@Url.Action("CourseDetails", "Student", new { area = "Student", id = enrollment.CourseId })"
+                                       class="btn btn-primary w-100">
+                                        <i class="fas fa-play-circle ms-2"></i> متابعة المشاهدة
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Expired Enrollments -->
+        <div class="tab-pane fade" id="expired" role="tabpanel">
+            @if (!expiredEnrollments.Any())
+            {
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-clock fa-4x text-muted opacity-50"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">لا يوجد اشتراكات منتهية</h5>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var enrollment in expiredEnrollments)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0 bg-light expired-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <span class="badge bg-secondary mb-2">
+                                                <i class="fas fa-clock ms-1"></i> منتهي
+                                            </span>
+                                        </div>
+                                        <i class="fas fa-book-open fa-3x text-muted opacity-25"></i>
+                                    </div>
+
+                                    <h5 class="card-title text-muted mb-3">@enrollment.Course?.Title</h5>
+
+                                    <p class="card-text small text-muted mb-3">
+                                        <i class="fas fa-chalkboard-teacher ms-1"></i>
+                                        @(enrollment.Course?.Instructor?.User?.FullName ?? "غير محدد")
+                                    </p>
+
+                                    <p class="small text-muted mb-3">
+                                        <i class="fas fa-calendar-alt ms-1"></i>
+                                        انتهى في: @enrollment.ExpiresAt.ToString("yyyy/MM/dd")
+                                    </p>
+
+                                    <!-- زر تجديد الاشتراك -->
+                                    <button type="button" class="btn btn-outline-primary w-100"
+                                            onclick="showRenewModal(@enrollment.CourseId, '@enrollment.Course?.Title')">
+                                        <i class="fas fa-redo-alt ms-2"></i> تجديد الاشتراك
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // تفعيل التبويبات
+            var triggerTabList = [].slice.call(document.querySelectorAll('#enrollmentTabs button'));
+            triggerTabList.forEach(function (triggerEl) {
+                var tabTrigger = new bootstrap.Tab(triggerEl);
+                triggerEl.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    tabTrigger.show();
+                });
+            });
+
+            // Activate Code Button Click
+            $('#activateCodeBtn').click(function() {
+                var code = $('#activationCode').val().trim();
+
+                if (!code) {
+                    $('#activationCode').addClass('is-invalid');
+                    $('#codeError').text('الكود مطلوب');
+                    return;
+                }
+
+                // Show spinner
+                $('#activateSpinner').removeClass('d-none');
+                $(this).prop('disabled', true);
+
+                // Send request
+                $.ajax({
+                    url: '/Student/Student/ActivateCode',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ code: code }),
+                    success: function(response) {
+                        $('#activateSpinner').addClass('d-none');
+                        $('#activateCodeBtn').prop('disabled', false);
+
+                        if (response.success) {
+                            // Hide activation modal
+                            $('#activateCodeModal').modal('hide');
+
+                            // Show success modal
+                            $('#successMessage').text(response.message);
+                            $('#successExpiry').text(`الاشتراك ساري حتى ${new Date(response.expiresAt).toLocaleDateString('ar-EG')}`);
+                            $('#goToCourseBtn').data('course-id', response.courseId);
+
+                            var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                            successModal.show();
+
+                            // Clear input
+                            $('#activationCode').val('').removeClass('is-invalid');
+                        } else {
+                            // Show error
+                            $('#activationCode').addClass('is-invalid');
+                            $('#codeError').text(response.message);
+                        }
+                    },
+                    error: function() {
+                        $('#activateSpinner').addClass('d-none');
+                        $('#activateCodeBtn').prop('disabled', false);
+                        $('#activationCode').addClass('is-invalid');
+                        $('#codeError').text('حدث خطأ في الاتصال');
+                    }
+                });
+            });
+
+            // Go to course button
+            $('#goToCourseBtn').click(function() {
+                var courseId = $(this).data('course-id');
+                window.location.href = '/Student/Student/CourseDetails/' + courseId;
+            });
+
+            // Clear error on input
+            $('#activationCode').on('input', function() {
+                $(this).removeClass('is-invalid');
+            });
+        });
+
+        function showRenewModal(courseId, courseTitle) {
+            // Show confirmation before renew
+            Swal.fire({
+                title: 'تجديد الاشتراك',
+                html: `هل تريد تجديد اشتراك الكورس <strong>${courseTitle}</strong>؟`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'نعم',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Open activation modal
+                    $('#activateCodeModal').modal('show');
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    .course-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+        }
+
+    .expired-card {
+        opacity: 0.8;
+        filter: grayscale(0.3);
+    }
+
+    .nav-tabs .nav-link {
+        font-weight: 600;
+        color: #6c757d;
+        border: none;
+        padding: 12px 24px;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: #0d6efd;
+            background: none;
+            border-bottom: 3px solid #0d6efd;
+        }
+</style>

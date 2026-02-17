@@ -1,0 +1,310 @@
+﻿@model EduPlatform.Web.ViewModels.Student.StudentDashboardViewModel
+
+@{
+    ViewData["Title"] = "لوحة تحكم الطالب";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Modal for Code Activation -->
+<div class="modal fade" id="activateCodeModal" tabindex="-1" aria-labelledby="activateCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activateCodeModalLabel">
+                    <i class="fas fa-key ms-2 text-primary"></i>
+                    تفعيل كود اشتراك
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="activationCode" class="form-label fw-bold">أدخل الكود</label>
+                    <input type="text" class="form-control" id="activationCode" placeholder="مثال: EDU-AR1-3A9F">
+                    <div class="invalid-feedback" id="codeError"></div>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle ms-2"></i>
+                    الكود مكون من 8-20 حرف وأرقام
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-primary" id="activateCodeBtn">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" id="activateSpinner"></span>
+                    تفعيل
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-3">
+                    <i class="fas fa-check-circle fa-3x text-success"></i>
+                </div>
+                <h4 class="mb-3" id="successTitle">تم التفعيل بنجاح!</h4>
+                <p class="mb-2" id="successMessage"></p>
+                <p class="text-muted small" id="successExpiry"></p>
+                <div class="mt-4">
+                    <button type="button" class="btn btn-primary" id="goToCourseBtn">اذهب للكورس</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid fade-in">
+    <!-- Header with Activate Button -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-tachometer-alt text-primary ms-2"></i>
+            لوحة التحكم
+        </h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#activateCodeModal">
+            <i class="fas fa-key ms-2"></i>
+            تفعيل كود جديد
+        </button>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-2">إجمالي الاشتراكات</h6>
+                            <h3 class="mb-0 fw-bold">@Model.TotalEnrollments</h3>
+                        </div>
+                        <i class="fas fa-book-open fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-2">اشتراكات نشطة</h6>
+                            <h3 class="mb-0 fw-bold">@Model.ActiveEnrollments</h3>
+                        </div>
+                        <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-2">كورسات مكتملة</h6>
+                            <h3 class="mb-0 fw-bold">@Model.CompletedCourses</h3>
+                        </div>
+                        <i class="fas fa-graduation-cap fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Courses Section -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-play-circle ms-2 text-primary"></i>
+                كورساتي
+            </h5>
+            <a href="@Url.Action("MyEnrollments", "Student", new { area = "Student" })" class="btn btn-sm btn-outline-primary">
+                عرض الكل
+                <i class="fas fa-arrow-left ms-1"></i>
+            </a>
+        </div>
+        <div class="card-body">
+            @if (!Model.EnrolledCourses.Any())
+            {
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-book-open fa-4x text-muted opacity-50"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">لا يوجد كورسات مشترك فيها</h5>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#activateCodeModal">
+                        <i class="fas fa-key ms-2"></i>
+                        فعّل كود للبدء
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var course in Model.EnrolledCourses)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 course-card shadow-sm border-0">
+                                <div class="position-relative">
+                                    <img src="@course.ThumbnailUrl" class="card-img-top" alt="@course.CourseTitle" style="height: 160px; object-fit: cover; border-radius: 10px 10px 0 0;">
+                                    @if (course.IsExpiringSoon)
+                                    {
+                                        <span class="position-absolute top-0 end-0 badge bg-warning m-2">
+                                            <i class="fas fa-clock ms-1"></i> ينتهي قريباً
+                                        </span>
+                                    }
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">@course.CourseTitle</h5>
+                                    <p class="card-text small text-muted mb-3">
+                                        <i class="fas fa-chalkboard-teacher ms-1"></i> @course.InstructorName
+                                    </p>
+
+                                    <!-- Progress Bar -->
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between small mb-1">
+                                            <span>التقدم</span>
+                                            <span class="fw-bold text-success">@course.ProgressPercentage%</span>
+                                        </div>
+                                        <div class="progress" style="height: 8px; background-color: #e9ecef;">
+                                            <div class="progress-bar bg-success rounded-pill"
+                                                 style="width: @course.ProgressPercentage%;"
+                                                 role="progressbar"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between small text-muted mb-3">
+                                        <span><i class="fas fa-video ms-1"></i> @course.WatchedVideos/@course.TotalVideos فيديو</span>
+                                        <span><i class="fas fa-calendar-alt ms-1"></i> @course.ExpiresAt.ToString("yyyy/MM/dd")</span>
+                                    </div>
+
+                                    <!-- زر متابعة المشاهدة - بالطريقة الجديدة -->
+                                    <a href="@Url.Action("CourseDetails", "Student", new { area = "Student", id = course.CourseId })"
+                                       class="btn btn-primary w-100">
+                                        <i class="fas fa-play-circle ms-2"></i> متابعة المشاهدة
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Activate Code Button Click
+            $('#activateCodeBtn').click(function() {
+                var code = $('#activationCode').val().trim();
+
+                if (!code) {
+                    $('#activationCode').addClass('is-invalid');
+                    $('#codeError').text('الكود مطلوب');
+                    return;
+                }
+
+                // Show spinner
+                $('#activateSpinner').removeClass('d-none');
+                $(this).prop('disabled', true);
+
+                // Send request
+                $.ajax({
+                    url: '/Student/Student/ActivateCode',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ code: code }),
+                    success: function(response) {
+                        $('#activateSpinner').addClass('d-none');
+                        $('#activateCodeBtn').prop('disabled', false);
+
+                        if (response.success) {
+                            // Hide activation modal
+                            $('#activateCodeModal').modal('hide');
+
+                            // Show success modal
+                            $('#successMessage').text(response.message);
+                            $('#successExpiry').text(`الاشتراك ساري حتى ${new Date(response.expiresAt).toLocaleDateString('ar-EG')}`);
+                            $('#goToCourseBtn').data('course-id', response.courseId);
+
+                            var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                            successModal.show();
+
+                            // Clear input
+                            $('#activationCode').val('').removeClass('is-invalid');
+                        } else {
+                            // Show error
+                            $('#activationCode').addClass('is-invalid');
+                            $('#codeError').text(response.message);
+                        }
+                    },
+                    error: function() {
+                        $('#activateSpinner').addClass('d-none');
+                        $('#activateCodeBtn').prop('disabled', false);
+                        $('#activationCode').addClass('is-invalid');
+                        $('#codeError').text('حدث خطأ في الاتصال');
+                    }
+                });
+            });
+
+            // Go to course button
+            $('#goToCourseBtn').click(function() {
+                var courseId = $(this).data('course-id');
+                window.location.href = '/Student/Student/CourseDetails/' + courseId;
+            });
+
+            // Clear error on input
+            $('#activationCode').on('input', function() {
+                $(this).removeClass('is-invalid');
+            });
+
+            // Show success message from TempData
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+        });
+    </script>
+}
+
+<style>
+    .course-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+        }
+
+    .progress {
+        border-radius: 10px;
+    }
+
+    .bg-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+
+    .bg-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+
+    .bg-info {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    }
+</style>

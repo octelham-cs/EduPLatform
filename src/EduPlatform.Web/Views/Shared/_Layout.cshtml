@@ -49,9 +49,9 @@
     </nav>
 
     <div class="d-flex">
-        @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Instructor") || User.IsInRole("Admin")))
+        @if (User.Identity?.IsAuthenticated == true)
         {
-            <!-- Sidebar -->
+            <!-- Sidebar - تظهر لكل المستخدمين المسجلين -->
             <aside class="sidebar d-none d-lg-block">
                 <div class="sidebar-header">
                     <h6><i class="fas fa-th-large me-2"></i>القائمة الرئيسية</h6>
@@ -142,8 +142,6 @@
                                 <span>المواد</span>
                             </a>
                         </li>
-
-
                         <li class="nav-item">
                             <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "GradeLevel") ? "active" : "")"
                                asp-area="Admin" asp-controller="GradeLevel" asp-action="Index">
@@ -151,8 +149,6 @@
                                 <span>المستويات</span>
                             </a>
                         </li>
-
-
                         <li class="nav-item">
                             <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "Branch") ? "active" : "")"
                                asp-area="Admin" asp-controller="Branch" asp-action="Index">
@@ -160,8 +156,25 @@
                                 <span>الشعب</span>
                             </a>
                         </li>
-
-
+                    </ul>
+                }
+                else if (User.IsInRole("Student"))
+                {
+                    <ul class="nav flex-column px-0 py-2">
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard") ? "active" : "")"
+                               href="@Url.Action("Dashboard", "Student", new { area = "Student" })">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>لوحة التحكم</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewContext.RouteData.Values["action"]?.ToString() == "MyEnrollments") ? "active" : "")"
+                               href="@Url.Action("MyEnrollments", "Student", new { area = "Student" })">
+                                <i class="fas fa-book-open"></i>
+                                <span>كورساتي</span>
+                            </a>
+                        </li>
                     </ul>
                 }
             </aside>
@@ -176,7 +189,6 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
                 </div>
                 <div class="offcanvas-body p-0 bg-dark">
-                    <!-- نفس محتوى الـ sidebar للموبايل -->
                     @if (User.IsInRole("Instructor"))
                     {
                         <ul class="nav flex-column px-3 py-2">
@@ -261,6 +273,39 @@
                                     <span>المواد</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "GradeLevel") ? "active" : "")"
+                                   asp-area="Admin" asp-controller="GradeLevel" asp-action="Index">
+                                    <i class="fas fa-layer-group"></i>
+                                    <span>المستويات</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "Branch") ? "active" : "")"
+                                   asp-area="Admin" asp-controller="Branch" asp-action="Index">
+                                    <i class="fas fa-code-branch"></i>
+                                    <span>الشعب</span>
+                                </a>
+                            </li>
+                        </ul>
+                    }
+                    else if (User.IsInRole("Student"))
+                    {
+                        <ul class="nav flex-column px-3 py-2">
+                            <li class="nav-item">
+                                <a class="nav-link @((ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard") ? "active" : "")"
+                                   href="@Url.Action("Dashboard", "Student", new { area = "Student" })">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>لوحة التحكم</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @((ViewContext.RouteData.Values["action"]?.ToString() == "MyEnrollments") ? "active" : "")"
+                                   href="@Url.Action("MyEnrollments", "Student", new { area = "Student" })">
+                                    <i class="fas fa-book-open"></i>
+                                    <span>كورساتي</span>
+                                </a>
+                            </li>
                         </ul>
                     }
                 </div>
@@ -273,12 +318,23 @@
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="text-center py-3 text-muted small" style="margin-right: var(--sidebar-width);">
-        <div class="container">
-            &copy; @DateTime.Now.Year EduPlatform - جميع الحقوق محفوظة
-        </div>
-    </footer>
+    <!-- Footer - يظهر فقط إذا كان المستخدم مسجل دخوله -->
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <footer class="text-center py-3 text-muted small" style="margin-right: var(--sidebar-width);">
+            <div class="container">
+                &copy; @DateTime.Now.Year EduPlatform - جميع الحقوق محفوظة
+            </div>
+        </footer>
+    }
+    else
+    {
+        <footer class="text-center py-3 text-muted small">
+            <div class="container">
+                &copy; @DateTime.Now.Year EduPlatform - جميع الحقوق محفوظة
+            </div>
+        </footer>
+    }
 
     <!-- Toast Container -->
     <div class="toast-container"></div>
