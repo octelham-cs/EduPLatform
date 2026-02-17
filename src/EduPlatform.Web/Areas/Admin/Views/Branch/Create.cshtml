@@ -1,38 +1,40 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@model EduPlatform.Web.ViewModels.Admin.BranchCreateViewModel
+﻿@model EduPlatform.Web.ViewModels.Admin.BranchCreateViewModel
 
 @{
     ViewData["Title"] = "إضافة شعبة جديدة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid fade-in">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card">
-                <div class="card-header">
+        <div class="col-md-8">
+            <!-- بطاقة إضافة شعبة جديدة -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
                     <h5 class="mb-0">
-                        <i class="fas fa-plus-circle me-2 text-primary"></i>
+                        <i class="fas fa-plus-circle text-primary ms-2"></i>
                         إضافة شعبة جديدة
                     </h5>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <!-- الاسم بالعربية -->
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label fw-bold"></label>
                             <input asp-for="Name" class="form-control" placeholder="مثال: علمي علوم" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
 
+                        <!-- الاسم بالإنجليزية -->
                         <div class="mb-3">
                             <label asp-for="NameEn" class="form-label fw-bold"></label>
                             <input asp-for="NameEn" class="form-control" placeholder="Example: Scientific" />
-                            <span asp-validation-for="NameEn" class="text-danger"></span>
+                            <span asp-validation-for="NameEn" class="text-danger small"></span>
                         </div>
 
+                        <!-- الحالة -->
                         <div class="mb-4">
                             <div class="form-check">
                                 <input asp-for="IsActive" class="form-check-input" checked />
@@ -43,15 +45,43 @@
                         </div>
 
                         <hr />
+
+                        <!-- أزرار التحكم - بالطريقة المطلوبة -->
                         <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-right me-1"></i> رجوع
+                            <!-- زر الرجوع - باستخدام Url.Action -->
+                            <a href="@Url.Action("Index", "Branch", new { area = "Admin" })" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right ms-2"></i>
+                                رجوع
                             </a>
+
+                            <!-- زر الحفظ -->
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> حفظ
+                                <i class="fas fa-save ms-2"></i>
+                                حفظ
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- بطاقة مساعدة (اختياري) -->
+            <div class="card shadow-sm mt-3 bg-light">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="fw-bold mb-1">ملاحظات:</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                الاسم بالعربية مطلوب، والإنجليزي اختياري.
+                                <br>
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                الشعب تساعد في تنظيم المواد والطلاب حسب التخصص.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,4 +90,36 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            // إظهار رسالة نجاح لو في TempData
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+
+            // إظهار رسالة خطأ لو في TempData
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: '@TempData["Error"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+        });
+    </script>
 }
