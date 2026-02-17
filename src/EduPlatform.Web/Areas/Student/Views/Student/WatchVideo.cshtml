@@ -1,0 +1,228 @@
+﻿@model EduPlatform.Web.ViewModels.Student.VideoPlayerViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container-fluid fade-in">
+    <div class="row">
+        <!-- Video Player Section -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="ratio ratio-16x9">
+                        <iframe src="@Model.YouTubeEmbedUrl"
+                                title="@Model.Title"
+                                allowfullscreen
+                                id="youtubePlayer"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Info -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h4>@Model.Title</h4>
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-layer-group me-1"></i> @Model.CourseTitle
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-folder me-1"></i> @Model.ChapterTitle
+                            </p>
+                        </div>
+
+                        <div>
+                            @if (Model.PreviousVideoId.HasValue)
+                            {
+                                <a asp-action="WatchVideo" asp-route-id="@Model.PreviousVideoId"
+                                   class="btn btn-outline-primary btn-sm me-1">
+                                    <i class="fas fa-step-backward"></i>
+                                </a>
+                            }
+                            @if (Model.NextVideoId.HasValue)
+                            {
+                                <a asp-action="WatchVideo" asp-route-id="@Model.NextVideoId"
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-step-forward"></i>
+                                </a>
+                            }
+                        </div>
+                    </div>
+
+                    <p class="mb-0">@Model.Description</p>
+                </div>
+            </div>
+
+            <!-- Attached Files -->
+            @if (Model.AttachedFiles.Any())
+            {
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-paperclip me-2"></i>
+                            الملفات المرفقة
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            @foreach (var file in Model.AttachedFiles)
+                            {
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center p-3 border rounded">
+                                        @if (file.FileType == "PDF")
+                                        {
+                                            <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
+                                        }
+                                        else if (file.FileType == "Word")
+                                        {
+                                            <i class="fas fa-file-word fa-2x text-primary me-3"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-file fa-2x text-secondary me-3"></i>
+                                        }
+
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">@file.FileName</h6>
+                                            <small class="text-muted">@file.FormattedFileSize</small>
+                                        </div>
+
+                                        <a asp-action="DownloadFile" asp-route-id="@file.FileId"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Quiz Section -->
+            @if (Model.HasQuiz)
+            {
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="fas fa-question-circle text-primary me-2"></i>
+                                    اختبار تقدم
+                                </h6>
+                                <p class="text-muted small mb-0">
+                                    اختبر فهمك للفيديو قبل الانتقال للفيديو التالي
+                                </p>
+                            </div>
+
+                            @if (Model.QuizPassed)
+                            {
+                                <span class="badge bg-success p-2">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    تم الاجتياز
+                                </span>
+                            }
+                            else
+                            {
+                                <a asp-action="TakeQuiz" asp-route-id="@Model.QuizId"
+                                   class="btn btn-primary">
+                                    <i class="fas fa-play-circle me-1"></i>
+                                    ابدأ الاختبار
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Next Videos Sidebar -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        الفيديوهات التالية
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+                        @* هنا هنجيب الفيديوهات التالية من نفس الكورس *@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var player;
+        var videoId = @Model.VideoId;
+        var lastPosition = @Model.LastPosition;
+
+        // YouTube API
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtubePlayer', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // استكمال من آخر مرة
+            if (lastPosition > 0) {
+                player.seekTo(lastPosition);
+            }
+
+            // بدأ تشغيل الفيديو
+            player.playVideo();
+
+            // تحديث التقدم كل 5 ثواني
+            setInterval(updateProgress, 5000);
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.ENDED) {
+                // الفيديو خلص
+                markAsCompleted();
+            }
+        }
+
+        function updateProgress() {
+            if (player && player.getCurrentTime) {
+                var currentTime = Math.floor(player.getCurrentTime());
+                var duration = player.getDuration();
+                var isCompleted = currentTime >= duration - 10; // 10 ثواني قبل النهاية
+
+                $.post('/Student/Student/UpdateVideoProgress', {
+                    videoId: videoId,
+                    position: currentTime,
+                    isCompleted: isCompleted
+                });
+            }
+        }
+
+        function markAsCompleted() {
+            $.post('/Student/Student/UpdateVideoProgress', {
+                videoId: videoId,
+                position: player.getDuration(),
+                isCompleted: true
+            }).done(function() {
+                // تحديث الصفحة بعد شوية
+                setTimeout(function() {
+                    location.reload();
+                }, 2000);
+            });
+        }
+    </script>
+}
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
