@@ -1,0 +1,159 @@
+﻿@model EduPlatform.Web.ViewModels.Admin.GradeLevelDetailsViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل المستوى";
+}
+
+<div class="container-fluid fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="fas fa-layer-group text-primary me-2"></i>
+            تفاصيل المستوى: @Model.Name
+        </h2>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                <i class="fas fa-edit me-1"></i> تعديل
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-right me-1"></i> العودة
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-4 d-inline-block">
+                            <i class="fas fa-layer-group fa-4x text-primary"></i>
+                        </div>
+                    </div>
+
+                    <table class="table table-borderless">
+                        <tr>
+                            <th class="ps-0">الاسم بالعربية:</th>
+                            <td class="pe-0 text-end">@Model.Name</td>
+                        </tr>
+                        @if (!string.IsNullOrEmpty(Model.NameEn))
+                        {
+                            <tr>
+                                <th class="ps-0">الاسم بالإنجليزية:</th>
+                                <td class="pe-0 text-end">@Model.NameEn</td>
+                            </tr>
+                        }
+                        <tr>
+                            <th class="ps-0">الترتيب:</th>
+                            <td class="pe-0 text-end">@Model.Order</td>
+                        </tr>
+                        <tr>
+                            <th class="ps-0">الحالة:</th>
+                            <td class="pe-0 text-end">
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">نشط</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">غير نشط</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <ul class="nav nav-tabs mb-4" id="gradeLevelTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="subjects-tab" data-bs-toggle="tab" data-bs-target="#subjects" type="button">
+                        <i class="fas fa-book-open me-2"></i>
+                        المواد (@Model.Subjects.Count)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        الطلاب (@Model.Students.Count)
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="subjects">
+                    <div class="card">
+                        <div class="card-body">
+                            @if (!Model.Subjects.Any())
+                            {
+                                <p class="text-muted text-center">لا يوجد مواد في هذا المستوى</p>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>المادة</th>
+                                                <th>الشعبة</th>
+                                                <th>عدد المدرسين</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var subject in Model.Subjects)
+                                            {
+                                                <tr>
+                                                    <td>@subject.SubjectName</td>
+                                                    <td>@subject.Branch</td>
+                                                    <td>@subject.InstructorsCount</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="students">
+                    <div class="card">
+                        <div class="card-body">
+                            @if (!Model.Students.Any())
+                            {
+                                <p class="text-muted text-center">لا يوجد طلاب في هذا المستوى</p>
+                            }
+                            else
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>الطالب</th>
+                                                <th>البريد الإلكتروني</th>
+                                                <th>الشعبة</th>
+                                                <th>تاريخ التسجيل</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var student in Model.Students)
+                                            {
+                                                <tr>
+                                                    <td>@student.StudentName</td>
+                                                    <td>@student.Email</td>
+                                                    <td>@student.Branch</td>
+                                                    <td>@student.RegisteredAt.ToString("yyyy/MM/dd")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="text-muted small mt-2">* عرض آخر 20 طالب فقط</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
