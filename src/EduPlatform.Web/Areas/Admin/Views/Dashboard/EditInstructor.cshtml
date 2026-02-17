@@ -1,0 +1,139 @@
+﻿@model EduPlatform.Web.ViewModels.Admin.EditInstructorViewModel
+
+@{
+    ViewData["Title"] = "تعديل بيانات المدرس";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-in">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- بطاقة تعديل المدرس -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit text-warning ms-2"></i>
+                        تعديل بيانات المدرس: @Model.FullName
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditInstructor" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- الاسم الكامل -->
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label fw-bold"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="أدخل الاسم الكامل" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- البريد الإلكتروني -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" class="form-control" placeholder="example@domain.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- رقم الهاتف -->
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-bold"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="01xxxxxxxxx" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <!-- المادة -->
+                        <div class="mb-3">
+                            <label asp-for="SubjectId" class="form-label fw-bold"></label>
+                            <select asp-for="SubjectId" class="form-select" asp-items="@(new SelectList(Model.Subjects, "Id", "Name", Model.SubjectId))">
+                                <option value="">-- اختر المادة --</option>
+                            </select>
+                            <span asp-validation-for="SubjectId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- السيرة الذاتية -->
+                        <div class="mb-4">
+                            <label asp-for="Bio" class="form-label fw-bold"></label>
+                            <textarea asp-for="Bio" class="form-control" rows="4" placeholder="السيرة الذاتية للمدرس..."></textarea>
+                            <span asp-validation-for="Bio" class="text-danger small"></span>
+                        </div>
+
+                        <hr />
+
+                        <!-- أزرار التحكم - بالطريقة اللي طلبتها -->
+                        <div class="d-flex justify-content-between">
+                            <!-- زر الرجوع - باستخدام Url.Action -->
+                            <a href="@Url.Action("Instructors", "Dashboard", new { area = "Admin" })" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right ms-2"></i>
+                                رجوع
+                            </a>
+
+                            <!-- زر الحفظ - عادي عشان الفورم -->
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save ms-2"></i>
+                                حفظ التعديلات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- بطاقة مساعدة (اختياري) -->
+            <div class="card shadow-sm mt-3 bg-light">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="fw-bold mb-1">ملاحظات:</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                تغيير البريد الإلكتروني سيؤدي إلى تحديث اسم المستخدم أيضاً.
+                                <br>
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                جميع الحقول المطلوبة مميزة بعلامة.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            // إظهار رسالة نجاح لو في TempData
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+
+            // إظهار رسالة خطأ لو في TempData
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: '@TempData["Error"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+        });
+    </script>
+}

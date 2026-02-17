@@ -1,24 +1,26 @@
 ﻿@model List<EduPlatform.Core.Entities.Instructor>
+
 @{
     ViewData["Title"] = "إدارة المدرسين";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid py-4 fade-in">
+<div class="container-fluid fade-in">
     <div class="row">
         <div class="col-12">
-            <div class="card shadow border-0">
+            <!-- بطاقة إدارة المدرسين -->
+            <div class="card shadow-sm border-0">
                 <div class="card-header bg-white py-3">
                     <div class="row align-items-center">
                         <div class="col-md-6">
-                            <h4 class="mb-0">
-                                <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                            <h5 class="mb-0">
+                                <i class="fas fa-chalkboard-teacher text-primary ms-2"></i>
                                 إدارة المدرسين
-                            </h4>
+                            </h5>
                         </div>
-                        <div class="col-md-6 text-end">
-                            <a href="/Admin/Dashboard/AssignInstructor" class="btn btn-primary">
-                                <i class="fas fa-user-plus me-1"></i>
+                        <div class="col-md-6 text-start">
+                            <a href="@Url.Action("AssignInstructor", "Dashboard", new { area = "Admin" })" class="btn btn-primary">
+                                <i class="fas fa-user-plus ms-2"></i>
                                 تعيين مدرس جديد
                             </a>
                         </div>
@@ -26,16 +28,17 @@
                 </div>
 
                 <div class="card-body">
+                    <!-- رسالة النجاح -->
                     @if (TempData["Success"] != null)
                     {
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle me-2"></i>
+                            <i class="fas fa-check-circle ms-2"></i>
                             @TempData["Success"]
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     }
 
-                    <!-- فلترة -->
+                    <!-- فلترة وبحث -->
                     <div class="row mb-4">
                         <div class="col-md-4 mb-2">
                             <select class="form-select" id="statusFilter">
@@ -46,10 +49,17 @@
                             </select>
                         </div>
                         <div class="col-md-4 mb-2">
-                            <input type="text" class="form-control" id="searchInput" placeholder="بحث بالاسم أو الإيميل...">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control border-start-0" id="searchInput"
+                                       placeholder="بحث بالاسم أو الإيميل...">
+                            </div>
                         </div>
                     </div>
 
+                    <!-- جدول المدرسين -->
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-light">
@@ -70,7 +80,7 @@
                                         <td>@index</td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 ms-3">
                                                     <i class="fas fa-user text-primary"></i>
                                                 </div>
                                                 <div>
@@ -87,38 +97,79 @@
                                             {
                                                 case EduPlatform.Core.Enums.InstructorStatus.Pending:
                                                     <span class="badge bg-warning text-dark px-3 py-2">
-                                                        <i class="fas fa-clock me-1"></i> معلق
+                                                        <i class="fas fa-clock ms-1"></i> معلق
                                                     </span>
                                                     break;
                                                 case EduPlatform.Core.Enums.InstructorStatus.Approved:
                                                     <span class="badge bg-success px-3 py-2">
-                                                        <i class="fas fa-check me-1"></i> معتمد
+                                                        <i class="fas fa-check ms-1"></i> معتمد
                                                     </span>
                                                     break;
                                                 case EduPlatform.Core.Enums.InstructorStatus.Rejected:
                                                     <span class="badge bg-danger px-3 py-2">
-                                                        <i class="fas fa-times me-1"></i> مرفوض
+                                                        <i class="fas fa-times ms-1"></i> مرفوض
                                                     </span>
                                                     break;
                                             }
                                         </td>
                                         <td>@instructor.RegisteredAt.ToString("dd/MM/yyyy")</td>
                                         <td>
-                                            <div class="btn-group">
+                                            <div class="btn-group" role="group" style="gap: 5px;">
+                                                <!-- زر التفاصيل - يظهر للجميع -->
+                                                <a href="@Url.Action("InstructorDetails", "Dashboard", new { area = "Admin", id = instructor.Id })"
+                                                   class="btn btn-sm btn-outline-info" title="تفاصيل">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
                                                 @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Pending)
                                                 {
-                                                    <form action="/Admin/Dashboard/ApproveInstructor/@instructor.Id" method="post" class="d-inline">
+                                                    <!-- زر الموافقة -->
+                                                    <form action="@Url.Action("ApproveInstructor", "Dashboard", new { area = "Admin", id = instructor.Id })"
+                                                          method="post" class="d-inline" id="approve-form-@instructor.Id">
                                                         @Html.AntiForgeryToken()
-                                                        <button type="submit" class="btn btn-sm btn-success" title="موافقة">
+                                                        <button type="button" class="btn btn-sm btn-success"
+                                                                onclick="confirmApprove(@instructor.Id, '@(instructor.User?.FullName ?? "المدرس")')"
+                                                                title="موافقة">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
-                                                    <form action="/Admin/Dashboard/RejectInstructor/@instructor.Id" method="post" class="d-inline">
+
+                                                    <!-- زر الرفض -->
+                                                    <form action="@Url.Action("RejectInstructor", "Dashboard", new { area = "Admin", id = instructor.Id })"
+                                                          method="post" class="d-inline" id="reject-form-@instructor.Id">
                                                         @Html.AntiForgeryToken()
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="رفض">
+                                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                                onclick="confirmReject(@instructor.Id, '@(instructor.User?.FullName ?? "المدرس")')"
+                                                                title="رفض">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </form>
+                                                }
+
+                                                @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Approved)
+                                                {
+                                                    <!-- زر تعديل (اختياري) -->
+                                                    <a href="@Url.Action("EditInstructor", "Dashboard", new { area = "Admin", id = instructor.Id })"
+                                                       class="btn btn-sm btn-outline-warning" title="تعديل">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+
+                                                    <!-- زر تعطيل/تفعيل -->
+                                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                                            onclick="toggleInstructorStatus(@instructor.Id, '@(instructor.User?.FullName ?? "المدرس")')"
+                                                            title="تعطيل">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                }
+
+                                                @if (instructor.Status == EduPlatform.Core.Enums.InstructorStatus.Rejected)
+                                                {
+                                                    <!-- زر تفعيل للمرفوض -->
+                                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                                            onclick="toggleInstructorStatus(@instructor.Id, '@(instructor.User?.FullName ?? "المدرس")')"
+                                                            title="تفعيل">
+                                                        <i class="fas fa-check-circle"></i>
+                                                    </button>
                                                 }
                                             </div>
                                         </td>
@@ -128,13 +179,16 @@
                         </table>
                     </div>
 
+                    <!-- حالة عدم وجود بيانات -->
                     @if (!Model.Any())
                     {
                         <div class="text-center py-5">
-                            <i class="fas fa-users fa-4x text-muted opacity-25 mb-3"></i>
-                            <h5 class="text-muted">لا يوجد مدرسين</h5>
-                            <a href="/Admin/Dashboard/AssignInstructor" class="btn btn-primary mt-3">
-                                <i class="fas fa-user-plus me-2"></i>
+                            <div class="mb-3">
+                                <i class="fas fa-chalkboard-teacher fa-4x text-muted opacity-50"></i>
+                            </div>
+                            <h5 class="text-muted mb-3">لا يوجد مدرسين</h5>
+                            <a href="@Url.Action("AssignInstructor", "Dashboard", new { area = "Admin" })" class="btn btn-primary">
+                                <i class="fas fa-user-plus ms-2"></i>
                                 تعيين أول مدرس
                             </a>
                         </div>
@@ -146,8 +200,10 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
+            // فلترة حسب الحالة
             $('#statusFilter').change(function() {
                 var status = $(this).val();
                 $('tbody tr').each(function() {
@@ -159,12 +215,92 @@
                 });
             });
 
+            // بحث مباشر
             $('#searchInput').on('keyup', function() {
                 var value = $(this).val().toLowerCase();
                 $('tbody tr').filter(function() {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
             });
+
+            // إظهار رسائل النجاح
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
         });
+
+        // دالة لتأكيد الموافقة على المدرس
+        function confirmApprove(instructorId, instructorName) {
+            Swal.fire({
+                title: 'تأكيد الموافقة',
+                html: `هل أنت متأكد من الموافقة على المدرس <strong>${instructorName}</strong>؟`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'نعم، وافق',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(`#approve-form-${instructorId}`).submit();
+                }
+            });
+        }
+
+        // دالة لتأكيد رفض المدرس
+        function confirmReject(instructorId, instructorName) {
+            Swal.fire({
+                title: 'تأكيد الرفض',
+                html: `هل أنت متأكد من رفض المدرس <strong>${instructorName}</strong>؟`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'نعم، ارفض',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(`#reject-form-${instructorId}`).submit();
+                }
+            });
+        }
+
+        // دالة لتأكيد تعطيل/تفعيل المدرس
+        function toggleInstructorStatus(id, name) {
+            Swal.fire({
+                title: 'تأكيد',
+                text: `هل أنت متأكد من تغيير حالة المدرس ${name}؟`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'نعم',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Admin/Dashboard/ToggleInstructorStatus/' + id)
+                        .done(function(response) {
+                            if (response.success) {
+                                Swal.fire('تم', response.message, 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('خطأ', response.message, 'error');
+                            }
+                        })
+                        .fail(function() {
+                            Swal.fire('خطأ', 'حدث خطأ في الاتصال', 'error');
+                        });
+                }
+            });
+        }
     </script>
 }

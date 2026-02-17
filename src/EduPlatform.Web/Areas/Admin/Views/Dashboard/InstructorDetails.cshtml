@@ -1,0 +1,214 @@
+﻿@model EduPlatform.Web.ViewModels.Admin.InstructorDetailsViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل المدرس";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-in">
+    <!-- عنوان الصفحة مع الأزرار -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-chalkboard-teacher text-primary ms-2"></i>
+            تفاصيل المدرس: @Model.Name
+        </h1>
+        <div>
+            <a href="@Url.Action("Instructors", "Dashboard", new { area = "Admin" })" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-right ms-2"></i>
+                العودة للقائمة
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- العمود الأيمن: المعلومات الشخصية -->
+        <div class="col-md-4">
+            <!-- بطاقة المعلومات الأساسية -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4">
+                            <i class="fas fa-user-circle fa-4x text-primary"></i>
+                        </div>
+                    </div>
+
+                    <h4 class="mb-1">@Model.Name</h4>
+                    <p class="text-muted mb-3">@Model.Subject</p>
+
+                    <div class="mb-3">
+                        @switch (Model.Status)
+                        {
+                            case "Pending":
+                                <span class="badge bg-warning text-dark px-3 py-2">
+                                    <i class="fas fa-clock ms-1"></i> معلق
+                                </span>
+                                break;
+                            case "Approved":
+                                <span class="badge bg-success px-3 py-2">
+                                    <i class="fas fa-check ms-1"></i> معتمد
+                                </span>
+                                break;
+                            case "Rejected":
+                                <span class="badge bg-danger px-3 py-2">
+                                    <i class="fas fa-times ms-1"></i> مرفوض
+                                </span>
+                                break;
+                        }
+                    </div>
+
+                    <hr />
+
+                    <div class="text-start">
+                        <div class="mb-2">
+                            <i class="fas fa-envelope text-primary ms-2"></i>
+                            <strong>البريد الإلكتروني:</strong>
+                            <div class="mt-1">@Model.Email</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <i class="fas fa-phone text-primary ms-2"></i>
+                            <strong>رقم الهاتف:</strong>
+                            <div class="mt-1">@Model.PhoneNumber</div>
+                        </div>
+
+                        <div class="mb-2">
+                            <i class="fas fa-calendar-alt text-primary ms-2"></i>
+                            <strong>تاريخ التسجيل:</strong>
+                            <div class="mt-1">@Model.RegisteredAt.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+
+                        @if (Model.ApprovedAt.HasValue)
+                        {
+                            <div class="mb-2">
+                                <i class="fas fa-check-circle text-success ms-2"></i>
+                                <strong>تاريخ الاعتماد:</strong>
+                                <div class="mt-1">@Model.ApprovedAt.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة السيرة الذاتية -->
+            @if (!string.IsNullOrEmpty(Model.Bio))
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle text-primary ms-2"></i>
+                            السيرة الذاتية
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">@Model.Bio</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- العمود الأيسر: الإحصائيات والكورسات -->
+        <div class="col-md-8">
+            <!-- بطاقات الإحصائيات -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-6">
+                    <div class="card shadow-sm bg-primary bg-opacity-10 border-0">
+                        <div class="card-body text-center">
+                            <h3 class="fw-bold text-primary mb-1">@Model.TotalCourses</h3>
+                            <small class="text-muted">كورسات</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-6">
+                    <div class="card shadow-sm bg-success bg-opacity-10 border-0">
+                        <div class="card-body text-center">
+                            <h3 class="fw-bold text-success mb-1">@Model.TotalStudents</h3>
+                            <small class="text-muted">طلاب</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-6">
+                    <div class="card shadow-sm bg-warning bg-opacity-10 border-0">
+                        <div class="card-body text-center">
+                            <h3 class="fw-bold text-warning mb-1">@Model.TotalVideos</h3>
+                            <small class="text-muted">فيديوهات</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-6">
+                    <div class="card shadow-sm bg-info bg-opacity-10 border-0">
+                        <div class="card-body text-center">
+                            <h3 class="fw-bold text-info mb-1">@Model.TotalQuizzes</h3>
+                            <small class="text-muted">كويزات</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أحدث الكورسات -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book-open text-primary ms-2"></i>
+                        أحدث الكورسات
+                    </h5>
+                    <a href="@Url.Action("InstructorCourses", "Dashboard", new { area = "Admin", id = Model.Id })"
+                       class="btn btn-sm btn-outline-primary">
+                        عرض الكل
+                        <i class="fas fa-arrow-left ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (!Model.RecentCourses.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">لا توجد كورسات لهذا المدرس</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>اسم الكورس</th>
+                                        <th>السعر</th>
+                                        <th>عدد الطلاب</th>
+                                        <th>تاريخ الإضافة</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in Model.RecentCourses)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@course.Title</td>
+                                            <td>@course.Price.ToString("N0") ج.م</td>
+                                            <td>
+                                                <span class="badge bg-info">@course.StudentsCount</span>
+                                            </td>
+                                            <td>@course.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                <a href="@Url.Action("Details", "Course", new { area = "Admin", id = course.Id })"
+                                                   class="btn btn-sm btn-outline-info" title="عرض الكورس">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
