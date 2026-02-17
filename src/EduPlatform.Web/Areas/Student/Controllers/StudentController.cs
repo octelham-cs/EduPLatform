@@ -28,10 +28,11 @@ namespace EduPlatform.Web.Areas.Student.Controllers
             _logger = logger;
         }
 
+        // ============= S1: Dashboard & Code Activation =============
+
         // GET: /Student/Student/Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            // نجيب الطالب الحالي
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var student = await _context.Students
                 .Include(s => s.User)
@@ -42,7 +43,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 return NotFound("الطالب غير موجود");
             }
 
-            // نجيب الاشتراكات النشطة
             var enrollments = await _context.Enrollments
                 .Include(e => e.Course)
                     .ThenInclude(c => c.Instructor)
@@ -59,12 +59,10 @@ namespace EduPlatform.Web.Areas.Student.Controllers
 
             foreach (var enrollment in enrollments)
             {
-                // حساب عدد الفيديوهات
                 var totalVideos = enrollment.Course.Chapters?
                     .SelectMany(ch => ch.Videos ?? new List<Video>())
                     .Count() ?? 0;
 
-                // حساب الفيديوهات المشاهدة
                 var watchedVideos = await _context.VideoProgresses
                     .CountAsync(vp => vp.StudentId == student.Id &&
                                       vp.Video.Chapter.CourseId == enrollment.CourseId &&
@@ -79,7 +77,7 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                     CourseTitle = enrollment.Course.Title,
                     CourseDescription = enrollment.Course.Description,
                     InstructorName = enrollment.Course.Instructor?.User?.FullName ?? "غير معروف",
-                    ThumbnailUrl = "/images/course-default.jpg", // هنضيف thumbnails بعدين
+                    ThumbnailUrl = "/images/course-default.jpg",
                     Price = enrollment.EnrollmentCode?.Price ?? 0,
                     EnrolledAt = enrollment.EnrolledAt,
                     ExpiresAt = enrollment.ExpiresAt,
@@ -135,7 +133,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
 
                 if (result.Success)
                 {
-                    // ✅ نجيب آخر اشتراك للطالب
                     var enrollment = await _context.Enrollments
                         .Include(e => e.Course)
                             .ThenInclude(c => c.Instructor)
@@ -174,10 +171,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
             }
         }
 
-
-
-
-
         // GET: /Student/Student/MyEnrollments
         public async Task<IActionResult> MyEnrollments(string status = "active")
         {
@@ -210,12 +203,10 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 .OrderByDescending(e => e.EnrolledAt)
                 .ToListAsync();
 
-            // TODO: Map to ViewModel
             return View(enrollments);
         }
 
-
-
+        // ============= S2: Course Details & Video Player =============
 
         // GET: /Student/Student/CourseDetails/5
         public async Task<IActionResult> CourseDetails(int id)
@@ -229,7 +220,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 return NotFound();
             }
 
-            // نتأكد إن الطالب مشترك في الكورس ده
             var enrollment = await _context.Enrollments
                 .Include(e => e.Course)
                     .ThenInclude(c => c.Instructor)
@@ -243,14 +233,12 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 return Unauthorized("أنت غير مشترك في هذا الكورس");
             }
 
-            // نجيب Chapters مع الفيديوهات
             var chapters = await _context.Chapters
                 .Include(ch => ch.Videos)
                 .Where(ch => ch.CourseId == id)
                 .OrderBy(ch => ch.Order)
                 .ToListAsync();
 
-            // حساب إجمالي الفيديوهات والمشاهدة
             var allVideos = chapters.SelectMany(ch => ch.Videos ?? new List<Video>()).ToList();
             var totalVideos = allVideos.Count;
 
@@ -261,34 +249,27 @@ namespace EduPlatform.Web.Areas.Student.Controllers
 
             var progress = totalVideos > 0 ? (watchedVideos * 100) / totalVideos : 0;
 
-            // تجهيز الـ ViewModel
             var chapterViewModels = new List<ChapterViewModel>();
 
             foreach (var chapter in chapters)
             {
                 var videoItems = new List<VideoItemViewModel>();
 
-                // ✅ التعديل هنا - إزالة الـ '??' مع OrderBy
                 var videosInChapter = chapter.Videos ?? new List<Video>();
                 var orderedVideos = videosInChapter.OrderBy(v => v.Order);
 
                 foreach (var video in orderedVideos)
                 {
-                    // نشوف الفيديو اتشاف ولا لأ
                     var progressRecord = await _context.VideoProgresses
                         .FirstOrDefaultAsync(vp => vp.StudentId == student.Id && vp.VideoId == video.Id);
 
-                    // نجيب الكويز بتاع الفيديو لو موجود
                     var quiz = await _context.Quizzes
                         .FirstOrDefaultAsync(q => q.VideoId == video.Id);
 
-                    // نشوف الفيديو مقفول ولا لأ
                     bool isLocked = false;
 
-                    // لو مش أول فيديو في الباب
                     if (video.Order > 1)
                     {
-                        // بنجيب الفيديو اللي قبله
                         var previousVideo = await _context.Videos
                             .Where(v => v.ChapterId == video.ChapterId && v.Order == video.Order - 1)
                             .FirstOrDefaultAsync();
@@ -300,7 +281,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                                                vp.VideoId == previousVideo.Id &&
                                                vp.IsCompleted);
 
-                            // لو الفيديو اللي قبله مش متشاف، يبقى مقفول
                             if (!previousWatched)
                             {
                                 isLocked = true;
@@ -352,8 +332,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
             return View(viewModel);
         }
 
-
-
         // GET: /Student/Student/WatchVideo/5
         public async Task<IActionResult> WatchVideo(int id)
         {
@@ -366,7 +344,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 return NotFound();
             }
 
-            // نجيب الفيديو مع الكورس بتاعه
             var video = await _context.Videos
                 .Include(v => v.Chapter)
                     .ThenInclude(ch => ch.Course)
@@ -380,7 +357,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 return NotFound();
             }
 
-            // نتأكد إن الطالب مشترك في الكورس
             var enrollment = await _context.Enrollments
                 .FirstOrDefaultAsync(e => e.StudentId == student.Id &&
                                           e.CourseId == video.Chapter.CourseId &&
@@ -391,7 +367,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 return Unauthorized("أنت غير مشترك في هذا الكورس");
             }
 
-            // نجيب الفيديو اللي قبله واللي بعده
             var previousVideo = await _context.Videos
                 .Where(v => v.ChapterId == video.ChapterId && v.Order == video.Order - 1)
                 .FirstOrDefaultAsync();
@@ -400,15 +375,12 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 .Where(v => v.ChapterId == video.ChapterId && v.Order == video.Order + 1)
                 .FirstOrDefaultAsync();
 
-            // نجيب تقدم الطالب في الفيديو ده
             var progress = await _context.VideoProgresses
                 .FirstOrDefaultAsync(vp => vp.StudentId == student.Id && vp.VideoId == video.Id);
 
-            // نجيب الكويز بتاع الفيديو لو موجود
             var videoQuiz = await _context.Quizzes
                 .FirstOrDefaultAsync(q => q.VideoId == video.Id);
 
-            // نشوف لو الطالب عدى الكويز ده قبل كده
             bool quizPassed = false;
             if (videoQuiz != null)
             {
@@ -418,7 +390,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                                    qa.Passed);
             }
 
-            // تحويل الملفات المرفقة
             var attachedFiles = video.AttachedFiles?.Select(f => new AttachedFileViewModel
             {
                 FileId = f.Id,
@@ -429,7 +400,6 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 FormattedFileSize = FormatFileSize(f.FileSize)
             }).ToList() ?? new List<AttachedFileViewModel>();
 
-            // استخراج YouTube Embed URL
             string embedUrl = ExtractYouTubeEmbedUrl(video.YouTubeUrl);
 
             var viewModel = new VideoPlayerViewModel
@@ -440,31 +410,22 @@ namespace EduPlatform.Web.Areas.Student.Controllers
                 YouTubeUrl = video.YouTubeUrl,
                 YouTubeEmbedUrl = embedUrl,
                 DurationSeconds = video.DurationSeconds,
-
                 CourseId = video.Chapter.CourseId,
                 CourseTitle = video.Chapter.Course.Title,
-
                 ChapterId = video.ChapterId,
                 ChapterTitle = video.Chapter.Title,
-
                 PreviousVideoId = previousVideo?.Id,
                 NextVideoId = nextVideo?.Id,
-
                 AttachedFiles = attachedFiles,
-
                 HasQuiz = videoQuiz != null,
                 QuizId = videoQuiz?.Id,
                 QuizPassed = quizPassed,
-
                 LastPosition = progress?.LastPosition ?? 0,
                 IsCompleted = progress?.IsCompleted ?? false
             };
 
             return View(viewModel);
         }
-
-
-
 
         // POST: /Student/Student/UpdateVideoProgress
         [HttpPost]
@@ -542,13 +503,11 @@ namespace EduPlatform.Web.Areas.Student.Controllers
             return File(memory, GetContentType(path), file.FileName);
         }
 
-        // Helper Methods
+        // ============= Helper Methods =============
+
         private string ExtractYouTubeEmbedUrl(string url)
         {
             if (string.IsNullOrEmpty(url)) return "";
-
-            // https://youtu.be/VIDEO_ID
-            // https://www.youtube.com/watch?v=VIDEO_ID
 
             string videoId = "";
 
@@ -581,17 +540,17 @@ namespace EduPlatform.Web.Areas.Student.Controllers
         private string GetContentType(string path)
         {
             var types = new Dictionary<string, string>
-    {
-        { ".pdf", "application/pdf" },
-        { ".doc", "application/msword" },
-        { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-        { ".xls", "application/vnd.ms-excel" },
-        { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-        { ".jpg", "image/jpeg" },
-        { ".jpeg", "image/jpeg" },
-        { ".png", "image/png" },
-        { ".mp4", "video/mp4" }
-    };
+            {
+                { ".pdf", "application/pdf" },
+                { ".doc", "application/msword" },
+                { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+                { ".xls", "application/vnd.ms-excel" },
+                { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+                { ".jpg", "image/jpeg" },
+                { ".jpeg", "image/jpeg" },
+                { ".png", "image/png" },
+                { ".mp4", "video/mp4" }
+            };
 
             var ext = Path.GetExtension(path).ToLowerInvariant();
             return types.ContainsKey(ext) ? types[ext] : "application/octet-stream";
