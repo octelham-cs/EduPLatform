@@ -1,0 +1,96 @@
+﻿@model EduPlatform.Web.ViewModels.Admin.StudentEditViewModel
+
+@{
+    ViewData["Title"] = "تعديل بيانات الطالب";
+}
+
+<div class="container-fluid fade-in">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2 text-primary"></i>
+                        تعديل بيانات الطالب
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- الاسم الكامل -->
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label fw-bold"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="أدخل الاسم الكامل" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <!-- البريد الإلكتروني -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" class="form-control" type="email" placeholder="example@domain.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <!-- رقم الهاتف -->
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label fw-bold"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="01xxxxxxxxx" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <!-- المستوى الدراسي -->
+                        <div class="mb-3">
+                            <label asp-for="GradeLevelId" class="form-label fw-bold"></label>
+                            <select asp-for="GradeLevelId" class="form-select">
+                                <option value="">-- اختر المستوى --</option>
+                                @foreach (var level in Model.GradeLevels)
+                                {
+                                    <option value="@level.Id">@level.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="GradeLevelId" class="text-danger"></span>
+                        </div>
+
+                        <!-- الشعبة -->
+                        <div class="mb-3">
+                            <label asp-for="BranchId" class="form-label fw-bold"></label>
+                            <select asp-for="BranchId" class="form-select">
+                                <option value="">-- اختر الشعبة (اختياري) --</option>
+                                @foreach (var branch in Model.Branches)
+                                {
+                                    <option value="@branch.Id">@branch.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                        </div>
+
+                        <!-- حالة الحساب -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" />
+                                <label asp-for="IsActive" class="form-check-label fw-bold">
+                                    حساب نشط
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right me-1"></i> رجوع
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> حفظ التعديلات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
