@@ -1,0 +1,84 @@
+﻿@model EduPlatform.Web.ViewModels.Admin.SubjectEditViewModel
+
+@{
+    ViewData["Title"] = "تعديل المادة";
+}
+
+<div class="container-fluid fade-in">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2 text-primary"></i>
+                        تعديل المادة: @Model.Name
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NameEn" class="form-label fw-bold"></label>
+                            <input asp-for="NameEn" class="form-control" />
+                            <span asp-validation-for="NameEn" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="GradeLevelId" class="form-label fw-bold"></label>
+                            <select asp-for="GradeLevelId" class="form-select">
+                                <option value="">-- اختر المستوى --</option>
+                                @foreach (var level in Model.GradeLevels)
+                                {
+                                    <option value="@level.Id">@level.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="GradeLevelId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="BranchId" class="form-label fw-bold"></label>
+                            <select asp-for="BranchId" class="form-select">
+                                <option value="">-- عام (بدون شعبة) --</option>
+                                @foreach (var branch in Model.Branches)
+                                {
+                                    <option value="@branch.Id">@branch.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" />
+                                <label asp-for="IsActive" class="form-check-label fw-bold">
+                                    المادة نشطة
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right me-1"></i> رجوع
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> حفظ التعديلات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
