@@ -2,58 +2,66 @@
 
 @{
     ViewData["Title"] = "تعديل المادة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid fade-in">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card">
-                <div class="card-header">
+        <div class="col-md-8">
+            <!-- بطاقة تعديل المادة -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
                     <h5 class="mb-0">
-                        <i class="fas fa-edit me-2 text-primary"></i>
+                        <i class="fas fa-edit text-warning ms-2"></i>
                         تعديل المادة: @Model.Name
                     </h5>
                 </div>
                 <div class="card-body">
                     <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" asp-for="Id" />
 
+                        <!-- الاسم بالعربية -->
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label fw-bold"></label>
-                            <input asp-for="Name" class="form-control" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <input asp-for="Name" class="form-control" placeholder="أدخل اسم المادة بالعربية" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
 
+                        <!-- الاسم بالإنجليزية -->
                         <div class="mb-3">
                             <label asp-for="NameEn" class="form-label fw-bold"></label>
-                            <input asp-for="NameEn" class="form-control" />
-                            <span asp-validation-for="NameEn" class="text-danger"></span>
+                            <input asp-for="NameEn" class="form-control" placeholder="Enter subject name in English" />
+                            <span asp-validation-for="NameEn" class="text-danger small"></span>
                         </div>
 
+                        <!-- المستوى الدراسي -->
                         <div class="mb-3">
                             <label asp-for="GradeLevelId" class="form-label fw-bold"></label>
                             <select asp-for="GradeLevelId" class="form-select">
-                                <option value="">-- اختر المستوى --</option>
+                                <option value="">-- اختر المستوى الدراسي --</option>
                                 @foreach (var level in Model.GradeLevels)
                                 {
                                     <option value="@level.Id">@level.Name</option>
                                 }
                             </select>
-                            <span asp-validation-for="GradeLevelId" class="text-danger"></span>
+                            <span asp-validation-for="GradeLevelId" class="text-danger small"></span>
                         </div>
 
+                        <!-- الشعبة -->
                         <div class="mb-3">
                             <label asp-for="BranchId" class="form-label fw-bold"></label>
                             <select asp-for="BranchId" class="form-select">
-                                <option value="">-- عام (بدون شعبة) --</option>
+                                <option value="">-- بدون شعبة (عام) --</option>
                                 @foreach (var branch in Model.Branches)
                                 {
                                     <option value="@branch.Id">@branch.Name</option>
                                 }
                             </select>
-                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                            <span asp-validation-for="BranchId" class="text-danger small"></span>
                         </div>
 
+                        <!-- الحالة -->
                         <div class="mb-4">
                             <div class="form-check">
                                 <input asp-for="IsActive" class="form-check-input" />
@@ -64,15 +72,36 @@
                         </div>
 
                         <hr />
+
+                        <!-- أزرار التحكم - معدلة بالطريقة الجديدة -->
                         <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-right me-1"></i> رجوع
+                            <a href="@Url.Action("Index", "Subject", new { area = "Admin" })" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right ms-2"></i>
+                                رجوع
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> حفظ التعديلات
+                                <i class="fas fa-save ms-2"></i>
+                                حفظ التعديلات
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- بطاقة مساعدة (اختياري) -->
+            <div class="card shadow-sm mt-3 bg-light">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="fw-bold mb-1">نصائح للتعديل:</h6>
+                            <p class="text-muted small mb-0">
+                                تأكد من كتابة اسم المادة بشكل صحيح. الاسم بالإنجليزي اختياري لكن يفضل إدخاله للتوثيق.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

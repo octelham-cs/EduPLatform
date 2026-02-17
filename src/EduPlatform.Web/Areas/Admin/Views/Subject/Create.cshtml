@@ -2,30 +2,33 @@
 
 @{
     ViewData["Title"] = "إضافة مادة جديدة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid fade-in">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card">
-                <div class="card-header">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
                     <h5 class="mb-0">
-                        <i class="fas fa-plus-circle me-2 text-primary"></i>
+                        <i class="fas fa-plus-circle text-primary ms-2"></i>
                         إضافة مادة جديدة
                     </h5>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+
                         <div class="mb-3">
                             <label asp-for="Name" class="form-label fw-bold"></label>
                             <input asp-for="Name" class="form-control" placeholder="مثال: اللغة العربية" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="NameEn" class="form-label fw-bold"></label>
                             <input asp-for="NameEn" class="form-control" placeholder="Example: Arabic Language" />
-                            <span asp-validation-for="NameEn" class="text-danger"></span>
+                            <span asp-validation-for="NameEn" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
@@ -37,7 +40,7 @@
                                     <option value="@level.Id">@level.Name</option>
                                 }
                             </select>
-                            <span asp-validation-for="GradeLevelId" class="text-danger"></span>
+                            <span asp-validation-for="GradeLevelId" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
@@ -49,7 +52,7 @@
                                     <option value="@branch.Id">@branch.Name</option>
                                 }
                             </select>
-                            <span asp-validation-for="BranchId" class="text-danger"></span>
+                            <span asp-validation-for="BranchId" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-4">
@@ -63,11 +66,11 @@
 
                         <hr />
                         <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-right me-1"></i> رجوع
+                            <a href="@Url.Action("Index", "Subject", new { area = "Admin" })" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-right ms-2"></i> رجوع
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save me-1"></i> حفظ
+                                <i class="fas fa-save ms-2"></i> حفظ
                             </button>
                         </div>
                     </form>

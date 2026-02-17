@@ -1,0 +1,163 @@
+﻿@model EduPlatform.Web.ViewModels.Admin.SubjectDetailsViewModel
+
+@{
+    ViewData["Title"] = "تفاصيل المادة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-in">
+    <!-- عنوان الصفحة -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-book-open text-primary ms-2"></i>
+            تفاصيل المادة
+        </h1>
+        <div>
+
+
+
+            <a href="@Url.Action("Edit", "Subject", new { area = "Admin", id = Model.Id })" class="btn btn-warning">
+                <i class="fas fa-edit ms-2"></i>
+                تعديل
+            </a>
+
+            <a href="@Url.Action("Index", "Subject", new { area = "Admin" })" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-arrow-right ms-2"></i>
+                العودة للقائمة
+            </a>
+
+
+
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- العمود الأيمن: معلومات المادة -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4">
+                            <i class="fas fa-book-open fa-4x text-primary"></i>
+                        </div>
+                    </div>
+
+                    <h4 class="mb-1">@Model.Name</h4>
+                    @if (!string.IsNullOrEmpty(Model.NameEn))
+                    {
+                        <p class="text-muted mb-3">@Model.NameEn</p>
+                    }
+
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <span class="badge bg-info">@Model.GradeLevel</span>
+                        <span class="badge bg-secondary">@Model.Branch</span>
+                    </div>
+
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">نشط</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">غير نشط</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- العمود الأيسر: المدرسين والكورسات -->
+        <div class="col-md-8">
+            <!-- المدرسين -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chalkboard-teacher text-primary ms-2"></i>
+                        المدرسين (@Model.Instructors.Count)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Instructors.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-chalkboard-teacher fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">لا يوجد مدرسين لهذه المادة</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>المدرس</th>
+                                        <th>البريد الإلكتروني</th>
+                                        <th>عدد الطلاب</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var instructor in Model.Instructors)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@instructor.Name</td>
+                                            <td>@instructor.Email</td>
+                                            <td>@instructor.StudentsCount</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- الكورسات -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-video text-primary ms-2"></i>
+                        الكورسات (@Model.Courses.Count)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Courses.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-video fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">لا يوجد كورسات لهذه المادة</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>الكورس</th>
+                                        <th>المدرس</th>
+                                        <th>السعر</th>
+                                        <th>عدد الطلاب</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in Model.Courses)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@course.Title</td>
+                                            <td>@course.InstructorName</td>
+                                            <td>@course.Price.ToString("N0") ج.م</td>
+                                            <td>@course.StudentsCount</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}

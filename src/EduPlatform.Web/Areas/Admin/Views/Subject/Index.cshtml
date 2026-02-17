@@ -2,52 +2,63 @@
 
 @{
     ViewData["Title"] = "إدارة المواد";
+    // هنضيف مسار الـ Layout الرئيسي
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid fade-in">
+    <!-- عنوان الصفحة -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>
+        <h1 class="h3 mb-0">
             <i class="fas fa-book-open text-primary me-2"></i>
             إدارة المواد
-        </h2>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> إضافة مادة جديدة
+        </h1>
+
+
+        <a href="@Url.Action("Create", "Subject", new { area = "Admin" })" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>
+            إضافة مادة جديدة
         </a>
+
+
     </div>
 
-    <div class="card mb-4">
+    <!-- قسم البحث -->
+    <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form method="get" class="row g-3">
-                <div class="col-md-8">
+                <div class="col-md-10">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0">
                             <i class="fas fa-search text-muted"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0"
+                        <input type="text" class="form-control border-start-0 ps-0"
                                name="searchTerm" value="@ViewBag.SearchTerm"
-                               placeholder="بحث باسم المادة...">
+                               placeholder="ابحث باسم المادة..." />
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i> بحث
+                        <i class="fas fa-search me-2"></i>بحث
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div class="card">
+    <!-- جدول المواد -->
+    <div class="card shadow-sm">
         <div class="card-body">
             @if (!Model.Any())
             {
                 <div class="text-center py-5">
-                    <div class="rounded-circle bg-light d-inline-flex p-4 mb-3">
-                        <i class="fas fa-book-open fa-3x text-muted"></i>
+                    <div class="mb-3">
+                        <i class="fas fa-book-open fa-4x text-muted opacity-50"></i>
                     </div>
-                    <h5 class="text-muted">لا يوجد مواد حتى الآن</h5>
-                    <a asp-action="Create" class="btn btn-primary mt-3">
-                        <i class="fas fa-plus me-1"></i> إضافة أول مادة
+                    <h5 class="text-muted mb-3">لا توجد مواد مضافة حتى الآن</h5>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        إضافة أول مادة
                     </a>
                 </div>
             }
@@ -55,7 +66,7 @@
             {
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead>
+                        <thead class="table-light">
                             <tr>
                                 <th>#</th>
                                 <th>المادة</th>
@@ -68,19 +79,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (int i = 0; i < Model.Count; i++)
+                            @{
+                                int counter = ((ViewBag.CurrentPage - 1) * 10) + 1;
+                            }
+                            @foreach (var subject in Model)
                             {
-                                var subject = Model[i];
                                 <tr>
-                                    <td>@((ViewBag.CurrentPage - 1) * 10 + i + 1)</td>
+                                    <td>@(counter++)</td>
                                     <td>
-                                        <div>
-                                            <h6 class="mb-0">@subject.Name</h6>
-                                            @if (!string.IsNullOrEmpty(subject.NameEn))
-                                            {
-                                                <small class="text-muted">@subject.NameEn</small>
-                                            }
-                                        </div>
+                                        <div class="fw-bold">@subject.Name</div>
+                                        @if (!string.IsNullOrEmpty(subject.NameEn))
+                                        {
+                                            <small class="text-muted">@subject.NameEn</small>
+                                        }
                                     </td>
                                     <td>@subject.GradeLevel</td>
                                     <td>@subject.Branch</td>
@@ -102,15 +113,23 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a asp-action="Details" asp-route-id="@subject.Id"
+
+
+
+                                            <a href="@Url.Action("Details", "Subject", new { area = "Admin", id = subject.Id })"
                                                class="btn btn-sm btn-outline-info" title="تفاصيل">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a asp-action="Edit" asp-route-id="@subject.Id"
+
+                                            <a href="@Url.Action("Edit", "Subject", new { area = "Admin", id = subject.Id })"
                                                class="btn btn-sm btn-outline-warning" title="تعديل">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm @(subject.IsActive ? "btn-outline-danger" : "btn-outline-success")"
+
+
+
+
+                                            <button type="button" class="btn btn-sm btn-outline-success"
                                                     onclick="toggleStatus(@subject.Id)" title="@(subject.IsActive ? "تعطيل" : "تفعيل")">
                                                 <i class="fas @(subject.IsActive ? "fa-ban" : "fa-check")"></i>
                                             </button>
@@ -126,7 +145,8 @@
                     </table>
                 </div>
 
-                @if (ViewBag.TotalPages > 1)
+                <!-- Pagination -->
+                if (ViewBag.TotalPages > 1)
                 {
                     <nav class="mt-4">
                         <ul class="pagination justify-content-center">
@@ -145,7 +165,6 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleStatus(id) {
             Swal.fire({
