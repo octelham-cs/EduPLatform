@@ -4,6 +4,7 @@ using EduPlatform.Core.Interfaces;
 using EduPlatform.Infrastructure.Data;
 using EduPlatform.Web.ViewModels.Student;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -16,6 +17,7 @@ namespace EduPlatform.Web.Areas.Student.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IEnrollmentService _enrollmentService;
+        private readonly UserManager<ApplicationUser> _userManager;  // أضف السطر ده
         private readonly ILogger<StudentController> _logger;
 
         public StudentController(
@@ -555,5 +557,44 @@ namespace EduPlatform.Web.Areas.Student.Controllers
             var ext = Path.GetExtension(path).ToLowerInvariant();
             return types.ContainsKey(ext) ? types[ext] : "application/octet-stream";
         }
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> RenewEnrollment([FromBody] RenewRequest request)
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                    return Json(new { success = false, message = "حدث خطأ في التحقق من حساب الطالب" });
+
+                var enrollment = await _context.Enrollments
+                    .FirstOrDefaultAsync(e => e.Student != null
+                        && e.Student.UserId == user.Id
+                        && e.CourseId == request.CourseId);
+
+                if (enrollment == null)
+                    return Json(new { success = false, message = "الاشتراك غير موجود" });
+
+                var result = await _enrollmentService.RenewEnrollmentAsync(enrollment.Id, request.Code);
+
+                return Json(new { success = result.Success, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "حدث خطأ أثناء معالجة الطلب" });
+            }
+        }
+
+        public class RenewRequest
+        {
+            public int CourseId { get; set; }
+            public string Code { get; set; } = string.Empty;
+        }
+
+
     }
 }

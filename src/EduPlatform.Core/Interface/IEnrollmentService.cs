@@ -16,5 +16,31 @@ namespace EduPlatform.Core.Interfaces
 
 
         Task<List<Enrollment>> GetStudentEnrollmentsAsync(string userId);
+
+
+
+
+
+        Task<List<Enrollment>> GetActiveEnrollmentsAsync(string userId);
+
+        /// <summary>
+        /// جلب الاشتراكات المنتهية فقط
+        /// </summary>
+        Task<List<Enrollment>> GetExpiredEnrollmentsAsync(string userId);
+
+        /// <summary>
+        /// التحقق من صلاحية اشتراك معين
+        /// </summary>
+        Task<bool> IsEnrollmentValidAsync(int enrollmentId);
+
+        /// <summary>
+        /// تجديد اشتراك منتهي
+        /// </summary>
+        Task<(bool Success, string Message)> RenewEnrollmentAsync(int oldEnrollmentId, string newCode);
+
+        /// <summary>
+        /// فحص الاشتراكات المنتهية (للتشغيل التلقائي)
+        /// </summary>
+        Task CheckExpiredEnrollmentsAsync();
     }
 }
