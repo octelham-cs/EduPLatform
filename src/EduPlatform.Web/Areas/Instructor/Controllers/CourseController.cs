@@ -64,6 +64,21 @@ namespace EduPlatform.Web.Areas.Instructor.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AddCourseViewModel model)
         {
+
+
+            
+        
+
+
+
+
+
+
+
+
+
+
+
             if (!ModelState.IsValid)
             {
                 await LoadSubjectsDropdown();
