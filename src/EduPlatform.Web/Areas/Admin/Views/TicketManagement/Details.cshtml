@@ -1,0 +1,292 @@
+﻿@model EduPlatform.Web.ViewModels.Ticket.TicketDetailsViewModel
+@{
+    ViewData["Title"] = "تفاصيل التذكرة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-in">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Ticket", new { area = "Admin" })">إدارة التذاكر</a>
+                    </li>
+                    <li class="breadcrumb-item active">@Model.Title</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-check-circle ms-2"></i>
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Ticket Details -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h4 class="mb-0">@Model.Title</h4>
+                        <div>
+                            <span class="badge bg-@Model.StatusColor px-3 py-2 ms-2">
+                                @Model.Status
+                            </span>
+                            <span class="badge bg-@Model.PriorityColor px-3 py-2">
+                                @Model.Priority
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-light rounded-circle p-2 ms-2">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">@Model.CreatedByName</div>
+                            <small class="text-muted">@Model.CreatedByEmail · @Model.UserType</small>
+                        </div>
+                    </div>
+
+                    <div class="bg-light p-4 rounded-3 mb-4">
+                        <p class="mb-0">@Model.Description</p>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+                    {
+                        <div class="mb-4">
+                            <span class="fw-semibold">
+                                <i class="fas fa-paperclip ms-1"></i>
+                                المرفقات:
+                            </span>
+                            <a href="@Model.AttachmentPath" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                                <i class="fas fa-download ms-1"></i>
+                                تحميل الملف
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Replies -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments text-primary ms-2"></i>
+                        الردود (@Model.Replies.Count)
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.Replies.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">لا توجد ردود حتى الآن</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var reply in Model.Replies)
+                        {
+                            <div class="d-flex mb-4 @(reply.IsAdmin ? "justify-content-end" : "justify-content-start")">
+                                <div class="bg-@(reply.IsAdmin ? "primary bg-opacity-10" : "light") p-3 rounded-3"
+                                     style="max-width: 80%;">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="bg-@(reply.IsAdmin ? "primary" : "secondary") bg-opacity-10 rounded-circle p-2 ms-2">
+                                            <i class="fas fa-user text-@(reply.IsAdmin ? "primary" : "secondary")"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">
+                                                @reply.UserName
+                                                @if (reply.IsAdmin)
+                                                {
+                                                    <span class="badge bg-primary ms-2">أدمن</span>
+                                                }
+                                            </div>
+                                            <small class="text-muted">@reply.CreatedAtFormatted</small>
+                                        </div>
+                                    </div>
+                                    <p class="mb-2">@reply.Message</p>
+                                    @if (!string.IsNullOrEmpty(reply.AttachmentPath))
+                                    {
+                                        <a href="@reply.AttachmentPath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download ms-1"></i>
+                                            تحميل المرفق
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- Add Reply -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-reply text-primary ms-2"></i>
+                        إضافة رد
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="AddReply" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+
+                        <div class="mb-3">
+                            <textarea name="Message" class="form-control" rows="3"
+                                      placeholder="اكتب ردك هنا..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small">
+                                <i class="fas fa-paperclip ms-1"></i>
+                                مرفق (اختياري)
+                            </label>
+                            <input type="file" name="Attachment" class="form-control"
+                                   accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <!-- زر إرسال الرد -->
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane ms-2"></i>
+                                إرسال الرد
+                            </button>
+
+                            @if (Model.Status != "مغلقة" && Model.Status != "تم الحل")
+                            {
+                                <!-- زر تم الحل - بالطريقة الجديدة مع area -->
+                                <button type="submit"
+                                        formaction="@Url.Action("UpdateStatus", "Ticket", new { area = "Admin", id = Model.Id, status = 3 })"
+                                        class="btn btn-success">
+                                    <i class="fas fa-check ms-2"></i>
+                                    تم الحل
+                                </button>
+
+                                <!-- زر قيد المراجعة - بالطريقة الجديدة مع area -->
+                                <button type="submit"
+                                        formaction="@Url.Action("UpdateStatus", "Ticket", new { area = "Admin", id = Model.Id, status = 2 })"
+                                        class="btn btn-info">
+                                    <i class="fas fa-spinner ms-2"></i>
+                                    قيد المراجعة
+                                </button>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog text-primary ms-2"></i>
+                        تحديث الحالة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateStatus" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">تغيير الحالة</label>
+                            <select name="status" class="form-select">
+                                <option value="1" selected="@(Model.Status == "مفتوحة")">مفتوحة</option>
+                                <option value="2" selected="@(Model.Status == "قيد المراجعة")">قيد المراجعة</option>
+                                <option value="3" selected="@(Model.Status == "تم الحل")">تم الحل</option>
+                                <option value="4" selected="@(Model.Status == "مغلقة")">مغلقة</option>
+                            </select>
+                        </div>
+
+                        <!-- زر تحديث الحالة - بالطريقة الجديدة مع area -->
+                        <button type="submit" formaction="@Url.Action("UpdateStatus", "Ticket", new { area = "Admin" })"
+                                class="btn btn-primary w-100">
+                            <i class="fas fa-save ms-2"></i>
+                            تحديث الحالة
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-primary ms-2"></i>
+                        معلومات التذكرة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <span class="text-muted">رقم التذكرة:</span>
+                            <span class="fw-semibold ms-2">#@Model.Id</span>
+                        </li>
+                        <li class="mb-3">
+                            <span class="text-muted">تاريخ الإنشاء:</span>
+                            <span class="fw-semibold ms-2">@Model.CreatedAtFormatted</span>
+                        </li>
+                        @if (Model.ClosedAt.HasValue)
+                        {
+                            <li class="mb-3">
+                                <span class="text-muted">تاريخ الإغلاق:</span>
+                                <span class="fw-semibold ms-2">@Model.ClosedAt.Value.ToString("yyyy/MM/dd HH:mm")</span>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- زر العودة للقائمة -->
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "Ticket", new { area = "Admin" })" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-right ms-2"></i>
+                            العودة للقائمة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: '@TempData["Error"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+        });
+    </script>
+}

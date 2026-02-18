@@ -1,0 +1,143 @@
+﻿@model EduPlatform.Web.ViewModels.Ticket.CreateTicketViewModel
+@{
+    ViewData["Title"] = "إنشاء تذكرة دعم فني";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- بطاقة إنشاء تذكرة جديدة -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus-circle text-primary ms-2"></i>
+                        إنشاء تذكرة دعم فني جديدة
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <!-- العنوان -->
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold"></label>
+                            <input asp-for="Title" class="form-control form-control-lg"
+                                   placeholder="مثال: مشكلة في تسجيل الدخول" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <!-- الوصف -->
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="5"
+                                      placeholder="اشرح المشكلة بالتفصيل..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                            <small class="text-muted d-block mt-1">
+                                <i class="fas fa-info-circle ms-1"></i>
+                                كلما شرحت المشكلة بتفصيل أكثر، كلما ساعدنا فريق الدعم في حلها بشكل أسرع
+                            </small>
+                        </div>
+
+                        <!-- الأولوية والملف المرفق -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Priority" class="form-label fw-bold"></label>
+                                <select asp-for="Priority" asp-items="Model.Priorities"
+                                        class="form-select">
+                                    <option value="">-- اختر الأولوية --</option>
+                                </select>
+                                <span asp-validation-for="Priority" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Attachment" class="form-label fw-bold"></label>
+                                <input asp-for="Attachment" class="form-control" type="file"
+                                       accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
+                                <span asp-validation-for="Attachment" class="text-danger small"></span>
+                                <small class="text-muted d-block mt-1">
+                                    <i class="fas fa-paperclip ms-1"></i>
+                                    صورة أو ملف (اختياري)
+                                </small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- أزرار التحكم - بالطريقة المطلوبة -->
+                        <div class="d-flex justify-content-between">
+                            <!-- زر الرجوع - بالطريقة الجديدة -->
+                            <a href="@Url.Action("Index", "Ticket", new { area = "Student" })" class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-right ms-2"></i>
+                                رجوع
+                            </a>
+
+                            <!-- زر الإرسال -->
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-paper-plane ms-2"></i>
+                                إرسال التذكرة
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- بطاقة مساعدة (اختياري) -->
+            <div class="card shadow-sm mt-3 bg-light border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-lightbulb text-warning fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="fw-bold mb-1">نصائح قبل الإرسال:</h6>
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                تأكد من كتابة عنوان واضح ومختصر للمشكلة.
+                                <br>
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                اشرح المشكلة بالتفصيل، مع ذكر الخطوات التي قمت بها.
+                                <br>
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                يمكنك إرفاق صورة توضيحية أو ملف (اختياري).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: '@TempData["Error"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+        });
+    </script>
+}

@@ -1,10 +1,11 @@
 using EduPlatform.Core.Entities;
+using EduPlatform.Core.Interfaces;
 using EduPlatform.Infrastructure.Data;
+using EduPlatform.Infrastructure.Services;
 using EduPlatform.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using EduPlatform.Core.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,7 @@ builder.Services.AddSignalR();
 // Services الخاصة بالمشروع
 builder.Services.AddScoped<IEnrollmentService, EduPlatform.Infrastructure.Services.EnrollmentService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 // ===========================================
 // 4. إضافة Session (دعم الجلسات)

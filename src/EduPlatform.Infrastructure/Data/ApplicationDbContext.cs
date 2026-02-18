@@ -32,6 +32,8 @@ namespace EduPlatform.Infrastructure.Data
         public DbSet<Quiz> Quizzes { get; set; }
         public DbSet<QuizAttempt> QuizAttempts { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<SupportTicket> SupportTickets { get; set; }
+        public DbSet<TicketReply> TicketReplies { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -50,6 +52,28 @@ namespace EduPlatform.Infrastructure.Data
       .WithMany()
       .HasForeignKey(i => i.SubjectId)
       .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+            // Support Ticket configurations
+            builder.Entity<SupportTicket>()
+                .HasOne(t => t.CreatedBy)
+                .WithMany()
+                .HasForeignKey(t => t.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SupportTicket>()
+                .HasMany(t => t.Replies)
+                .WithOne(r => r.Ticket)
+                .HasForeignKey(r => r.TicketId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<TicketReply>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

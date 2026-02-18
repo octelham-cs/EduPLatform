@@ -112,6 +112,18 @@
                                 <span>التقارير</span>
                             </a>
                         </li>
+
+
+
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "Ticket") ? "active" : "")"
+                               asp-area="Instructor" asp-controller="Ticket" asp-action="Index">
+                                <i class="fas fa-headset"></i>
+                                <span>الدعم الفني</span>
+                            </a>
+                        </li>
+
+
                     </ul>
                 }
                 else if (User.IsInRole("Admin"))
@@ -156,6 +168,18 @@
                                 <span>الشعب</span>
                             </a>
                         </li>
+
+
+
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "TicketManagement") ? "active" : "")"
+                               asp-area="Admin" asp-controller="TicketManagement" asp-action="Index">
+                                <i class="fas fa-tickets"></i>
+                                <span>إدارة التذاكر</span>
+                            </a>
+                        </li>
+
+
                     </ul>
                 }
                 else if (User.IsInRole("Student"))
@@ -173,6 +197,16 @@
                                href="@Url.Action("MyEnrollments", "Student", new { area = "Student" })">
                                 <i class="fas fa-book-open"></i>
                                 <span>كورساتي</span>
+                            </a>
+                        </li>
+
+
+
+                        <li class="nav-item">
+                            <a class="nav-link @((ViewContext.RouteData.Values["controller"]?.ToString() == "Ticket") ? "active" : "")"
+                               asp-area="Student" asp-controller="Ticket" asp-action="Index">
+                                <i class="fas fa-headset"></i>
+                                <span>الدعم الفني</span>
                             </a>
                         </li>
 

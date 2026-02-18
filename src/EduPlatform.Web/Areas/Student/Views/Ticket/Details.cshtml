@@ -1,0 +1,281 @@
+﻿@model EduPlatform.Web.ViewModels.Ticket.TicketDetailsViewModel
+@{
+    ViewData["Title"] = "تفاصيل التذكرة";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-in">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Ticket", new { area = "Student" })">تذاكر الدعم الفني</a>
+                    </li>
+                    <li class="breadcrumb-item active">@Model.Title</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-check-circle ms-2"></i>
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- التذكرة الرئيسية -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h4 class="mb-0">@Model.Title</h4>
+                        <div>
+                            <span class="badge bg-@Model.StatusColor px-3 py-2 ms-2">
+                                @Model.Status
+                            </span>
+                            <span class="badge bg-@Model.PriorityColor px-3 py-2">
+                                @Model.Priority
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-light rounded-circle p-2 ms-2">
+                            <i class="fas fa-user text-primary"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold">@Model.CreatedByName</div>
+                            <small class="text-muted">@Model.CreatedAtFormatted</small>
+                        </div>
+                    </div>
+
+                    <div class="bg-light p-4 rounded-3 mb-4">
+                        <p class="mb-0">@Model.Description</p>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.AttachmentPath))
+                    {
+                        <div class="mb-4">
+                            <span class="fw-semibold">
+                                <i class="fas fa-paperclip ms-1"></i>
+                                المرفقات:
+                            </span>
+                            <a href="@Model.AttachmentPath" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                                <i class="fas fa-download ms-1"></i>
+                                تحميل الملف
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- الردود -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments text-primary ms-2"></i>
+                        الردود (@Model.Replies.Count)
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (!Model.Replies.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">لا توجد ردود حتى الآن</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var reply in Model.Replies)
+                        {
+                            <div class="d-flex mb-4 @(reply.IsStudent ? "justify-content-start" : "justify-content-end")">
+                                <div class="bg-@(reply.IsStudent ? "light" : "primary bg-opacity-10") p-3 rounded-3"
+                                     style="max-width: 80%;">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="bg-@(reply.IsStudent ? "secondary" : "primary") bg-opacity-10 rounded-circle p-2 ms-2">
+                                            <i class="fas fa-user text-@(reply.IsStudent ? "secondary" : "primary")"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">@reply.UserName</div>
+                                            <small class="text-muted">@reply.CreatedAtFormatted</small>
+                                        </div>
+                                    </div>
+                                    <p class="mb-2">@reply.Message</p>
+                                    @if (!string.IsNullOrEmpty(reply.AttachmentPath))
+                                    {
+                                        <a href="@reply.AttachmentPath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-download ms-1"></i>
+                                            تحميل المرفق
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- إضافة رد -->
+            @if (Model.Status != "مغلقة" && Model.Status != "تم الحل")
+            {
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0">
+                            <i class="fas fa-reply text-primary ms-2"></i>
+                            إضافة رد
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form asp-action="AddReply" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+
+                            <div class="mb-3">
+                                <textarea name="Message" class="form-control" rows="3"
+                                      placeholder="اكتب ردك هنا..." required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small">
+                                    <i class="fas fa-paperclip ms-1"></i>
+                                    مرفق (اختياري)
+                                </label>
+                                <input type="file" name="Attachment" class="form-control"
+                                       accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                @if (Model.Status != "مغلقة")
+                                {
+                                    <!-- زر إرسال الرد -->
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane ms-2"></i>
+                                        إرسال الرد
+                                    </button>
+                                }
+
+                                @if (Model.Status != "مغلقة" && Model.Status != "تم الحل")
+                                {
+                                    <!-- زر إغلاق التذكرة - بالطريقة الجديدة مع SweetAlert -->
+                                    <button type="button" class="btn btn-outline-danger"
+                                            onclick="closeTicket(@Model.Id, '@Model.Title')">
+                                        <i class="fas fa-times-circle ms-2"></i>
+                                        إغلاق التذكرة
+                                    </button>
+                                }
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle text-primary ms-2"></i>
+                        معلومات التذكرة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <span class="text-muted">رقم التذكرة:</span>
+                            <span class="fw-semibold ms-2">#@Model.Id</span>
+                        </li>
+                        <li class="mb-3">
+                            <span class="text-muted">تاريخ الإنشاء:</span>
+                            <span class="fw-semibold ms-2">@Model.CreatedAtFormatted</span>
+                        </li>
+                        @if (Model.ClosedAt.HasValue)
+                        {
+                            <li class="mb-3">
+                                <span class="text-muted">تاريخ الإغلاق:</span>
+                                <span class="fw-semibold ms-2">@Model.ClosedAt.Value.ToString("yyyy/MM/dd HH:mm")</span>
+                            </li>
+                        }
+                    </ul>
+
+                    <!-- زر العودة الإضافي -->
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "Ticket", new { area = "Student" })" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-right ms-2"></i>
+                            العودة للقائمة
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: '@TempData["Error"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+        });
+
+        function closeTicket(id, title) {
+            Swal.fire({
+                title: 'تأكيد إغلاق التذكرة',
+                html: `هل أنت متأكد من إغلاق التذكرة <strong>${title}</strong>؟`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'نعم، أغلق',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // إنشاء form ديناميكياً
+                    var form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = '@Url.Action("Close", "Ticket", new { area = "" })' + '/' + id;
+
+                    // إضافة anti-forgery token
+                    var token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '__RequestVerificationToken';
+                    token.value = $('input[name="__RequestVerificationToken"]').val();
+
+                    form.appendChild(token);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    </script>
+}

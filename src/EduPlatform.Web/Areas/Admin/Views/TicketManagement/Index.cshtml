@@ -1,0 +1,212 @@
+﻿@using EduPlatform.Core.Enums
+@model List<EduPlatform.Web.ViewModels.Ticket.TicketListItemViewModel>
+@{
+    ViewData["Title"] = "إدارة تذاكر الدعم الفني";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var selectedStatus = ViewBag.StatusFilter as TicketStatus?;
+    var selectedPriority = ViewBag.PriorityFilter as TicketPriority?;
+}
+
+<div class="container-fluid fade-in">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-3">
+                <i class="fas fa-tickets text-primary ms-2"></i>
+                إدارة تذاكر الدعم الفني
+            </h1>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning bg-opacity-10 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-folder-open fa-2x text-warning mb-2"></i>
+                    <h3 class="mb-0 fw-bold">@ViewBag.OpenCount</h3>
+                    <small class="text-muted">مفتوحة</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info bg-opacity-10 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-spinner fa-2x text-info mb-2"></i>
+                    <h3 class="mb-0 fw-bold">@ViewBag.InProgressCount</h3>
+                    <small class="text-muted">قيد المراجعة</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success bg-opacity-10 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                    <h3 class="mb-0 fw-bold">@ViewBag.ResolvedCount</h3>
+                    <small class="text-muted">تم الحل</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-secondary bg-opacity-10 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-times-circle fa-2x text-secondary mb-2"></i>
+                    <h3 class="mb-0 fw-bold">@ViewBag.ClosedCount</h3>
+                    <small class="text-muted">مغلقة</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">الحالة</label>
+                    <select name="status" class="form-select">
+                        <option value="">كل الحالات</option>
+                        <option value="1" selected="@(selectedStatus == TicketStatus.Open)">مفتوحة</option>
+                        <option value="2" selected="@(selectedStatus == TicketStatus.InProgress)">قيد المراجعة</option>
+                        <option value="3" selected="@(selectedStatus == TicketStatus.Resolved)">تم الحل</option>
+                        <option value="4" selected="@(selectedStatus == TicketStatus.Closed)">مغلقة</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">الأولوية</label>
+                    <select name="priority" class="form-select">
+                        <option value="">كل الأولويات</option>
+                        <option value="1" selected="@(selectedPriority == TicketPriority.Low)">منخفضة</option>
+                        <option value="2" selected="@(selectedPriority == TicketPriority.Medium)">متوسطة</option>
+                        <option value="3" selected="@(selectedPriority == TicketPriority.High)">عالية</option>
+                        <option value="4" selected="@(selectedPriority == TicketPriority.Urgent)">عاجلة</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <!-- زر التصفية -->
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-filter ms-1"></i>
+                        تصفية
+                    </button>
+
+                    <!-- زر إعادة ضبط - بالطريقة الجديدة مع area -->
+                    <a href="@Url.Action("Index", "Ticket", new { area = "Admin" })" class="btn btn-outline-secondary">
+                        <i class="fas fa-redo ms-1"></i>
+                        إعادة ضبط
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tickets Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>العنوان</th>
+                            <th>المرسل</th>
+                            <th>النوع</th>
+                            <th>الحالة</th>
+                            <th>الأولوية</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>الردود</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (ticket, index) in Model.Select((t, i) => (t, i + 1)))
+                        {
+                            <tr>
+                                <td class="text-muted">@index</td>
+                                <td>
+                                    <div class="fw-semibold">@ticket.Title</div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 ms-2">
+                                            <i class="fas fa-user text-primary small"></i>
+                                        </div>
+                                        <div>
+                                            <div class="small fw-semibold">@ticket.CreatedBy</div>
+                                            <small class="text-muted">@ticket.CreatedByEmail</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@(ticket.UserType == "طالب" ? "info" : "warning") bg-opacity-10
+                                                       text-@(ticket.UserType == "طالب" ? "info" : "warning")">
+                                        @ticket.UserType
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@ticket.StatusColor px-3 py-2">
+                                        @ticket.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@ticket.PriorityColor px-3 py-2">
+                                        @ticket.Priority
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">@ticket.CreatedAtFormatted</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+                                        <i class="fas fa-comment ms-1"></i>
+                                        @ticket.RepliesCount
+                                    </span>
+                                </td>
+                                <td>
+                                    <!-- زر التفاصيل - بالطريقة الجديدة مع area -->
+                                    <a href="@Url.Action("Details", "Ticket", new { area = "Admin", id = ticket.Id })"
+                                       class="btn btn-sm btn-outline-primary" title="تفاصيل">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            @if (TempData["Success"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم',
+                        text: '@TempData["Success"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: '@TempData["Error"]',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+            }
+        });
+    </script>
+}
